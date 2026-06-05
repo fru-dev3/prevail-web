@@ -311,11 +311,10 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
 }
 
 // Brand monogram — gold ◈ with cyan dot in the center
-// Official Prevail logo — two opposing arcs (gold + cyan) on a dark
-// green-teal rounded square. The mark is the council: two AIs facing
-// each other, ready to deliberate. SVG paths byte-identical to
-// public/logo.svg so favicon, og-image, app icon, and inline brand
-// all stay in sync.
+// Official Prevail logo — cyan C on left, gold C on right, with two
+// dots: gold upper-right + cyan lower-left. "Two council members
+// facing each other." SVG byte-identical to public/logo.svg, flat
+// solid colors matching the source image.
 function Logo({ size = 24 }: { size?: number }) {
   return (
     <svg
@@ -324,37 +323,23 @@ function Logo({ size = 24 }: { size?: number }) {
       viewBox="0 0 1024 1024"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <defs>
-        <linearGradient id="prevailBg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#324032" />
-          <stop offset="100%" stopColor="#1f2a1f" />
-        </linearGradient>
-        <linearGradient id="prevailGold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fbd773" />
-          <stop offset="100%" stopColor="#e8b945" />
-        </linearGradient>
-        <linearGradient id="prevailCyan" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#7adceb" />
-          <stop offset="100%" stopColor="#4ab9cc" />
-        </linearGradient>
-      </defs>
-      <rect width="1024" height="1024" rx="224" ry="224" fill="url(#prevailBg)" />
+      <rect width="1024" height="1024" rx="224" ry="224" fill="#2a362a" />
       <path
         d="M 485 694 A 210 210 0 1 0 485 330"
-        stroke="url(#prevailGold)"
+        stroke="#f7c551"
         strokeWidth="124"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M 539 694 A 210 210 0 1 1 539 330"
-        stroke="url(#prevailCyan)"
+        stroke="#60c5d8"
         strokeWidth="124"
         fill="none"
         strokeLinecap="round"
       />
-      <circle cx="700" cy="252" r="44" fill="url(#prevailGold)" />
-      <circle cx="324" cy="772" r="44" fill="url(#prevailCyan)" />
+      <circle cx="700" cy="252" r="44" fill="#f7c551" />
+      <circle cx="324" cy="772" r="44" fill="#60c5d8" />
     </svg>
   );
 }
