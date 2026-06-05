@@ -29,10 +29,10 @@ const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
 const DMG_URL =
-  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.2.0_aarch64.dmg";
+  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.2.1_aarch64.dmg";
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
-const VERSION_DESKTOP = "0.1.0";
+const VERSION_DESKTOP = "0.2.1";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -128,15 +128,23 @@ function McpIcon({ className = "" }: { className?: string }) {
   );
 }
 
-// Hermes brand mark — winged messenger ('H' with wings). References
-// the greek messenger god the user's Hermes agent is named after.
+// Hermes AI brand mark — winged caduceus. References the Greek
+// messenger god Hermes (caduceus = the winged staff with two snakes).
+// Stylized + simplified for icon-scale rendering. No canonical public
+// SVG exists for any product called "Hermes AI" so this is bespoke.
 function HermesBrand({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7l3 1M3 10l3 0M3 13l3-1" />
-      <path d="M21 7l-3 1M21 10l-3 0M21 13l-3-1" />
-      <path d="M9 6v13M15 6v13M9 12h6" strokeWidth="2.2" />
-      <circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {/* Central staff */}
+      <line x1="12" y1="3" x2="12" y2="22" strokeWidth="2" />
+      {/* Ball on top */}
+      <circle cx="12" cy="3.2" r="1.2" fill="currentColor" stroke="none" />
+      {/* Wings — two angled strokes off each side near the top */}
+      <path d="M12 6 Q 7 5.5 4 7.5 Q 7.5 7 9 8.5" />
+      <path d="M12 6 Q 17 5.5 20 7.5 Q 16.5 7 15 8.5" />
+      {/* Two snakes — single S-curves crossing the staff */}
+      <path d="M12 9 C 9 11 15 12 12 14" strokeWidth="1.4" />
+      <path d="M12 14 C 9 16 15 17 12 19" strokeWidth="1.4" />
     </svg>
   );
 }
@@ -1057,8 +1065,8 @@ function LogoBar() {
     { label: "Tailscale", color: "#f5f3ed", render: (c) => <SimpleIcon icon={siTailscale} className={c} /> },
     { label: "Telegram", color: "#229ED9", render: (c) => <SimpleIcon icon={siTelegram} className={c} /> },
     { label: "Multica AI", color: "#f5f3ed", render: (c) => <MulticaBrandReal className={c} /> },
-    { label: "Paperclip AI", color: "#70cbcf", render: (c) => <PaperclipBrandReal className={c} /> },
-    { label: "OpenClaw", color: "#6ee787", render: (c) => <OpenClawBrand className={c} /> },
+    { label: "Paperclip AI", color: "#0092b7", render: (c) => <PaperclipBrandReal className={c} /> },
+    { label: "OpenClaw", color: "#ff4d4d", render: (c) => <OpenClawBrand className={c} /> },
     { label: "Hermes AI", color: "#c4a8ff", render: (c) => <HermesBrand className={c} /> },
   ];
   return (
@@ -2000,14 +2008,34 @@ function lensBlurb(id: string) {
 // Ecosystem: MCP server, Telegram bridge, OpenClaw, Paperclip, Hermes,
 // Multica all share the ~/.ai/ knowledge layer.
 
-// OpenClaw brand mark — chat-bubble silhouette with an open bracket
-// claw inside. Represents the Telegram gateway nature of OpenClaw
-// (the user's own product — no public SVG exists).
+// OpenClaw brand mark — real lobster mark pulled verbatim from
+// https://openclaw.ai/favicon.svg. Body + two claws + antennae + eyes
+// with teal pupils. Recolored via currentColor on the wrapping span,
+// but the gradient defs are inlined so the brand red shows through
+// even on a tinted wrapper.
 function OpenClawBrand({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12a8 8 0 0 1-12.1 6.87L4 20l1.13-4.9A8 8 0 1 1 21 12z" />
-      <path d="M9 9l-2 3 2 3M15 9l2 3-2 3" strokeWidth="2" />
+    <svg viewBox="0 0 120 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="openclaw-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ff4d4d"/>
+          <stop offset="100%" stopColor="#991b1b"/>
+        </linearGradient>
+      </defs>
+      {/* Body */}
+      <path d="M60 10 C30 10 15 35 15 55 C15 75 30 95 45 100 L45 110 L55 110 L55 100 C55 100 60 102 65 100 L65 110 L75 110 L75 100 C90 95 105 75 105 55 C105 35 90 10 60 10Z" fill="url(#openclaw-grad)"/>
+      {/* Left Claw */}
+      <path d="M20 45 C5 40 0 50 5 60 C10 70 20 65 25 55 C28 48 25 45 20 45Z" fill="url(#openclaw-grad)"/>
+      {/* Right Claw */}
+      <path d="M100 45 C115 40 120 50 115 60 C110 70 100 65 95 55 C92 48 95 45 100 45Z" fill="url(#openclaw-grad)"/>
+      {/* Antennae */}
+      <path d="M45 15 Q35 5 30 8" stroke="#ff4d4d" strokeWidth="3" strokeLinecap="round"/>
+      <path d="M75 15 Q85 5 90 8" stroke="#ff4d4d" strokeWidth="3" strokeLinecap="round"/>
+      {/* Eyes */}
+      <circle cx="45" cy="35" r="6" fill="#050810"/>
+      <circle cx="75" cy="35" r="6" fill="#050810"/>
+      <circle cx="46" cy="34" r="2.5" fill="#00e5cc"/>
+      <circle cx="76" cy="34" r="2.5" fill="#00e5cc"/>
     </svg>
   );
 }
@@ -2044,8 +2072,8 @@ function EcosystemSection() {
     render: (cls: string) => ReactNode;
   }> = [
     { name: "Multica AI", color: "#f5f3ed", render: (cls) => <MulticaBrandReal className={cls} /> },
-    { name: "Paperclip AI", color: "#70cbcf", render: (cls) => <PaperclipBrandReal className={cls} /> },
-    { name: "OpenClaw", color: "#6ee787", render: (cls) => <OpenClawBrand className={cls} /> },
+    { name: "Paperclip AI", color: "#0092b7", render: (cls) => <PaperclipBrandReal className={cls} /> },
+    { name: "OpenClaw", color: "#ff4d4d", render: (cls) => <OpenClawBrand className={cls} /> },
     { name: "Hermes AI", color: "#c4a8ff", render: (cls) => <HermesBrand className={cls} /> },
     { name: "MCP", color: "#5fbfff", render: (cls) => <McpIcon className={cls} /> },
     { name: "Telegram", color: "#229ED9", render: (cls) => <SimpleIcon icon={siTelegram} className={cls} /> },

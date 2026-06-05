@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
   <!-- Prevail official logo
-       Two opposing C-arcs (cyan on LEFT, gold on RIGHT) with two
-       small dots floating outside the arcs (gold upper-right,
-       cyan lower-left). Asymmetric placement → "two people in
-       council, facing each other" feel.
-       Solid colors. No transparency. -->
+       Cyan C on LEFT (opens right), Gold C on RIGHT (opens left).
+       Two small dots floating INSIDE the central area enclosed by
+       the two arcs — like two council members seated at a round
+       table, facing each other. Gold dot upper-center, cyan dot
+       lower-center. Flat solid colors. No transparency. -->
 
   <rect width="1024" height="1024" rx="224" ry="224" fill="#2a362a"/>
 
@@ -19,9 +19,9 @@
         stroke="#60c5d8" stroke-width="124" fill="none"
         stroke-linecap="round" />
 
-  <!-- GOLD dot, upper-right -->
-  <circle cx="700" cy="252" r="44" fill="#f7c551"/>
+  <!-- GOLD dot, INSIDE the central area, upper-right of center -->
+  <circle cx="560" cy="400" r="44" fill="#f7c551"/>
 
-  <!-- CYAN dot, lower-left -->
-  <circle cx="324" cy="772" r="44" fill="#60c5d8"/>
+  <!-- CYAN dot, INSIDE the central area, lower-left of center -->
+  <circle cx="464" cy="624" r="44" fill="#60c5d8"/>
 </svg>
