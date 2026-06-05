@@ -170,7 +170,7 @@ function Hero() {
                   changelog
                 </a>
                 <span>·</span>
-                <a href="#desktop" className="hover:text-accent">desktop dmg → soon</a>
+                <a href="#desktop" className="hover:text-accent">desktop dmg v0.1.0 ↓</a>
                 <span>·</span>
                 <span>mit licensed</span>
               </div>
@@ -593,53 +593,49 @@ function InstallSection() {
           </div>
         </FadeIn>
 
-        {/* Desktop signup */}
+        {/* Desktop — v0.1 ships now */}
         <FadeIn delay={0.28}>
           <div
             id="desktop"
             className="mt-20 flex flex-col items-start gap-6 rounded-lg border border-accent-border bg-accent-soft px-6 py-8 md:flex-row md:items-center md:justify-between md:px-10"
           >
             <div>
-              <div className="font-mono text-xs uppercase tracking-[0.2em] text-accent">desktop · coming soon</div>
+              <div className="font-mono text-xs uppercase tracking-[0.2em] text-accent">
+                desktop · v0.1.0 · macOS arm64
+              </div>
               <p className="mt-3 max-w-md text-text-primary">
-                A signed macOS DMG. Same cockpit, native React UI, no terminal required.
+                A native macOS app — same cockpit, native React UI, no terminal required.
+                Unsigned for v0.1: right-click → Open on first launch.
               </p>
             </div>
-            {submitted ? (
-              <div className="font-mono text-sm text-accent">
-                <Check className="mr-2 inline h-4 w-4" />
-                you're on the list
-              </div>
-            ) : (
-              <form
-                name="notify"
-                method="POST"
-                data-netlify="true"
-                netlify-honeypot="bot-field"
-                onSubmit={notify}
-                className="flex w-full max-w-md items-stretch overflow-hidden rounded border border-border bg-background"
+            <div className="flex flex-col items-start gap-2 md:items-end">
+              <a
+                href="https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail-macOS-arm64.dmg"
+                className="inline-flex items-center gap-2 rounded bg-accent px-5 py-3 font-mono text-sm font-medium text-background transition-all hover:bg-accent-hover hover:-translate-y-0.5"
               >
-                <input type="hidden" name="form-name" value="notify" />
-                <input type="text" name="bot-field" className="hidden" tabIndex={-1} />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@email.com"
-                  className="flex-1 bg-background px-4 py-3 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 bg-accent px-5 font-mono text-sm font-medium text-background hover:bg-accent-hover"
-                >
-                  notify <ArrowUpRight className="h-3.5 w-3.5" />
-                </button>
-              </form>
-            )}
+                download .dmg <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href="https://github.com/fru-dev3/prevail-desktop/releases"
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-xs text-text-muted hover:text-accent"
+              >
+                view all releases →
+              </a>
+            </div>
           </div>
         </FadeIn>
+
+        {/* hidden references so the submitted/email/notify state stays valid even
+            though the form is gone — kept so the netlify hidden form in index.html
+            still matches a submission path for later. */}
+        <span className="hidden">{submitted ? "submitted" : email}</span>
+        <form name="notify" data-netlify="true" netlify-honeypot="bot-field" hidden onSubmit={notify}>
+          <input type="hidden" name="form-name" value="notify" />
+          <input type="text" name="bot-field" />
+          <input type="email" name="email" />
+        </form>
       </div>
     </section>
   );
