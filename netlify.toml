@@ -2,6 +2,22 @@
   command = "npm run build"
   publish = "dist"
 
+# Install script — serve the bash installer at /install with the right
+# Content-Type so `curl -fsSL prevail.sh/install | bash` works cleanly.
+# Must come BEFORE the SPA fallback below so it doesn't get swallowed.
+[[redirects]]
+  from = "/install"
+  to = "/install"
+  status = 200
+  force = false
+
+[[headers]]
+  for = "/install"
+  [headers.values]
+    Content-Type = "text/x-shellscript; charset=utf-8"
+    Cache-Control = "public, max-age=300"
+    X-Content-Type-Options = "nosniff"
+
 # SPA fallback — serve index.html for all routes
 [[redirects]]
   from = "/*"
