@@ -346,8 +346,8 @@ function Logo({ size = 24 }: { size?: number }) {
         fill="none"
         strokeLinecap="round"
       />
-      <circle cx="700" cy="252" r="44" fill="#f7c551" />
-      <circle cx="324" cy="772" r="44" fill="#60c5d8" />
+      <circle cx="560" cy="400" r="44" fill="#f7c551" />
+      <circle cx="464" cy="624" r="44" fill="#60c5d8" />
     </svg>
   );
 }
@@ -1013,12 +1013,22 @@ function HardQuestionsSection() {
           </div>
         </FadeIn>
 
-        {/* Closing pitch */}
-        <FadeIn delay={0.4}>
-          <div className="mx-auto mt-16 max-w-4xl rounded-2xl border border-gold-border bg-gradient-to-br from-gold-soft to-transparent p-8 text-center md:p-12">
-            {/* Real model logos — the "best reasoning models" */}
-            <ModelLogoRow />
+      </div>
+    </section>
+  );
+}
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COUNCIL PITCH — model logos + "around one table" + Convene CTA + GitHub
+// star button. Lives right under the hero, above the install section.
+
+function CouncilPitch() {
+  return (
+    <section className="border-t border-border-soft py-16 md:py-20">
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <div className="mx-auto max-w-4xl rounded-2xl border border-gold-border bg-gradient-to-br from-gold-soft to-transparent p-8 text-center md:p-12">
+            <ModelLogoRow />
             <p className="mt-10 text-xl font-medium leading-relaxed md:text-2xl">
               Imagine the best reasoning models on the planet,{" "}
               <span className="text-gold">around one table</span>, working{" "}
@@ -2404,6 +2414,7 @@ export default function App() {
       <Nav theme={theme} onToggleTheme={toggleTheme} />
       <main className="pt-14">
         <Hero />
+        <CouncilPitch />
         <DownloadSection />
         <LogoBar />
         <HardQuestionsSection />
