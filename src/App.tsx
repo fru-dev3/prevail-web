@@ -29,7 +29,7 @@ const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
 const DMG_URL =
-  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.1.0_aarch64.dmg";
+  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.2.0_aarch64.dmg";
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
 const VERSION_DESKTOP = "0.1.0";
