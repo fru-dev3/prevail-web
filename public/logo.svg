@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Prevail official logo
+       Dark green-teal rounded square base, two opposing arcs (gold + cyan)
+       representing the AI council facing each other, with small accent dots.
+  -->
+
+  <!-- Subtle background gradient adds depth without breaking the flat aesthetic -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#324032"/>
+      <stop offset="100%" stop-color="#1f2a1f"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbd773"/>
+      <stop offset="100%" stop-color="#e8b945"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7adceb"/>
+      <stop offset="100%" stop-color="#4ab9cc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square base (no transparency — solid fill) -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner highlight at top — gives the icon dimensionality -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+
+  <!-- LEFT ARC (gold C, opens right) ─────────────────────────────────
+       Center (380, 512), radius 210, stroke 124, opens to the right.
+       Arc from bottom-right (60° below horizontal) up around the LEFT
+       side to top-right (60° above horizontal). Long arc, counterclockwise. -->
+  <path d="M 485 694 A 210 210 0 1 0 485 330"
+        stroke="url(#goldGrad)" stroke-width="124" fill="none"
+        stroke-linecap="round" />
+
+  <!-- RIGHT ARC (cyan C, opens left) ─────────────────────────────────
+       Mirror of the gold arc. Center (644, 512), radius 210, opens left. -->
+  <path d="M 539 694 A 210 210 0 1 1 539 330"
+        stroke="url(#cyanGrad)" stroke-width="124" fill="none"
+        stroke-linecap="round" />
+
+  <!-- Top dot (gold, off-center near top-right of right arc) -->
+  <circle cx="700" cy="252" r="44" fill="url(#goldGrad)"/>
+
+  <!-- Bottom dot (cyan, off-center near bottom-left of left arc) -->
+  <circle cx="324" cy="772" r="44" fill="url(#cyanGrad)"/>
+</svg>
