@@ -6,64 +6,75 @@ Landing page for **Prevail** — *One question. Four engines. One verdict.*
 
 ## Live URLs
 
-| Surface | URL |
-|---|---|
-| **Production (Netlify)** | https://prevail-site.netlify.app |
-| **Custom domain (pending DNS)** | https://prevail.sh |
-| **Repo** | https://github.com/fru-dev3/prevail-site |
-| **Netlify admin** | https://app.netlify.com/projects/prevail-site |
-| **Site ID** | `68129d3b-87a5-4c7f-bc51-78078bd286e2` |
+| Surface | URL | Status |
+|---|---|---|
+| **Primary (custom domain)** | https://prevail.sh | DNS pending at GoDaddy |
+| **Alias** | https://prevail.fru.dev | ✅ live |
+| **Netlify default** | https://prevail-site.netlify.app | ✅ live |
+| **Repo** | https://github.com/fru-dev3/prevail-site | |
+| **Netlify admin** | https://app.netlify.com/projects/prevail-site | |
+| **Site ID** | `68129d3b-87a5-4c7f-bc51-78078bd286e2` | |
 
 ---
 
-## Point `prevail.sh` at Netlify
+## Point `prevail.sh` at Netlify (GoDaddy — 2 records to add)
 
-Add the following records at your registrar (the apex domain `prevail.sh`).
+The domain is registered at **GoDaddy**. The site is already configured on Netlify
+with `prevail.sh` as the primary domain. You just need to add **two DNS records**
+at GoDaddy and SSL will provision automatically within minutes.
 
-### Option A — Netlify DNS (recommended)
+### 1. Sign in to GoDaddy → Domains → prevail.sh → DNS
 
-Delegate the zone to Netlify and let it manage everything (best for cert renewal + edge routing).
+### 2. Add these two records
 
 ```
-NS  prevail.sh.  dns1.p01.nsone.net.
-NS  prevail.sh.  dns2.p01.nsone.net.
-NS  prevail.sh.  dns3.p01.nsone.net.
-NS  prevail.sh.  dns4.p01.nsone.net.
+Type   Name   Value                          TTL
+─────  ─────  ─────────────────────────────  ─────
+A      @      75.2.60.5                      1 hour
+CNAME  www    prevail-site.netlify.app       1 hour
 ```
 
-Then run:
+GoDaddy creates a default `Parked` A record automatically — **delete it** before adding the A record above, otherwise both will conflict.
+
+### 3. Wait 5-30 minutes for DNS propagation
+
+Verify with:
 
 ```bash
-netlify dns:create prevail.sh
-netlify domains:add prevail.sh
+dig prevail.sh +short        # should return 75.2.60.5
+dig www.prevail.sh +short    # should return prevail-site.netlify.app + CNAME chain
 ```
 
-### Option B — Keep current DNS, point records manually
+### 4. SSL provisions automatically
 
-Paste these into your registrar's DNS panel:
-
-```
-# Apex (prevail.sh) — use ALIAS / ANAME / flattened CNAME
-ALIAS  @    apex-loadbalancer.netlify.com.
-
-# www subdomain
-CNAME  www  prevail-site.netlify.app.
-```
-
-> Some registrars don't support `ALIAS`/`ANAME` at the apex. If yours doesn't (e.g. plain GoDaddy), use Netlify's apex A records instead:
->
-> ```
-> A  @  75.2.60.5
-> ```
-
-Then run:
+Once both records resolve, Netlify's automated Let's Encrypt flow issues the cert.
+Check status:
 
 ```bash
-netlify domains:add prevail.sh
-netlify domains:add www.prevail.sh
+netlify api showSiteTLSCertificate \
+  --data='{"site_id":"68129d3b-87a5-4c7f-bc51-78078bd286e2"}'
 ```
 
-SSL is issued automatically via Let's Encrypt once DNS resolves.
+If SSL doesn't auto-issue within an hour, force it:
+
+- Netlify admin → **Domain management** → **HTTPS** → **Verify DNS configuration** → **Provision certificate**
+
+### Alternative — fully delegate DNS to Netlify (skip GoDaddy DNS entirely)
+
+If you prefer Netlify to manage the entire `prevail.sh` zone (same pattern as `fru.dev`), update the **nameservers** at GoDaddy instead of adding the records above:
+
+```
+dns1.p01.nsone.net
+dns2.p01.nsone.net
+dns3.p01.nsone.net
+dns4.p01.nsone.net
+```
+
+(GoDaddy → Domains → prevail.sh → Nameservers → "I'll use my own nameservers".)
+
+Then on the Netlify side, the DNS zone needs creating manually (`netlify api createDnsZone` was 500-ing during initial setup — use the Netlify dashboard's "Set up Netlify DNS" flow instead). Once nameservers propagate, the A/CNAME records are auto-created and SSL provisions.
+
+For most users, **just add the 2 records at GoDaddy** above and move on.
 
 ---
 
