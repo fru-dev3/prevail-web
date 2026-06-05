@@ -593,54 +593,88 @@ function DesktopAppMock() {
           </div>
         </div>
 
-        {/* main pane */}
-        <div className="flex flex-col bg-bg">
-          {/* tab bar */}
-          <div className="flex items-center gap-1 border-b border-border-soft px-4">
-            <button className="relative -mb-px flex items-center gap-2 px-3 py-2.5 text-xs text-gold">
-              <MessageSquare className="h-3 w-3" /> Chat
-              <span className="absolute bottom-0 left-0 right-0 h-px bg-gold" />
-            </button>
+        {/* main pane — COUNCIL TAB active, fan-out + verdict */}
+        <div className="flex min-h-0 flex-col bg-bg">
+          {/* tab bar — Council is active */}
+          <div className="flex shrink-0 items-center gap-1 border-b border-border-soft px-4">
             <button className="flex items-center gap-2 px-3 py-2.5 text-xs text-text-mute">
+              <MessageSquare className="h-3 w-3" /> Chat
+            </button>
+            <button className="relative -mb-px flex items-center gap-2 px-3 py-2.5 text-xs text-gold">
               <Scale className="h-3 w-3" /> Council
+              <span className="absolute bottom-0 left-0 right-0 h-px bg-gold" />
             </button>
             <button className="flex items-center gap-2 px-3 py-2.5 text-xs text-text-mute">
               <Sparkles className="h-3 w-3" /> Benchmark
             </button>
           </div>
 
-          {/* messages */}
-          <div className="space-y-4 px-5 py-5 text-[12px]">
-            {/* User message */}
-            <div className="flex justify-end">
-              <div className="max-w-[80%] rounded-lg border border-border bg-surface-1 px-3 py-2">
-                Should I prepay the mortgage or invest the delta?
+          {/* council body */}
+          <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-hidden px-4 py-3 text-[11px]">
+            {/* Question echo */}
+            <div className="shrink-0 rounded-md border border-border bg-surface-1 px-3 py-2 font-mono text-[10px] text-text-soft">
+              <span className="text-gold">$</span> Should I prepay the mortgage
+              or invest the delta?
+            </div>
+
+            {/* 4 panelist replies in a 2x2 grid */}
+            <div className="grid shrink-0 grid-cols-2 gap-2">
+              {[
+                { name: "claude", color: "#c4a35a", text: "Invest. 22-yr horizon dominates.", done: true },
+                { name: "codex", color: "#5fbfff", text: "Invest. Tax wrapper > prepay.", done: true },
+                { name: "agy", color: "#6ee787", text: "Split. 60/40 toward investing.", done: true },
+                { name: "ollama", color: "#c4a8ff", text: "Prepay. Guaranteed 6.2%.", done: false },
+              ].map((p) => (
+                <div
+                  key={p.name}
+                  className="overflow-hidden rounded-md border border-border bg-surface-1"
+                >
+                  <div className="flex items-center justify-between border-b border-border-soft bg-surface-2 px-2.5 py-1 font-mono text-[9px]">
+                    <span style={{ color: p.color }}>◇ {p.name}</span>
+                    {p.done ? (
+                      <span className="text-ok">✓</span>
+                    ) : (
+                      <span className="pulse-soft text-gold">stream</span>
+                    )}
+                  </div>
+                  <div className="px-2.5 py-1.5 text-[10px] text-text-soft">
+                    {p.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Disagreement panel */}
+            <div className="shrink-0 rounded-md border-l-2 border-gold bg-surface-1 px-3 py-1.5">
+              <div className="font-mono text-[9px] uppercase tracking-wider text-gold">
+                ▸ Where panelists disagreed
+              </div>
+              <div className="mt-0.5 text-[10px] text-text-soft">
+                3/4 favor investment; Ollama anchors on guaranteed return.
               </div>
             </div>
 
-            {/* Assistant block */}
-            <div>
-              <div className="mb-1.5 flex items-center gap-2 font-mono text-[10px] text-text-mute">
-                <span className="text-gold">◇</span>
-                <span className="text-gold">claude</span>
-                <span className="text-ok">✓ done</span>
+            {/* Verdict block */}
+            <div className="shrink-0 rounded-md border border-gold-border bg-gold-soft p-3">
+              <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-gold">
+                <span>◆</span>
+                <span>Verdict · synthesized by claude</span>
               </div>
-              <div className="leading-relaxed text-text">
-                At a 6.2% APR and a 22-year horizon, investing the delta in low-cost
-                index funds dominates after-tax. Three caveats: keep an emergency
-                fund first, then split 60/40 toward investment, and revisit the math
-                each annual review.
+              <div className="mt-1 text-[11px] leading-relaxed text-text">
+                Invest 60% in tax-advantaged index funds. Prepay 40% quarterly.
+                Revisit annually.
                 <span className="blink text-gold">▌</span>
               </div>
             </div>
           </div>
 
           {/* composer */}
-          <div className="mt-auto border-t border-border-soft p-4">
-            <div className="flex items-center gap-2 rounded-md border border-border bg-surface-0 p-2.5 text-[11px] text-text-mute">
-              <span>ask anything · cmd+enter to send</span>
+          <div className="shrink-0 border-t border-border-soft p-3">
+            <div className="flex items-center gap-2 rounded-md border border-border bg-surface-0 p-2 text-[11px] text-text-mute">
+              <Scale className="h-3 w-3 text-gold" />
+              <span>ask the council · cmd+enter to convene</span>
               <div className="ml-auto flex items-center gap-1.5 rounded bg-gold px-2 py-0.5 text-bg">
-                <span>send</span>
+                <span>convene</span>
                 <ArrowRight className="h-3 w-3" />
               </div>
             </div>
