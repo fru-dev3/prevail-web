@@ -5,20 +5,25 @@ import {
   Brain,
   Check,
   Copy,
-  Feather,
   Folder,
-  Github,
   Layers,
   MessageSquare,
-  Monitor,
   Moon,
-  Paperclip as PaperclipIcon,
   Scale,
   Sparkles,
+  Star,
   Sun,
   Terminal,
 } from "lucide-react";
-import { siTelegram } from "simple-icons";
+import {
+  siClaude,
+  siDeepseek,
+  siGooglegemini,
+  siMeta,
+  siMistralai,
+  siOllama,
+  siTelegram,
+} from "simple-icons";
 
 const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
@@ -123,6 +128,156 @@ function McpIcon({ className = "" }: { className?: string }) {
   );
 }
 
+// Paperclip AI brand mark — stylized double-clip suggesting 30 agents
+// attached to one knowledge layer. No public SVG exists for the user's
+// internal Paperclip product, so this is a custom stylized mark.
+function PaperclipBrand({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 7v9.5a4.5 4.5 0 0 1-9 0V6.5a3 3 0 0 1 6 0V15a1.5 1.5 0 0 1-3 0V8" />
+      <circle cx="5" cy="5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="5" cy="19" r="1" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="19" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// Hermes brand mark — winged messenger ('H' with wings). References
+// the greek messenger god the user's Hermes agent is named after.
+function HermesBrand({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {/* Wings — angled lines on each side */}
+      <path d="M3 7l3 1M3 10l3 0M3 13l3-1" />
+      <path d="M21 7l-3 1M21 10l-3 0M21 13l-3-1" />
+      {/* H letterform — center stem */}
+      <path d="M9 6v13M15 6v13M9 12h6" strokeWidth="2.2" />
+      {/* Helm dot at top */}
+      <circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// Multica brand mark — two stacked M's suggesting multi-machine. Two
+// overlapping displays.
+function MulticaBrand({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {/* Back machine */}
+      <rect x="3" y="3" width="14" height="10" rx="1.5" />
+      <path d="M6 16h8M10 13v3" />
+      {/* Front machine (offset) */}
+      <rect x="7" y="9" width="14" height="10" rx="1.5" fill="var(--color-surface-0)" />
+      <path d="M10 22h8M14 19v3" />
+    </svg>
+  );
+}
+
+// Reusable model-logo row — actual brand logos in their official colors.
+// Used to anchor "the best reasoning models" claims visually.
+const COUNCIL_MODELS = [
+  { name: "Claude", icon: siClaude, color: "#cc785c" },
+  { name: "Gemini", icon: siGooglegemini, color: "#4285F4" },
+  { name: "OpenAI", custom: "openai" as const, color: "#10a37f" },
+  { name: "Llama", icon: siMeta, color: "#0866FF" },
+  { name: "Ollama", icon: siOllama, color: "#a3a3a3" },
+  { name: "Mistral", icon: siMistralai, color: "#FF7000" },
+  { name: "DeepSeek", icon: siDeepseek, color: "#4D6BFE" },
+];
+
+// OpenAI starburst — simple-icons doesn't ship one due to trademark
+// constraints, so we render the public-domain hexagonal knot
+// approximation used by community marks.
+function OpenAIMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.205 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.074zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.142-.08 4.774-2.757a.795.795 0 0 0 .392-.681v-6.737l2.018 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.488 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.78 2.756a.78.78 0 0 0 .785 0l5.843-3.369v2.33a.082.082 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.594 3.855L13.075 8.37l2.02-1.169a.076.076 0 0 1 .071 0l4.83 2.792a4.504 4.504 0 0 1-.681 8.116v-5.678a.79.79 0 0 0-.392-.679zm2.01-3.02l-.141-.085-4.774-2.776a.795.795 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.676 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v3l-2.597 1.5-2.607-1.5z" />
+    </svg>
+  );
+}
+
+function ModelLogoRow({ size = "md" }: { size?: "sm" | "md" }) {
+  const dim = size === "sm" ? "h-6 w-6" : "h-8 w-8";
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+      {COUNCIL_MODELS.map((m) => (
+        <div
+          key={m.name}
+          title={m.name}
+          className="flex flex-col items-center gap-1.5 text-text-mute transition-colors hover:text-text"
+        >
+          <div className={dim} style={{ color: m.color }}>
+            {m.custom === "openai" ? (
+              <OpenAIMark className="h-full w-full" />
+            ) : m.icon ? (
+              <SimpleIcon icon={m.icon} className="h-full w-full" />
+            ) : null}
+          </div>
+          <span className="text-[10px] uppercase tracking-wider">{m.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// "Star on GitHub" button with a live star count fetched from the
+// GitHub REST API. Falls back to a static badge if the fetch fails or
+// hasn't returned yet (network blocked, rate limited, etc.).
+function GitHubStarButton({
+  size = "sm",
+  className = "",
+}: {
+  size?: "sm" | "lg";
+  className?: string;
+}) {
+  const [stars, setStars] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("https://api.github.com/repos/fru-dev3/prevail")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled || !j) return;
+        if (typeof j.stargazers_count === "number") setStars(j.stargazers_count);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const isLg = size === "lg";
+  return (
+    <a
+      href={GITHUB_CLI}
+      target="_blank"
+      rel="noreferrer"
+      className={`group inline-flex items-stretch overflow-hidden rounded-md border border-border-soft bg-surface-0 transition-all hover:border-border ${
+        isLg ? "text-sm" : "text-xs"
+      } ${className}`}
+    >
+      <span
+        className={`flex items-center gap-1.5 ${isLg ? "px-4 py-2.5" : "px-3 py-1.5"} text-text-soft group-hover:text-text`}
+      >
+        <Star className={isLg ? "h-4 w-4" : "h-3.5 w-3.5"} />
+        <span className="font-medium">Star</span>
+        <span className="hidden text-text-mute sm:inline">fru-dev3/prevail</span>
+      </span>
+      <span
+        className={`flex items-center border-l border-border-soft bg-surface-1 font-mono font-medium text-text-soft ${
+          isLg ? "px-4" : "px-3"
+        }`}
+      >
+        {stars !== null ? formatStars(stars) : "★"}
+      </span>
+    </a>
+  );
+}
+
+function formatStars(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  return n.toString();
+}
+
 // Reusable mock window chrome — used in every product mockup
 function WindowChrome({
   title,
@@ -174,15 +329,7 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-          <a
-            href={GITHUB_CLI}
-            target="_blank"
-            rel="noreferrer"
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-border-soft text-text-soft hover:bg-surface-1 hover:text-text"
-            aria-label="GitHub"
-          >
-            <Github className="h-4 w-4" />
-          </a>
+          <GitHubStarButton />
           <a
             href={DMG_URL}
             className="inline-flex items-center gap-1.5 rounded-md bg-gold px-4 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
@@ -279,6 +426,7 @@ function Hero() {
                   <Terminal className="h-4 w-4" />
                   Install CLI
                 </a>
+                <GitHubStarButton size="lg" />
               </div>
             </FadeIn>
 
@@ -883,23 +1031,29 @@ function HardQuestionsSection() {
 
         {/* Closing pitch */}
         <FadeIn delay={0.4}>
-          <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-gold-border bg-gradient-to-br from-gold-soft to-transparent p-8 text-center md:p-10">
-            <p className="text-xl font-medium leading-relaxed md:text-2xl">
-              Imagine the four best reasoning models on the planet,{" "}
+          <div className="mx-auto mt-16 max-w-4xl rounded-2xl border border-gold-border bg-gradient-to-br from-gold-soft to-transparent p-8 text-center md:p-12">
+            {/* Real model logos — the "best reasoning models" */}
+            <ModelLogoRow />
+
+            <p className="mt-10 text-xl font-medium leading-relaxed md:text-2xl">
+              Imagine the best reasoning models on the planet,{" "}
               <span className="text-gold">around one table</span>, working{" "}
               <span className="text-gold">your hardest question</span> together.
             </p>
             <p className="mt-4 text-text-soft">
               That's what <Brand /> is. A council of AI for the rest of your life.
             </p>
-            <a
-              href="#install"
-              className="mt-8 inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-              style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-            >
-              Convene the council
-              <ArrowRight className="h-4 w-4" />
-            </a>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="#install"
+                className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+              >
+                Convene the council
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <GitHubStarButton size="lg" />
+            </div>
           </div>
         </FadeIn>
       </div>
@@ -1578,20 +1732,20 @@ function EcosystemSection() {
     {
       title: "Paperclip · 30 agents",
       desc: "Every domain has a specialist agent that distills, summarizes, and stays current. Daily briefs already wait in your inbox.",
-      color: "#c4a8ff",
-      render: (cls) => <PaperclipIcon className={cls} />,
+      color: "#a78bfa",
+      render: (cls) => <PaperclipBrand className={cls} />,
     },
     {
       title: "Multica · multi-machine",
       desc: "Mac Mini source of truth, MacBook over Tailscale, both writing the same files. Zero sync code.",
       color: "#f0c674",
-      render: (cls) => <Monitor className={cls} />,
+      render: (cls) => <MulticaBrand className={cls} />,
     },
     {
       title: "Hermes-compatible",
       desc: "Plug Hermes — or any agent that reads ~/.ai/ — into the same knowledge layer. Open by design.",
       color: "#88d0ff",
-      render: (cls) => <Feather className={cls} />,
+      render: (cls) => <HermesBrand className={cls} />,
     },
   ];
   return (
