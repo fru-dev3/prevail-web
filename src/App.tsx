@@ -21,6 +21,7 @@ import {
   siMeta,
   siMistralai,
   siOllama,
+  siTailscale,
   siTelegram,
 } from "simple-icons";
 
@@ -1021,28 +1022,46 @@ function HardQuestionsSection() {
 // LOGO BAR — gentle social proof / "what you use it with"
 
 function LogoBar() {
-  const items = [
-    { label: "Claude", color: "#c4a35a" },
-    { label: "Codex", color: "#5fbfff" },
-    { label: "Antigravity", color: "#6ee787" },
-    { label: "Ollama", color: "#c4a8ff" },
-    { label: "MCP", color: "#f0c674" },
-    { label: "Tailscale", color: "#88d0ff" },
+  // Real brand logos — every dot has been replaced with an actual SVG
+  // mark in its official brand color. Models on the left, ecosystem
+  // tools on the right.
+  const items: Array<{
+    label: string;
+    color: string;
+    render: (cls: string) => ReactNode;
+  }> = [
+    { label: "Claude", color: "#cc785c", render: (c) => <SimpleIcon icon={siClaude} className={c} /> },
+    { label: "Codex", color: "#10a37f", render: (c) => <OpenAIMark className={c} /> },
+    { label: "Antigravity", color: "#4285F4", render: (c) => <SimpleIcon icon={siGooglegemini} className={c} /> },
+    { label: "Ollama", color: "#f5f3ed", render: (c) => <SimpleIcon icon={siOllama} className={c} /> },
+    { label: "MCP", color: "#5fbfff", render: (c) => <McpIcon className={c} /> },
+    { label: "Tailscale", color: "#f5f3ed", render: (c) => <SimpleIcon icon={siTailscale} className={c} /> },
+    { label: "Telegram", color: "#229ED9", render: (c) => <SimpleIcon icon={siTelegram} className={c} /> },
+    { label: "Multica AI", color: "#f5f3ed", render: (c) => <MulticaBrandReal className={c} /> },
+    { label: "Paperclip AI", color: "#70cbcf", render: (c) => <PaperclipBrandReal className={c} /> },
+    { label: "OpenClaw", color: "#6ee787", render: (c) => <OpenClawBrand className={c} /> },
+    { label: "Hermes AI", color: "#c4a8ff", render: (c) => <HermesBrand className={c} /> },
   ];
   return (
-    <section className="border-y border-border-soft bg-surface-0/30 py-10">
+    <section className="border-y border-border-soft bg-surface-0/30 py-12">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-text-mute">
+        <p className="mb-8 text-center text-xs uppercase tracking-[0.2em] text-text-mute">
           Plays with the tools you already use
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-text-soft">
+        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 md:gap-x-14">
           {items.map((it) => (
-            <div key={it.label} className="flex items-center gap-2 text-sm font-medium">
+            <div
+              key={it.label}
+              title={it.label}
+              className="flex items-center gap-2.5 text-sm font-medium text-text-soft transition-colors hover:text-text"
+            >
               <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: it.color }}
-              />
-              {it.label}
+                className="flex h-5 w-5 items-center justify-center"
+                style={{ color: it.color }}
+              >
+                {it.render("h-5 w-5")}
+              </span>
+              <span>{it.label}</span>
             </div>
           ))}
         </div>
