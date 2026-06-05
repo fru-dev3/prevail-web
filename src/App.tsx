@@ -278,25 +278,32 @@ function formatStars(n: number): string {
   return n.toString();
 }
 
-// Reusable mock window chrome — used in every product mockup
+// Reusable mock window chrome — used in every product mockup.
+// fillParent=true makes the chrome stretch to its container's height so
+// the slider mockups (Desktop ↔ CLI) stay the same size regardless of
+// which one is active.
 function WindowChrome({
   title,
   children,
-  height,
+  fillParent = false,
 }: {
   title: string;
   children: ReactNode;
-  height?: string;
+  fillParent?: boolean;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-surface-0 shadow-2xl">
-      <div className="frost flex items-center gap-2 border-b border-border-soft px-4 py-2.5">
+    <div
+      className={`overflow-hidden rounded-xl border border-border bg-surface-0 shadow-2xl ${
+        fillParent ? "flex h-full flex-col" : ""
+      }`}
+    >
+      <div className="frost flex shrink-0 items-center gap-2 border-b border-border-soft px-4 py-2.5">
         <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
         <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
         <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
         <span className="ml-3 font-mono text-xs text-text-mute">{title}</span>
       </div>
-      <div className={height ?? "h-auto"}>{children}</div>
+      <div className={fillParent ? "flex-1 overflow-hidden" : ""}>{children}</div>
     </div>
   );
 }
@@ -501,8 +508,10 @@ function HeroSlider() {
         </div>
       </div>
 
-      {/* Swap content with crossfade */}
-      <div className="relative">
+      {/* Swap content with crossfade. Container is height-locked so the
+          hero never jumps when the user (or the auto-rotate) toggles
+          tabs — both Desktop and CLI mocks share the same canvas size. */}
+      <div className="relative h-[480px] sm:h-[520px] md:h-[560px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
@@ -510,6 +519,7 @@ function HeroSlider() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.45, ease: EASE }}
+            className="absolute inset-0"
           >
             {active === "desktop" ? <DesktopAppMock /> : <CliMock />}
           </motion.div>
@@ -542,8 +552,8 @@ function HeroSlider() {
 
 function DesktopAppMock() {
   return (
-    <WindowChrome title="Prevail">
-      <div className="grid grid-cols-[180px_1fr] bg-surface-0">
+    <WindowChrome title="Prevail" fillParent>
+      <div className="grid h-full grid-cols-[180px_1fr] bg-surface-0">
         {/* sidebar */}
         <div className="border-r border-border-soft bg-surface-0 p-3">
           <div className="mb-3 px-2 font-mono text-[9px] uppercase tracking-[0.18em] text-text-mute">
@@ -690,190 +700,128 @@ function AsciiPrevail({ size = "sm" }: { size?: "xs" | "sm" | "md" }) {
 
 function CliMock() {
   return (
-    <WindowChrome title="iTerm — prevail">
-      <div className="bg-bg p-4 font-mono text-[10px] leading-[1.4] md:p-5 md:text-[11px]">
-        {/* === BANNER === full 9-row replica */}
-        <div className="border-b border-gold/40 pb-3">
-          <div className="flex items-start gap-5">
-            {/* Mascot + ASCII PREVAIL */}
-            <div className="hidden flex-col items-center text-gold md:flex">
-              <div className="text-[8px] text-gold/60">╲ │ ╱</div>
-              <div className="text-[9px] font-bold text-gold">─ ◈ ─</div>
-              <div className="text-[8px] text-gold/60">╱ │ ╲</div>
-              <div className="mt-1 text-[7px] text-text-mute">EST 2026</div>
+    <WindowChrome title="iTerm — prevail" fillParent>
+      <div className="flex h-full flex-col overflow-hidden bg-bg p-3 font-mono text-[9px] leading-[1.35] md:p-4 md:text-[10px]">
+        {/* === BANNER === tight 5-row replica */}
+        <div className="shrink-0 border-b border-gold/40 pb-2">
+          <div className="flex items-start gap-3">
+            <div className="hidden shrink-0 md:block">
+              <AsciiPrevail size="xs" />
             </div>
-            <div className="hidden md:block">
-              <AsciiPrevail size="sm" />
-            </div>
-            <div className="hidden h-[60px] w-px bg-border md:block" />
-            {/* Status column */}
-            <div className="flex-1">
+            <div className="hidden h-[44px] w-px shrink-0 bg-border md:block" />
+            <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
                 <span className="font-medium text-gold">
-                  THURSDAY, JUNE 5 <span className="text-text-mute">· 2026</span>
+                  THU, JUN 5 · 2026
                 </span>
                 <span className="text-text-mute">
-                  <span className="text-text">20</span> dom ·{" "}
-                  <span className="text-text">19</span> apps ·{" "}
-                  <span className="text-warn">65</span> open
+                  <span className="text-text">20</span>d ·{" "}
+                  <span className="text-text">19</span>a ·{" "}
+                  <span className="text-warn">65</span>o
                 </span>
               </div>
-              <div className="mt-0.5 text-text-mute">
-                07:48 · prevail v{VERSION_CLI} · opentui
+              <div className="mt-0.5 truncate text-text-mute">
+                07:48 · prevail v{VERSION_CLI}
               </div>
               <div className="mt-0.5">
-                <span className="text-text-mute">vault</span>{" "}
-                <span className="text-text">~/Documents/prevail/vault-demo</span>
-              </div>
-              <div className="mt-1">
-                <span className="text-text-mute">defaults</span>{" "}
                 <span className="text-gold">⚖ Council:</span>
                 <span className="text-text">ON</span>{" "}
-                <span className="ml-1 text-gold">◆ Framework:</span>
+                <span className="text-gold">◆ F:</span>
                 <span className="text-text">BLUF</span>{" "}
-                <span className="ml-1 text-gold">◇ Lens:</span>
+                <span className="text-gold">◇ L:</span>
                 <span className="text-text">FIRST</span>
-              </div>
-              <div className="mt-0.5">
-                <span className="text-text-mute">{"        "}</span>
-                <span className="text-gold">⬡ Web:</span>
-                <span className="text-text">ON</span>
-                <span className="ml-3 text-ai">◇ configure</span>
-                <span className="ml-2 text-ai">◈ bench</span>
-                <span className="ml-2 text-ai">▸ tools</span>
               </div>
               <div className="mt-0.5">
                 <span className="text-text-mute">cli</span>{" "}
                 <span style={{ color: "#6ee787" }}>✓ Claude</span>{" "}
                 <span style={{ color: "#6ee787" }}>✓ Codex</span>{" "}
-                <span style={{ color: "#6ee787" }}>✓ Antigravity</span>{" "}
+                <span style={{ color: "#6ee787" }}>✓ Agy</span>{" "}
                 <span style={{ color: "#f0c674" }}>! Ollama</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* === BODY === sidebar + workspace */}
-        <div className="mt-3 grid grid-cols-[120px_1fr] gap-4 md:grid-cols-[150px_1fr] md:gap-5">
-          {/* SIDEBAR */}
-          <div>
-            <div className="text-[9px] font-medium text-gold">
-              LIFE DOMAINS · 20 ●
+        {/* === BODY === sidebar + workspace — fills remaining height */}
+        <div className="mt-2 grid min-h-0 flex-1 grid-cols-[88px_1fr] gap-3 md:grid-cols-[110px_1fr]">
+          {/* SIDEBAR — trimmed to 7 visible domains */}
+          <div className="min-h-0 overflow-hidden">
+            <div className="text-[8px] font-medium text-gold">
+              DOMAINS · 20 ●
             </div>
-            <div className="mt-2 space-y-[1px]">
+            <div className="mt-1.5 space-y-[1px]">
               {[
-                { d: "chief", g: "◆", c: "10", active: true },
-                { d: "vision", g: "★", c: "10" },
-                { d: "wealth", g: "¤", c: "14" },
-                { d: "health", g: "♥", c: "14" },
-                { d: "tax", g: "§", c: "14" },
-                { d: "calendar", g: "▦", c: "11" },
-                { d: "career", g: "▲", c: "14" },
-                { d: "business", g: "◈", c: "11" },
-                { d: "estate", g: "⌂", c: "11" },
-                { d: "real-estate", g: "⊓", c: "9" },
-                { d: "insurance", g: "+", c: "10" },
-                { d: "benefits", g: "✚", c: "11" },
-                { d: "brand", g: "※", c: "10" },
-                { d: "content", g: "¶", c: "11" },
-                { d: "social", g: "◯", c: "9" },
+                { d: "chief", g: "◆", active: true },
+                { d: "vision", g: "★" },
+                { d: "wealth", g: "¤" },
+                { d: "health", g: "♥" },
+                { d: "tax", g: "§" },
+                { d: "career", g: "▲" },
+                { d: "business", g: "◈" },
               ].map((row) => (
                 <div
                   key={row.d}
-                  className={`flex items-center justify-between ${
-                    row.active ? "text-text" : "text-text-mute"
-                  }`}
+                  className={row.active ? "text-text" : "text-text-mute"}
                 >
-                  <span>
-                    <span className={row.active ? "text-gold" : ""}>
-                      {row.active ? "›" : " "}
-                    </span>{" "}
-                    <span className={row.active ? "text-gold" : ""}>{row.g}</span>{" "}
-                    {row.d}
-                  </span>
-                  <span className="text-text-mute">{row.c}</span>
+                  <span className={row.active ? "text-gold" : ""}>
+                    {row.active ? "›" : " "}
+                  </span>{" "}
+                  <span className={row.active ? "text-gold" : ""}>{row.g}</span>{" "}
+                  {row.d}
                 </div>
               ))}
-            </div>
-            <div className="mt-3 border-t border-border-soft pt-2 text-[9px] text-gold">
-              + new domain
             </div>
           </div>
 
           {/* WORKSPACE PANE */}
-          <div className="rounded border border-border-soft p-3">
-            {/* Workspace title + tabs */}
-            <div className="mb-1.5 text-gold">chief</div>
-            <div className="text-text-mute">
-              <span className="rounded border border-gold-border bg-gold-soft px-1.5 py-0.5 text-gold">
+          <div className="flex min-h-0 flex-col overflow-hidden rounded border border-border-soft p-2.5">
+            <div className="text-gold">chief</div>
+            <div className="mt-1 text-text-mute">
+              <span className="rounded border border-gold-border bg-gold-soft px-1 py-0.5 text-gold">
                 [chat]
-              </span>{" "}
-              · state · quick start · prompts · skills{" "}
-              <span className="ml-2" style={{ color: "#6ee787" }}>✓ ▸Claude</span>
-              <span className="ml-2" style={{ color: "#6ee787" }}>✓ Codex</span>
-              <span className="ml-2" style={{ color: "#6ee787" }}>✓ Antigravity</span>
+              </span>
+              {" "}· state · prompts · skills
             </div>
 
-            <div className="mt-3 text-text-mute">
-              ready · seeded with the active tab
-            </div>
-
-            {/* Council in motion */}
-            <div className="mt-3">
+            <div className="mt-2.5">
               <span className="text-gold">▸</span>{" "}
               <span className="text-text">
-                /council should I prepay the mortgage or invest the delta?
+                /council should I prepay the mortgage?
               </span>
             </div>
-            <div className="mt-1.5 text-text-soft">
+            <div className="mt-1 text-text-soft">
               <span className="pulse-soft text-gold">◆</span> convening ·{" "}
               <span style={{ color: "#c4a35a" }}>claude</span> ·{" "}
               <span style={{ color: "#5fbfff" }}>codex</span> ·{" "}
-              <span style={{ color: "#6ee787" }}>antigravity</span> ·{" "}
+              <span style={{ color: "#6ee787" }}>agy</span> ·{" "}
               <span style={{ color: "#c4a8ff" }}>ollama</span>
             </div>
 
-            {/* Disagreement panel */}
-            <div className="mt-3 rounded border-l-2 border-gold pl-3">
-              <div className="text-[9px] uppercase tracking-wider text-gold">
-                ▸ Where panelists disagreed
+            <div className="mt-2 rounded border-l-2 border-gold pl-2">
+              <div className="text-[8px] uppercase tracking-wider text-gold">
+                ▸ Disagreement
               </div>
-              <div className="mt-1 text-text-soft">
-                3/4 favor investment; Ollama anchors on guaranteed return.
-                Antigravity's split framing is most actionable.
+              <div className="mt-0.5 text-text-soft">
+                3/4 favor invest; Ollama anchors on guaranteed return.
               </div>
             </div>
 
-            {/* Verdict block */}
-            <div className="mt-3 rounded border border-gold-border bg-gold-soft p-2.5">
-              <div className="text-[9px] uppercase tracking-wider text-gold">
-                ◆ Verdict · synthesized by Claude
+            <div className="mt-2 rounded border border-gold-border bg-gold-soft p-2">
+              <div className="text-[8px] uppercase tracking-wider text-gold">
+                ◆ Verdict · by Claude
               </div>
-              <div className="mt-1 text-text">
-                Invest 60% in tax-advantaged index funds via your tax-deferred
-                wrapper. Prepay 40% toward principal each quarter. Revisit
-                annually.
+              <div className="mt-0.5 text-text">
+                Invest 60% in tax-advantaged index funds. Prepay 40%
+                quarterly. Revisit annually.
                 <span className="blink text-gold">▌</span>
               </div>
             </div>
 
-            {/* Stats line */}
-            <div className="mt-3 text-text-mute">
-              0 msgs · updated today · 185 past chats · /search ·{" "}
-              <span className="text-ai">
-                ~/Documents/prevail/vault-demo/chief ↗
-              </span>
-            </div>
-
-            {/* Input row */}
-            <div className="mt-3 border-t border-border-soft pt-2">
-              <div className="text-text-mute">
-                — chat with chief · Claude · esc to return —
-              </div>
-              <div className="mt-2 rounded border border-border bg-bg p-2">
+            <div className="mt-auto pt-2">
+              <div className="rounded border border-border bg-bg p-1.5">
                 <span className="text-gold">›</span>{" "}
                 <span className="text-text-mute">
-                  ask anything · / for commands · enter sends · esc back
+                  ask anything · enter sends
                 </span>
                 <span className="blink ml-1 text-gold">▌</span>
               </div>
@@ -881,13 +829,12 @@ function CliMock() {
           </div>
         </div>
 
-        {/* Footer hint */}
-        <div className="mt-3 border-t border-border-soft pt-2 text-text-mute">
-          <span className="text-gold">[n new]</span> add a domain ·{" "}
-          <span className="text-gold">[c chat]</span> talk to claude ·{" "}
-          <span className="text-gold">[e edit]</span> open in $EDITOR ·{" "}
-          <span className="text-gold">[r refresh]</span> rescan vault ·{" "}
-          <span className="text-gold">[q quit]</span> exit
+        <div className="mt-2 shrink-0 border-t border-border-soft pt-1.5 text-text-mute">
+          <span className="text-gold">[n]</span> new ·{" "}
+          <span className="text-gold">[c]</span> chat ·{" "}
+          <span className="text-gold">[e]</span> edit ·{" "}
+          <span className="text-gold">[r]</span> refresh ·{" "}
+          <span className="text-gold">[q]</span> quit
         </div>
       </div>
     </WindowChrome>
