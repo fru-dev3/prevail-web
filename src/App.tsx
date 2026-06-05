@@ -809,21 +809,38 @@ function CliMock() {
               {" "}· state · prompts · skills
             </div>
 
-            <div className="mt-2.5">
+            <div className="mt-2">
               <span className="text-gold">▸</span>{" "}
               <span className="text-text">
                 /council should I prepay the mortgage?
               </span>
             </div>
-            <div className="mt-1 text-text-soft">
-              <span className="pulse-soft text-gold">◆</span> convening ·{" "}
-              <span style={{ color: "#c4a35a" }}>claude</span> ·{" "}
-              <span style={{ color: "#5fbfff" }}>codex</span> ·{" "}
-              <span style={{ color: "#6ee787" }}>agy</span> ·{" "}
-              <span style={{ color: "#c4a8ff" }}>ollama</span>
+
+            {/* 4 panelist responses — one per line, terminal-styled */}
+            <div className="mt-2 space-y-[2px]">
+              {[
+                { name: "claude", color: "#c4a35a", text: "Invest. 22-yr horizon dominates.", done: true },
+                { name: "codex", color: "#5fbfff", text: "Invest. Tax wrapper > prepay.", done: true },
+                { name: "agy", color: "#6ee787", text: "Split. 60/40 toward investing.", done: true },
+                { name: "ollama", color: "#c4a8ff", text: "Prepay. Guaranteed 6.2%.", done: false },
+              ].map((p) => (
+                <div key={p.name} className="flex items-baseline gap-2">
+                  <span style={{ color: p.color }} className="shrink-0">
+                    ◇ {p.name.padEnd(7, " ")}
+                  </span>
+                  <span className="flex-1 truncate text-text">{p.text}</span>
+                  <span className="shrink-0 text-[8px]">
+                    {p.done ? (
+                      <span className="text-ok">✓</span>
+                    ) : (
+                      <span className="pulse-soft text-gold">●</span>
+                    )}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            <div className="mt-2 rounded border-l-2 border-gold pl-2">
+            <div className="mt-2 rounded border-l-2 border-gold bg-surface-1 pl-2 pr-1 py-1">
               <div className="text-[8px] uppercase tracking-wider text-gold">
                 ▸ Disagreement
               </div>
@@ -838,7 +855,7 @@ function CliMock() {
               </div>
               <div className="mt-0.5 text-text">
                 Invest 60% in tax-advantaged index funds. Prepay 40%
-                quarterly. Revisit annually.
+                quarterly.
                 <span className="blink text-gold">▌</span>
               </div>
             </div>
