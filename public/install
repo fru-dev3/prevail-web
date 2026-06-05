@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+# Prevail installer
+#
+# Usage:
+#   curl -fsSL https://prevail.sh/install | bash
+#
+# Detects your platform, downloads the latest release tarball from
+# https://github.com/fru-dev3/prevail/releases, extracts to ~/.prevail,
+# symlinks the binary into your PATH, and prints next steps.
+#
+# Source: https://github.com/fru-dev3/prevail-site/blob/main/public/install
+# License: MIT
+
+set -euo pipefail
+
+# ── Constants ───────────────────────────────────────────────────────
+REPO="fru-dev3/prevail"
+INSTALL_DIR="${PREVAIL_HOME:-$HOME/.prevail}"
+BIN_NAME="prevail"
+
+# ── Pretty output (no emoji — Prevail brand convention) ─────────────
+gold='\033[38;5;179m'
+cyan='\033[38;5;81m'
+green='\033[38;5;77m'
+red='\033[38;5;203m'
+dim='\033[2m'
+reset='\033[0m'
+
+step()  { printf "${gold}◆${reset} %s\n" "$*"; }
+ok()    { printf "${green}✓${reset} %s\n" "$*"; }
+warn()  { printf "${red}!${reset} %s\n" "$*"; }
+info()  { printf "${dim}  %s${reset}\n" "$*"; }
+die()   { printf "${red}✗ %s${reset}\n" "$*" >&2; exit 1; }
+
+# ── Banner ─────────────────────────────────────────────────────────
+print_banner() {
+  cat <<EOF
+
+${gold}Prev${cyan}ai${gold}l${reset} ${dim}— a Council of AI for your hard questions${reset}
+
+EOF
+}
+
+# ── Detect platform ─────────────────────────────────────────────────
+detect_platform() {
+  local os arch
+  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+  arch=$(uname -m)
+
+  case "$os" in
+    darwin) os="darwin" ;;
+    linux)  os="linux"  ;;
+    msys*|mingw*|cygwin*)
+      die "Native Windows isn't supported yet. Run this inside WSL2 instead." ;;
+    *) die "Unsupported OS: $os" ;;
+  esac
+
+  case "$arch" in
+    arm64|aarch64) arch="arm64" ;;
+    x86_64|amd64)  arch="x64"   ;;
+    *) die "Unsupported architecture: $arch" ;;
+  esac
+
+  echo "$os" "$arch"
+}
+
+# ── Pick install location ────────────────────────────────────────────
+pick_bin_target() {
+  # Prefer ~/.local/bin (XDG-standard, no sudo needed).
+  # Fall back to /usr/local/bin only if it's already in PATH AND writable.
+  if [[ -w "/usr/local/bin" ]] && echo "$PATH" | tr ':' '\n' | grep -qx "/usr/local/bin"; then
+    echo "/usr/local/bin/$BIN_NAME"
+  else
+    mkdir -p "$HOME/.local/bin"
+    echo "$HOME/.local/bin/$BIN_NAME"
+  fi
+}
+
+# ── Ensure target dir is on PATH (best-effort, for ~/.local/bin) ─────
+maybe_patch_shell_rc() {
+  local bin_dir="$1"
+  if [[ "$bin_dir" != "$HOME/.local/bin" ]]; then return 0; fi
+  if echo "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then return 0; fi
+
+  local rc=""
+  case "${SHELL:-}" in
+    */zsh)  rc="$HOME/.zshrc"  ;;
+    */bash) rc="$HOME/.bashrc" ;;
+    */fish) rc="$HOME/.config/fish/config.fish" ;;
+    *) return 0 ;;
+  esac
+
+  [[ -f "$rc" ]] || touch "$rc"
+  if ! grep -qF '$HOME/.local/bin' "$rc" 2>/dev/null; then
+    {
+      printf '\n# Added by Prevail installer\n'
+      if [[ "$rc" == *config.fish ]]; then
+        printf 'set -gx PATH $HOME/.local/bin $PATH\n'
+      else
+        printf 'export PATH="$HOME/.local/bin:$PATH"\n'
+      fi
+    } >> "$rc"
+    info "added \$HOME/.local/bin to PATH in $rc"
+    info "open a new terminal or run: source $rc"
+  fi
+}
+
+# ── Main ────────────────────────────────────────────────────────────
+main() {
+  print_banner
+
+  step "detecting platform"
+  read -r OS ARCH < <(detect_platform)
+  ok "platform: $OS-$ARCH"
+
+  step "resolving latest release"
+  # /releases/latest/download/<asset> follows the 302 redirect from the
+  # latest tag to the actual asset URL. The asset name pattern is set
+  # by the prevail release workflow.
+  local asset_url="https://github.com/${REPO}/releases/latest/download/prevail-LATEST-${OS}-${ARCH}.tar.gz"
+
+  # Resolve via gh-style "latest" indirection — GitHub serves the
+  # actual versioned asset under /latest/download/ when the filename
+  # contains the version. So we instead query the API for the real
+  # tag, then build the URL with the version baked in.
+  local tag
+  tag=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+    | grep '"tag_name":' | head -n1 | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
+  [[ -n "$tag" ]] || die "could not resolve latest release tag"
+  ok "latest: $tag"
+
+  asset_url="https://github.com/${REPO}/releases/download/${tag}/prevail-${tag}-${OS}-${ARCH}.tar.gz"
+
+  step "downloading $(basename "$asset_url")"
+  local tmp
+  tmp=$(mktemp -d)
+  trap 'rm -rf "$tmp"' EXIT
+
+  if ! curl -fsSL --progress-bar "$asset_url" -o "$tmp/prevail.tar.gz"; then
+    warn "could not fetch $asset_url"
+    info "your platform ($OS-$ARCH) may not have a prebuilt binary."
+    info "check https://github.com/${REPO}/releases for available assets,"
+    info "or build from source: git clone https://github.com/${REPO}.git"
+    exit 1
+  fi
+  ok "downloaded $(du -h "$tmp/prevail.tar.gz" | awk '{print $1}')"
+
+  step "installing to $INSTALL_DIR"
+  mkdir -p "$INSTALL_DIR"
+  tar -xzf "$tmp/prevail.tar.gz" -C "$INSTALL_DIR"
+  [[ -f "$INSTALL_DIR/$BIN_NAME" ]] || die "binary not found after extract"
+  chmod +x "$INSTALL_DIR/$BIN_NAME"
+
+  # Strip macOS quarantine attribute so Gatekeeper doesn't block the
+  # binary on first run (only relevant on darwin).
+  if [[ "$OS" == "darwin" ]]; then
+    xattr -d com.apple.quarantine "$INSTALL_DIR/$BIN_NAME" 2>/dev/null || true
+  fi
+  ok "extracted"
+
+  step "symlinking binary"
+  local bin_target
+  bin_target=$(pick_bin_target)
+  ln -sf "$INSTALL_DIR/$BIN_NAME" "$bin_target"
+  ok "linked: $bin_target"
+
+  maybe_patch_shell_rc "$(dirname "$bin_target")"
+
+  step "verifying"
+  if command -v "$BIN_NAME" >/dev/null 2>&1; then
+    local version
+    version=$("$BIN_NAME" --version 2>/dev/null || echo "(version probe failed)")
+    ok "$version"
+  else
+    warn "prevail isn't on PATH yet"
+    info "open a new terminal, then run: prevail"
+  fi
+
+  cat <<EOF
+
+${green}◆${reset} ${gold}installed.${reset}
+
+  Next steps:
+
+  ${cyan}1.${reset} Run ${gold}prevail${reset} to launch the cockpit (first run shows a 30-second wizard).
+  ${cyan}2.${reset} Pick the bundled demo vault (synthetic, safe to explore) or point at your own folder.
+  ${cyan}3.${reset} Press ${gold}Shift+C${reset} on a hard question to convene the council across every CLI you've installed.
+
+  Docs:    ${dim}https://prevail.sh${reset}
+  Repo:    ${dim}https://github.com/${REPO}${reset}
+  Issues:  ${dim}https://github.com/${REPO}/issues${reset}
+
+EOF
+}
+
+main "$@"
