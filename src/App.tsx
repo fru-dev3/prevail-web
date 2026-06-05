@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
-  Brain,
   Check,
   Copy,
   Folder,
@@ -128,48 +127,15 @@ function McpIcon({ className = "" }: { className?: string }) {
   );
 }
 
-// Paperclip AI brand mark — stylized double-clip suggesting 30 agents
-// attached to one knowledge layer. No public SVG exists for the user's
-// internal Paperclip product, so this is a custom stylized mark.
-function PaperclipBrand({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 7v9.5a4.5 4.5 0 0 1-9 0V6.5a3 3 0 0 1 6 0V15a1.5 1.5 0 0 1-3 0V8" />
-      <circle cx="5" cy="5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="19" cy="5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="5" cy="19" r="1" fill="currentColor" stroke="none" />
-      <circle cx="19" cy="19" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 // Hermes brand mark — winged messenger ('H' with wings). References
 // the greek messenger god the user's Hermes agent is named after.
 function HermesBrand({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {/* Wings — angled lines on each side */}
       <path d="M3 7l3 1M3 10l3 0M3 13l3-1" />
       <path d="M21 7l-3 1M21 10l-3 0M21 13l-3-1" />
-      {/* H letterform — center stem */}
       <path d="M9 6v13M15 6v13M9 12h6" strokeWidth="2.2" />
-      {/* Helm dot at top */}
       <circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-// Multica brand mark — two stacked M's suggesting multi-machine. Two
-// overlapping displays.
-function MulticaBrand({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {/* Back machine */}
-      <rect x="3" y="3" width="14" height="10" rx="1.5" />
-      <path d="M6 16h8M10 13v3" />
-      {/* Front machine (offset) */}
-      <rect x="7" y="9" width="14" height="10" rx="1.5" fill="var(--color-surface-0)" />
-      <path d="M10 22h8M14 19v3" />
     </svg>
   );
 }
@@ -1455,81 +1421,199 @@ function FrameworksSection() {
   );
 }
 
+// Each framework gets a STRUCTURALLY distinct rendering — the visual
+// shape should reveal the framework. Banner labels, dividers, grids,
+// loops — not just colored prefix letters on similar paragraphs.
+
+function FwLabel({ children, color = "gold" }: { children: ReactNode; color?: string }) {
+  return (
+    <div
+      className={`inline-block rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] ${
+        color === "ok" ? "bg-ok/20 text-ok" : color === "warn" ? "bg-warn/20 text-warn" : "bg-gold-soft text-gold"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function FwDivider() {
+  return <div className="my-2 h-px bg-border-soft" />;
+}
+
 function FrameworkReply({ id }: { id: string }) {
   const sample: Record<string, ReactNode> = {
+    // BLUF — banner-style verdict at top, hairline divider, supporting detail below
     bluf: (
-      <div className="space-y-2 text-text">
-        <p className="font-medium text-gold">
-          ◆ Invest. Compounding wins at your horizon.
+      <div>
+        <FwLabel>Bottom Line</FwLabel>
+        <p className="mt-1.5 text-base font-semibold text-text">
+          Invest. Compounding wins at your horizon.
         </p>
-        <p className="text-text-soft">
+        <FwDivider />
+        <FwLabel>Detail</FwLabel>
+        <p className="mt-1.5 text-text-soft">
           At 6.2% APR over 22 years, tax-advantaged equities outpace the
           mortgage by ~$160k after-tax. Keep the emergency fund first.
         </p>
       </div>
     ),
+
+    // WIN — single boxed move + tiny defer note
     win: (
-      <div className="space-y-2 text-text">
-        <p className="font-medium text-gold">
-          ◆ Move $X into the index fund this month.
-        </p>
-        <p className="text-text-soft">
-          That's the only step that matters this quarter. Defer the
-          prepay decision until you re-run this in January.
+      <div>
+        <FwLabel>What's Important Now</FwLabel>
+        <div className="mt-1.5 rounded border border-gold-border bg-gold-soft p-3">
+          <div className="text-[9px] uppercase tracking-wider text-gold">
+            ⟶ Next move
+          </div>
+          <div className="mt-1 text-base font-semibold text-text">
+            Move $2,000 into VTI this Friday.
+          </div>
+        </div>
+        <p className="mt-3 text-[11px] italic text-text-mute">
+          Defer everything else until the January review.
         </p>
       </div>
     ),
+
+    // SCQA — 4 labeled blocks stacked, each with letter chip
     scqa: (
-      <div className="space-y-1.5 text-text">
-        <p><span className="text-gold">S:</span> $2k/mo of optional cash.</p>
-        <p><span className="text-gold">C:</span> Mortgage at 6.2%, market noisy.</p>
-        <p><span className="text-gold">Q:</span> Prepay or invest?</p>
-        <p><span className="text-gold">A:</span> Invest. The math at 22yr horizon dominates.</p>
+      <div className="space-y-2">
+        {[
+          ["S", "Situation", "$2k/mo of optional cash."],
+          ["C", "Complication", "Mortgage at 6.2%, market noisy."],
+          ["Q", "Question", "Prepay or invest?"],
+          ["A", "Answer", "Invest. 22-yr horizon dominates."],
+        ].map(([letter, label, text]) => (
+          <div key={letter} className="flex gap-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-gold-soft text-sm font-bold text-gold">
+              {letter}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[9px] uppercase tracking-wider text-text-mute">
+                {label}
+              </div>
+              <div className="text-text">{text}</div>
+            </div>
+          </div>
+        ))}
       </div>
     ),
+
+    // SBAR — same pattern as SCQA but different content + cyan accent
     sbar: (
-      <div className="space-y-1.5 text-text">
-        <p><span className="text-gold">S:</span> Mortgage rate 6.2%, 22yr left.</p>
-        <p><span className="text-gold">B:</span> $2k/mo surplus, no high-interest debt.</p>
-        <p><span className="text-gold">A:</span> Compounding beats prepay after-tax.</p>
-        <p><span className="text-gold">R:</span> Invest 60%, prepay 40%.</p>
+      <div className="space-y-2">
+        {[
+          ["S", "Situation", "Mortgage rate 6.2%, 22yr left."],
+          ["B", "Background", "$2k/mo surplus, no high-interest debt."],
+          ["A", "Assessment", "Compounding beats prepay after-tax."],
+          ["R", "Recommendation", "Invest 60%, prepay 40%."],
+        ].map(([letter, label, text]) => (
+          <div key={letter} className="flex gap-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-ai/15 text-sm font-bold text-ai">
+              {letter}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[9px] uppercase tracking-wider text-text-mute">
+                {label}
+              </div>
+              <div className="text-text">{text}</div>
+            </div>
+          </div>
+        ))}
       </div>
     ),
+
+    // OODA — 4 stages in a horizontal loop with arrows between
     ooda: (
-      <div className="space-y-1.5 text-text">
-        <p><span className="text-gold">O</span>bserve · mortgage 6.2%, 22y</p>
-        <p><span className="text-gold">O</span>rient · long horizon favors equities</p>
-        <p><span className="text-gold">D</span>ecide · 60/40 split</p>
-        <p><span className="text-gold">A</span>ct · auto-debit this Friday</p>
+      <div>
+        <FwLabel>OODA Loop</FwLabel>
+        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] gap-1.5">
+          {[
+            ["Observe", "mortgage 6.2%, 22y"],
+            ["Orient", "long horizon → equities"],
+            ["Decide", "60/40 split"],
+            ["Act", "auto-debit Friday"],
+          ].flatMap(([stage, text], i, arr) => {
+            const card = (
+              <div
+                key={`s-${stage}`}
+                className="col-span-3 grid grid-cols-[1fr_auto_1fr] items-center gap-1.5"
+              >
+                <div className="rounded border border-border bg-surface-1 p-2">
+                  <div className="text-[9px] uppercase tracking-wider text-gold">
+                    {stage}
+                  </div>
+                  <div className="mt-0.5 text-[11px] text-text">{text}</div>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="col-span-3 flex justify-center text-text-mute">
+                    ↓
+                  </div>
+                )}
+              </div>
+            );
+            return [card];
+          })}
+        </div>
       </div>
     ),
+
+    // PROS/CONS — two-column ledger with green + warn columns
     proscons: (
-      <div className="grid grid-cols-2 gap-3 text-text">
-        <div>
-          <div className="text-ok">+ INVEST</div>
-          <div className="mt-1 text-[10px] text-text-soft">
-            • compounds longer<br />• tax wrapper<br />• liquid
+      <div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded border border-ok/30 bg-ok/10 p-2.5">
+            <div className="text-[9px] font-semibold uppercase tracking-wider text-ok">
+              + Invest
+            </div>
+            <ul className="mt-1.5 space-y-1 text-[11px] text-text">
+              <li className="flex gap-1.5"><span className="text-ok">+</span> compounds longer</li>
+              <li className="flex gap-1.5"><span className="text-ok">+</span> tax wrapper</li>
+              <li className="flex gap-1.5"><span className="text-ok">+</span> stays liquid</li>
+            </ul>
+          </div>
+          <div className="rounded border border-warn/30 bg-warn/10 p-2.5">
+            <div className="text-[9px] font-semibold uppercase tracking-wider text-warn">
+              − Prepay
+            </div>
+            <ul className="mt-1.5 space-y-1 text-[11px] text-text">
+              <li className="flex gap-1.5"><span className="text-warn">−</span> guaranteed 6.2%</li>
+              <li className="flex gap-1.5"><span className="text-warn">−</span> psych anchor</li>
+              <li className="flex gap-1.5"><span className="text-warn">−</span> illiquid</li>
+            </ul>
           </div>
         </div>
-        <div>
-          <div className="text-warn">− PREPAY</div>
-          <div className="mt-1 text-[10px] text-text-soft">
-            • guaranteed 6.2%<br />• psych anchor<br />• illiquid
-          </div>
+        <div className="mt-3 rounded border border-gold-border bg-gold-soft p-2 text-[11px]">
+          <span className="text-gold">Weight:</span>{" "}
+          <span className="text-text">Invest wins — horizon &gt; certainty premium.</span>
         </div>
       </div>
     ),
+
+    // STEELMAN — opposing view in muted quote, then your verdict
     steelman: (
-      <div className="space-y-2 text-text">
-        <p className="text-text-soft">
-          <span className="text-gold">Strongest case for prepayment:</span>{" "}
-          guaranteed 6.2% return, psychological discipline, and no need to
-          look at the market for two decades.
-        </p>
-        <p>
-          <span className="text-gold">Yet:</span> compounding in a tax wrapper
-          still wins at your horizon. Steelman noted; invest anyway.
-        </p>
+      <div>
+        <FwLabel color="warn">Strongest opposing case</FwLabel>
+        <blockquote className="mt-1.5 border-l-2 border-warn/60 bg-warn/5 pl-3 py-2 italic text-text-soft">
+          Prepayment guarantees a 6.2% return, builds psychological
+          discipline, and lets you ignore the market for two decades.
+        </blockquote>
+
+        <div className="mt-3 flex items-center gap-2 text-[9px] uppercase tracking-wider text-text-mute">
+          <div className="h-px flex-1 bg-border-soft" />
+          <span>and yet</span>
+          <div className="h-px flex-1 bg-border-soft" />
+        </div>
+
+        <div className="mt-3">
+          <FwLabel>Verdict</FwLabel>
+          <p className="mt-1.5 text-text">
+            Compounding in a tax wrapper still wins at your horizon.
+            Steelman noted; <span className="font-semibold text-gold">invest anyway.</span>
+          </p>
+        </div>
       </div>
     ),
   };
@@ -1551,7 +1635,137 @@ const LENSES = [
   { id: "dad", label: "DAD", glyph: "▲", color: "#d4b675" },
 ];
 
+// What each lens does to the same mortgage question — used by the
+// interactive demo. Each rendering should LOOK like the lens worked on
+// it (terminal-styled snippet inside the mock window).
+const LENS_DEMOS: Record<string, { quip: string; body: ReactNode }> = {
+  "first-principles": {
+    quip: "Stripped to mechanics",
+    body: (
+      <div>
+        <p className="text-text">
+          Money has two costs: <span className="text-gold">rate</span> and{" "}
+          <span className="text-gold">time</span>. Mortgage rate is fixed at 6.2%.
+          Equity expected return (after-tax, in your wrapper) is roughly 7-8% over
+          22 years. The arithmetic isn't subtle.
+        </p>
+        <p className="mt-2 text-text-soft">
+          Forget norms, forget what other people do. The number wins. Invest.
+        </p>
+      </div>
+    ),
+  },
+  outsider: {
+    quip: "Doesn't know your bias",
+    body: (
+      <div>
+        <p className="text-text">
+          A stranger looking at this: you have $2k/mo of surplus, no high-interest
+          debt, a 22-year horizon, and access to tax-advantaged accounts. You're
+          asking whether to give that up for a 6.2% locked return.
+        </p>
+        <p className="mt-2 text-text-soft">
+          Why would anyone in your position choose to compound less?
+        </p>
+      </div>
+    ),
+  },
+  contrarian: {
+    quip: "Argues against you",
+    body: (
+      <div>
+        <p className="text-text">
+          The "invest the delta" advice assumes you'll actually invest it. Most
+          people don't. They invest in month one, skip month four, take it out for
+          a car in year three.
+        </p>
+        <p className="mt-2 text-text-soft">
+          If discipline is your weak link, the forced savings of prepayment beats
+          the optimal-on-paper plan you won't execute.
+        </p>
+      </div>
+    ),
+  },
+  expansionist: {
+    quip: "Bigger version",
+    body: (
+      <div>
+        <p className="text-text">
+          The real question isn't "prepay or invest." It's: what's your{" "}
+          <span className="text-gold">capital allocation policy</span> for every
+          dollar of monthly surplus, forever?
+        </p>
+        <p className="mt-2 text-text-soft">
+          Pick a rule (e.g., 70% invest / 20% prepay / 10% cash). Apply it on
+          autopilot. Stop relitigating monthly.
+        </p>
+      </div>
+    ),
+  },
+  executor: {
+    quip: "Just do it",
+    body: (
+      <div>
+        <ol className="space-y-1.5 text-text">
+          <li><span className="text-gold">1.</span> Friday: open Fidelity VTI position.</li>
+          <li><span className="text-gold">2.</span> Set $2,000/mo recurring transfer.</li>
+          <li><span className="text-gold">3.</span> Mute the mortgage debate for 12 months.</li>
+        </ol>
+        <p className="mt-3 text-text-soft">Done.</p>
+      </div>
+    ),
+  },
+  alien: {
+    quip: "Sees the obvious",
+    body: (
+      <div>
+        <p className="text-text">
+          You spent 40 minutes typing this question. You'll spend 4 more weeks
+          deciding. The actual cost of the decision (delay × $2k × expected return)
+          is <span className="text-gold">~$280</span> — and growing each week you stall.
+        </p>
+        <p className="mt-2 text-text-soft">
+          The thing you're missing isn't the answer. It's that the question already
+          cost more than acting wrong would.
+        </p>
+      </div>
+    ),
+  },
+  mom: {
+    quip: "Plain English",
+    body: (
+      <div>
+        <p className="text-text">
+          "Sweetheart — pay the house. You'll sleep better."
+        </p>
+        <p className="mt-2 text-text-soft">
+          She's not wrong about the sleeping. She's just optimizing for a thing
+          your spreadsheet doesn't price. Decide which one you care about more.
+        </p>
+      </div>
+    ),
+  },
+  dad: {
+    quip: "Hard-nosed",
+    body: (
+      <div>
+        <p className="text-text">
+          Trap: "invest the delta" only works if you actually invest it{" "}
+          <span className="italic">and</span> stay invested through a 30% drawdown
+          without selling.
+        </p>
+        <p className="mt-2 text-text-soft">
+          If you can't honestly say yes to both, prepay. The "optimal" plan you
+          abandon mid-cycle is worse than the suboptimal one you keep.
+        </p>
+      </div>
+    ),
+  },
+};
+
 function LensesSection() {
+  const [active, setActive] = useState<string>("first-principles");
+  const activeLens = LENSES.find((l) => l.id === active)!;
   return (
     <section
       id="lenses"
@@ -1578,31 +1792,89 @@ function LensesSection() {
           </div>
         </FadeIn>
 
-        <div className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {LENSES.map((l, i) => (
-            <FadeIn key={l.id} delay={i * 0.04}>
-              <div
-                className="group h-full rounded-xl border border-border-soft bg-surface-0 p-5 transition-all hover:bg-surface-1"
-                style={{ borderColor: `${l.color}22` }}
-              >
-                <div className="flex items-center gap-3">
+        {/* Interactive lens demo — pick a lens, see how it reframes the
+            same mortgage question through that angle */}
+        <FadeIn delay={0.1}>
+          <div className="mt-16 overflow-hidden rounded-2xl border border-border-soft bg-surface-0">
+            <WindowChrome title={`prevail — /lens ${active}`}>
+              <div className="bg-bg p-5">
+                {/* Question echo */}
+                <div className="mb-4 rounded-md border border-border bg-surface-1 px-3 py-2 font-mono text-xs text-text-soft">
+                  <span className="text-ai">$</span> Should I prepay the mortgage
+                  or invest the delta?
+                </div>
+
+                {/* Active lens header */}
+                <div className="flex items-center gap-3 border-b border-border-soft pb-3">
                   <span
                     className="flex h-9 w-9 items-center justify-center rounded-lg text-lg"
-                    style={{ backgroundColor: `${l.color}18`, color: l.color }}
+                    style={{ backgroundColor: `${activeLens.color}18`, color: activeLens.color }}
                   >
-                    {l.glyph}
+                    {activeLens.glyph}
                   </span>
-                  <div className="font-mono text-sm font-semibold tracking-wider">
-                    {l.label}
+                  <div>
+                    <div className="font-mono text-sm font-semibold tracking-wider" style={{ color: activeLens.color }}>
+                      {activeLens.label}
+                    </div>
+                    <div className="text-xs text-text-mute italic">
+                      {LENS_DEMOS[active]?.quip}
+                    </div>
                   </div>
                 </div>
-                <p className="mt-3 text-sm text-text-soft">
-                  {lensBlurb(l.id)}
-                </p>
+
+                {/* Lens-applied reply, animates between selections */}
+                <div className="min-h-[160px] pt-4">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={active}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.25 }}
+                      className="text-sm leading-relaxed"
+                    >
+                      {LENS_DEMOS[active]?.body}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
-            </FadeIn>
-          ))}
-        </div>
+            </WindowChrome>
+          </div>
+        </FadeIn>
+
+        {/* Lens chips — click to switch the active lens above */}
+        <FadeIn delay={0.18}>
+          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {LENSES.map((l) => {
+              const isActive = l.id === active;
+              return (
+                <button
+                  key={l.id}
+                  onClick={() => setActive(l.id)}
+                  className={`group rounded-xl border p-4 text-left transition-all ${
+                    isActive
+                      ? "border-ai/40 bg-ai/5"
+                      : "border-border-soft bg-surface-0 hover:bg-surface-1"
+                  }`}
+                  style={isActive ? {} : { borderColor: `${l.color}22` }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-base"
+                      style={{ backgroundColor: `${l.color}18`, color: l.color }}
+                    >
+                      {l.glyph}
+                    </span>
+                    <div className="min-w-0 font-mono text-xs font-semibold tracking-wider">
+                      {l.label}
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-text-soft">{lensBlurb(l.id)}</p>
+                </button>
+              );
+            })}
+          </div>
+        </FadeIn>
 
         {/* ALL fan-out highlight */}
         <FadeIn delay={0.3}>
@@ -1690,58 +1962,60 @@ function lensBlurb(id: string) {
 // Ecosystem: MCP server, Telegram bridge, OpenClaw, Paperclip, Hermes,
 // Multica all share the ~/.ai/ knowledge layer.
 
+// OpenClaw brand mark — chat-bubble silhouette with an open bracket
+// claw inside. Represents the Telegram gateway nature of OpenClaw
+// (the user's own product — no public SVG exists).
+function OpenClawBrand({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a8 8 0 0 1-12.1 6.87L4 20l1.13-4.9A8 8 0 1 1 21 12z" />
+      <path d="M9 9l-2 3 2 3M15 9l2 3-2 3" strokeWidth="2" />
+    </svg>
+  );
+}
+
+// Real Multica logo — pulled verbatim from https://multica.ai/favicon.svg.
+// 8-spoke star/cross polygon; we recolor to currentColor so it picks up the
+// brand tint we set on the wrapper.
+function MulticaBrandReal({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} fill="currentColor" aria-label="Multica">
+      <polygon points="45,62.1 45,100 55,100 55,62.1 81.8,88.9 88.9,81.8 62.1,55 100,55 100,45 62.1,45 88.9,18.2 81.8,11.1 55,37.9 55,0 45,0 45,37.9 18.2,11.1 11.1,18.2 37.9,45 0,45 0,55 37.9,55 11.1,81.8 18.2,88.9" />
+    </svg>
+  );
+}
+
+// Real Paperclip AI logo mark — extracted from paperclip-logo.svg. The
+// original is wordmark+mark; we keep only the mark on the left (a stylized
+// paper corner with arrow). Colors use currentColor so it tints to brand.
+function PaperclipBrandReal({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 55 80" className={className} fill="currentColor" aria-label="Paperclip AI">
+      <path d="M43.99,0 L0,25.56 L.27,27.14 L4.84,26.37 L5.1,27.95 L40.64,7.3 L49.44,54.21 L24.94,71.84 L23.29,61.39 L40.29,49.57 L19.06,64.33 L21.54,80 L54.53,56.25 L43.99,0Z" opacity="0.85" />
+      <path d="M35.73,23.93 L31.17,24.74 L31.78,28.18 L35.2,47.46 L18.26,59.24 L11.21,64.14 L5.1,27.95 L4.84,26.37 L.27,27.14 L7.86,72.12 L19.06,64.33 L40.29,49.57 L35.73,23.93 Z M14.27,33.96 L18.26,59.24 L35.2,47.46 L22.49,56.3 L19.31,36.21 L31.78,28.18 L31.17,24.74 L35.73,23.93 L35.12,20.5 L14.27,33.96 Z" />
+    </svg>
+  );
+}
+
+// Ecosystem section — icons only, no titles, no descriptions.
+// Just a clean strip of brand marks showing 'plays with these tools'.
 function EcosystemSection() {
-  // Each item carries either a Lucide component or a custom render.
-  // The custom render lets us drop in brand SVGs (Telegram from
-  // simple-icons, our custom MCP mark) without forcing them to share
-  // Lucide's prop shape.
-  const items: Array<{
-    title: string;
-    desc: string;
+  const logos: Array<{
+    name: string;
     color: string;
     render: (cls: string) => ReactNode;
   }> = [
-    {
-      title: "Self-learning",
-      desc: "Every council verdict, every chat, every distill writes to your vault. Over time, your vault becomes the canonical benchmark — new models get graded against you, not a generic test.",
-      color: "#c4a35a",
-      render: (cls) => <Brain className={cls} />,
-    },
-    {
-      title: "MCP server built in",
-      desc: "Expose your vault to Claude Desktop or any MCP client. Token-auth, parent-process verified, chmod 0600 by default.",
-      color: "#5fbfff",
-      render: (cls) => <McpIcon className={cls} />,
-    },
-    {
-      title: "Telegram bridge",
-      desc: "Chat with your council from any device via OpenClaw. Same vault, same verdicts — just from the lock screen.",
-      color: "#229ED9",
-      render: (cls) => <SimpleIcon icon={siTelegram} className={cls} />,
-    },
-    {
-      title: "Paperclip · 30 agents",
-      desc: "Every domain has a specialist agent that distills, summarizes, and stays current. Daily briefs already wait in your inbox.",
-      color: "#a78bfa",
-      render: (cls) => <PaperclipBrand className={cls} />,
-    },
-    {
-      title: "Multica · multi-machine",
-      desc: "Mac Mini source of truth, MacBook over Tailscale, both writing the same files. Zero sync code.",
-      color: "#f0c674",
-      render: (cls) => <MulticaBrand className={cls} />,
-    },
-    {
-      title: "Hermes-compatible",
-      desc: "Plug Hermes — or any agent that reads ~/.ai/ — into the same knowledge layer. Open by design.",
-      color: "#88d0ff",
-      render: (cls) => <HermesBrand className={cls} />,
-    },
+    { name: "Multica AI", color: "#f5f3ed", render: (cls) => <MulticaBrandReal className={cls} /> },
+    { name: "Paperclip AI", color: "#70cbcf", render: (cls) => <PaperclipBrandReal className={cls} /> },
+    { name: "OpenClaw", color: "#6ee787", render: (cls) => <OpenClawBrand className={cls} /> },
+    { name: "Hermes AI", color: "#c4a8ff", render: (cls) => <HermesBrand className={cls} /> },
+    { name: "MCP", color: "#5fbfff", render: (cls) => <McpIcon className={cls} /> },
+    { name: "Telegram", color: "#229ED9", render: (cls) => <SimpleIcon icon={siTelegram} className={cls} /> },
   ];
   return (
     <section
       id="ecosystem"
-      className="relative border-t border-border-soft py-24 md:py-32"
+      className="relative border-t border-border-soft py-24 md:py-28"
     >
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
@@ -1750,76 +2024,27 @@ function EcosystemSection() {
               Ecosystem
             </p>
             <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-              Built to live with the rest of{" "}
-              <span className="text-text-soft">your agent stack.</span>
+              Plays well with{" "}
+              <span className="font-serif italic text-text-soft">your stack.</span>
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-text-soft">
-              Prevail is the cockpit; <code className="text-text">~/.ai/</code> is the
-              shared knowledge layer. Paperclip, OpenClaw, Multica, Hermes —
-              they all read and write the same files. Add yours next.
-            </p>
           </div>
         </FadeIn>
 
-        <div className="mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((it, i) => (
-            <FadeIn key={it.title} delay={i * 0.06}>
-              <div className="group relative h-full overflow-hidden rounded-xl border border-border-soft bg-surface-0 p-6 transition-all hover:border-border">
-                <div
-                  className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100"
-                  style={{
-                    background: `linear-gradient(90deg, transparent, ${it.color}, transparent)`,
-                  }}
-                />
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: `${it.color}18`, color: it.color }}
-                >
-                  {it.render("h-5 w-5")}
+        {/* Icons-only strip — no titles, no descriptions, just marks */}
+        <FadeIn delay={0.15}>
+          <div className="mt-16 grid grid-cols-3 gap-3 md:grid-cols-6 md:gap-4">
+            {logos.map((it) => (
+              <div
+                key={it.name}
+                title={it.name}
+                className="group flex aspect-square items-center justify-center rounded-xl border border-border-soft bg-surface-0 transition-all hover:border-border hover:bg-surface-1 hover:-translate-y-1"
+                style={{ color: it.color }}
+              >
+                <div className="opacity-80 transition-opacity group-hover:opacity-100">
+                  {it.render("h-10 w-10 md:h-12 md:w-12")}
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{it.title}</h3>
-                <p className="mt-2 text-sm text-text-soft">{it.desc}</p>
               </div>
-            </FadeIn>
-          ))}
-        </div>
-
-        {/* Shared filesystem hint */}
-        <FadeIn delay={0.4}>
-          <div className="mt-12 rounded-2xl border border-border-soft bg-surface-0 p-6 font-mono text-xs md:p-8 md:text-sm">
-            <div className="mb-3 text-text-mute">
-              <span className="text-gold">~/.ai/</span> · the shared knowledge layer
-            </div>
-            <div className="space-y-0.5 text-text-soft">
-              <div>
-                <span className="text-gold">├──</span> agents/{" "}
-                <span className="text-text-mute"># paperclip writes here</span>
-              </div>
-              <div>
-                <span className="text-gold">├──</span> gateways/openclaw/{" "}
-                <span className="text-text-mute"># telegram bridge</span>
-              </div>
-              <div>
-                <span className="text-gold">├──</span> skills/{" "}
-                <span className="text-text-mute"># shared by all agents</span>
-              </div>
-              <div>
-                <span className="text-gold">├──</span> mcp/{" "}
-                <span className="text-text-mute"># MCP server config</span>
-              </div>
-              <div>
-                <span className="text-gold">├──</span> memory/{" "}
-                <span className="text-text-mute"># cross-session state</span>
-              </div>
-              <div>
-                <span className="text-gold">└──</span> context/OMEGA.md{" "}
-                <span className="text-text-mute"># everyone reads + writes</span>
-              </div>
-            </div>
-            <div className="mt-4 border-t border-border-soft pt-3 text-text-mute">
-              Prevail, Paperclip, OpenClaw, Multica, Hermes — all share these
-              files. Bring your own agent next.
-            </div>
+            ))}
           </div>
         </FadeIn>
       </div>
