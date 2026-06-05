@@ -2357,6 +2357,7 @@ export default function App() {
       <Nav theme={theme} onToggleTheme={toggleTheme} />
       <main className="pt-14">
         <Hero />
+        <DownloadSection />
         <LogoBar />
         <HardQuestionsSection />
 
@@ -2422,7 +2423,6 @@ export default function App() {
         <LensesSection />
         <EcosystemSection />
         <Pillars />
-        <DownloadSection />
         <FAQSection />
       </main>
       <Footer />
