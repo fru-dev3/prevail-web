@@ -2,22 +2,23 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
-  Box,
+  Brain,
   Check,
   Copy,
+  Feather,
   Folder,
   Github,
   Layers,
   MessageSquare,
+  Monitor,
   Moon,
-  Network,
-  Repeat,
+  Paperclip as PaperclipIcon,
   Scale,
-  Send,
   Sparkles,
   Sun,
   Terminal,
 } from "lucide-react";
+import { siTelegram } from "simple-icons";
 
 const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
@@ -82,6 +83,44 @@ function useTheme(): [Theme, () => void] {
     localStorage.setItem(LS_THEME, theme);
   }, [theme]);
   return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))];
+}
+
+// Wraps a Simple Icons SVG path into a sized React SVG. Used for brand
+// logos (Telegram). Lucide icons handle generic glyphs.
+function SimpleIcon({
+  icon,
+  className = "",
+}: {
+  icon: { path: string };
+  className?: string;
+}) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="currentColor"
+    >
+      <path d={icon.path} />
+    </svg>
+  );
+}
+
+// Custom MCP server logo — Model Context Protocol uses a stylized
+// 'M' or hexagon-grid mark. The official protocol mark isn't on
+// simple-icons yet, so we render a small stylized version that reads
+// as "connected nodes" — the spirit of MCP.
+function McpIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="5" r="2" />
+      <circle cx="5" cy="18" r="2" />
+      <circle cx="19" cy="18" r="2" />
+      <path d="M12 7v3M10.5 11.5L7 16M13.5 11.5L17 16" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    </svg>
+  );
 }
 
 // Reusable mock window chrome — used in every product mockup
@@ -178,78 +217,86 @@ function Logo({ size = 24 }: { size?: number }) {
 
 function Hero() {
   return (
-    <section className="relative pt-32 pb-24 md:pt-40 md:pb-28 grain">
+    <section className="relative overflow-hidden pt-20 pb-12 md:pt-24 md:pb-16 grain">
       <div className="glow-gold absolute inset-0 -z-10" />
-      <div className="mx-auto max-w-6xl px-6">
-        {/* Eyebrow chip */}
-        <FadeIn>
-          <div className="flex justify-center">
-            <a
-              href={GITHUB_DESKTOP}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 py-1 pl-1 pr-4 text-xs"
-            >
-              <span className="rounded-full bg-gold px-2 py-0.5 font-medium text-bg">
-                New
-              </span>
-              <span className="text-text-soft">
-                Desktop v{VERSION_DESKTOP} & CLI v{VERSION_CLI} both available
-              </span>
-              <ArrowRight className="h-3 w-3 text-text-mute transition-transform group-hover:translate-x-0.5" />
-            </a>
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-12 xl:gap-16">
+          {/* LEFT — text */}
+          <div>
+            <FadeIn>
+              <a
+                href={GITHUB_DESKTOP}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 py-1 pl-1 pr-4 text-xs"
+              >
+                <span className="rounded-full bg-gold px-2 py-0.5 font-medium text-bg">
+                  New
+                </span>
+                <span className="text-text-soft">
+                  Desktop v{VERSION_DESKTOP} & CLI v{VERSION_CLI} both available
+                </span>
+                <ArrowRight className="h-3 w-3 text-text-mute transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </FadeIn>
+
+            <FadeIn delay={0.05}>
+              <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl xl:text-7xl xl:leading-[1.02]">
+                A{" "}
+                <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-transparent">
+                  Council of <span className="text-ai">AI</span>
+                </span>
+                <br />
+                for your hard questions.
+              </h1>
+            </FadeIn>
+
+            <FadeIn delay={0.12}>
+              <p className="mt-6 max-w-xl text-base text-text-soft md:text-lg">
+                <Brand /> sends every hard question to{" "}
+                <span className="text-text">Claude</span>,{" "}
+                <span className="text-text">Codex</span>,{" "}
+                <span className="text-text">Antigravity</span>, and{" "}
+                <span className="text-text">Ollama</span> at once. A chair
+                model reads all their answers and writes one clear verdict.
+              </p>
+            </FadeIn>
+
+            <FadeIn delay={0.18}>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <a
+                  href={DMG_URL}
+                  className="inline-flex items-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                  style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+                >
+                  <Folder className="h-4 w-4" />
+                  Download for Mac
+                </a>
+                <a
+                  href="#install"
+                  className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface-1 px-5 py-2.5 text-sm font-medium hover:bg-surface-2"
+                >
+                  <Terminal className="h-4 w-4" />
+                  Install CLI
+                </a>
+              </div>
+            </FadeIn>
+
+            {/* small trust row */}
+            <FadeIn delay={0.24}>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-mute">
+                <span><span className="text-gold">✓</span> Free, MIT</span>
+                <span><span className="text-gold">✓</span> Local-first</span>
+                <span><span className="text-gold">✓</span> Works with Claude, Codex, Gemini, Ollama</span>
+              </div>
+            </FadeIn>
           </div>
-        </FadeIn>
 
-        {/* Headline — "A Council of AI for Your Hard Questions" */}
-        <FadeIn delay={0.05}>
-          <h1 className="mt-10 text-center text-5xl font-bold tracking-tight md:text-7xl lg:text-[88px] lg:leading-[1.02]">
-            A{" "}
-            <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-transparent">
-              Council of <span className="text-ai">AI</span>
-            </span>
-            <br />
-            for your hard questions.
-          </h1>
-        </FadeIn>
-
-        <FadeIn delay={0.12}>
-          <p className="mx-auto mt-8 max-w-2xl text-center text-lg text-text-soft md:text-xl">
-            <Brand /> sends every hard question to{" "}
-            <span className="text-text">Claude</span>,{" "}
-            <span className="text-text">Codex</span>,{" "}
-            <span className="text-text">Antigravity</span>, and{" "}
-            <span className="text-text">Ollama</span> at once. A chair model reads
-            all their answers and writes one clear verdict.
-          </p>
-        </FadeIn>
-
-        <FadeIn delay={0.18}>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={DMG_URL}
-              className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-              style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-            >
-              <Folder className="h-4 w-4" />
-              Download for Mac
-            </a>
-            <a
-              href="#install"
-              className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface-1 px-6 py-3 text-sm font-medium hover:bg-surface-2"
-            >
-              <Terminal className="h-4 w-4" />
-              Install CLI
-            </a>
-          </div>
-        </FadeIn>
-
-        {/* HERO MOCK — slider between Desktop and CLI views */}
-        <FadeIn delay={0.28} y={40}>
-          <div className="mx-auto mt-16 max-w-5xl">
+          {/* RIGHT — slider */}
+          <FadeIn delay={0.28} y={20}>
             <HeroSlider />
-          </div>
-        </FadeIn>
+          </FadeIn>
+        </div>
       </div>
     </section>
   );
@@ -696,6 +743,167 @@ function CliMock() {
         </div>
       </div>
     </WindowChrome>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HARD QUESTIONS — the "why this matters" section
+// One agent isn't enough. Generic benchmarks don't grade your life.
+
+const HARD_QUESTIONS = [
+  {
+    domain: "Wealth",
+    glyph: "¤",
+    color: "#c4a35a",
+    q: "Should I prepay the mortgage or invest the delta?",
+    edge: "Tax-bracket sensitivity. Horizon math. The wrong default kills six figures.",
+  },
+  {
+    domain: "Career",
+    glyph: "▲",
+    color: "#5fbfff",
+    q: "Take the Series B offer or stay where I am?",
+    edge: "Equity dilution model + comp ladder + 5-year founder bet, weighed against vested RSUs.",
+  },
+  {
+    domain: "Health",
+    glyph: "♥",
+    color: "#6ee787",
+    q: "Lab panel just landed. What do I act on first?",
+    edge: "Signal vs noise across 47 markers. Most important: which yellow flags are downstream of one upstream cause.",
+  },
+  {
+    domain: "Tax",
+    glyph: "§",
+    color: "#f0c674",
+    q: "Roth conversion this year — does the IRMAA cliff bite?",
+    edge: "Sub-clause traps most general advice misses. The math says yes, the policy edge says wait.",
+  },
+  {
+    domain: "Family",
+    glyph: "♥",
+    color: "#ffb38a",
+    q: "Sister's wedding back home — contribute $40k?",
+    edge: "Western individualist advice flattens this. Real answer respects obligation and protects you.",
+  },
+  {
+    domain: "Estate",
+    glyph: "⌂",
+    color: "#c4a8ff",
+    q: "Term life vs whole life for my situation?",
+    edge: "The product pitch is wrong 80% of the time. The right answer depends on your dependents and runway.",
+  },
+];
+
+function HardQuestionsSection() {
+  return (
+    <section className="relative border-t border-border-soft py-24 md:py-32 grain">
+      <div className="glow-ai absolute inset-0 -z-10 opacity-30" />
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
+              Why one model isn't enough
+            </p>
+            <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+              Your life doesn't fit{" "}
+              <span className="text-text-soft">a benchmark.</span>
+            </h2>
+            <p className="mt-6 text-lg text-text-soft">
+              MMLU. HumanEval. GSM8K. Useful — for someone else. None of them
+              grade the questions you actually wrestle with. Real decisions are
+              tax-coded, family-coded, body-coded, time-coded. One model gives
+              you one frame. You need four — and a chair to call it.
+            </p>
+          </div>
+        </FadeIn>
+
+        {/* Three-column reasoning */}
+        <FadeIn delay={0.1}>
+          <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-3">
+            {[
+              {
+                n: "01",
+                t: "One model is one frame",
+                d: "Even the best frontier model has blind spots. You only see them when a second model disagrees.",
+              },
+              {
+                n: "02",
+                t: "Generic benchmarks miss you",
+                d: "MMLU doesn't know your tax bracket. HumanEval doesn't know your dependents. Your benchmark must be yours.",
+              },
+              {
+                n: "03",
+                t: "Decisions compound",
+                d: "Get the mortgage call right, the tax call right, the career call right — and 20 years compound.",
+              },
+            ].map((c) => (
+              <div key={c.n} className="rounded-xl border border-border-soft bg-surface-0 p-6">
+                <div className="font-mono text-xs text-gold">{c.n}</div>
+                <div className="mt-3 font-semibold">{c.t}</div>
+                <p className="mt-2 text-sm text-text-soft">{c.d}</p>
+              </div>
+            ))}
+          </div>
+        </FadeIn>
+
+        {/* Hard question list */}
+        <FadeIn delay={0.2}>
+          <div className="mx-auto mt-16 max-w-5xl">
+            <div className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-text-mute">
+              <span className="text-gold">◇</span> Questions <Brand /> was built for
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {HARD_QUESTIONS.map((q, i) => (
+                <FadeIn key={q.q} delay={0.05 * i}>
+                  <div className="group relative h-full overflow-hidden rounded-xl border border-border-soft bg-surface-0 p-5 transition-all hover:border-border hover:bg-surface-1">
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base"
+                        style={{ backgroundColor: `${q.color}18`, color: q.color }}
+                      >
+                        {q.glyph}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-mute">
+                          {q.domain}
+                        </div>
+                        <div className="mt-1.5 font-medium text-text">{q.q}</div>
+                        <div className="mt-2 text-xs text-text-soft">
+                          <span className="text-gold">▸</span> {q.edge}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* Closing pitch */}
+        <FadeIn delay={0.4}>
+          <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-gold-border bg-gradient-to-br from-gold-soft to-transparent p-8 text-center md:p-10">
+            <p className="text-xl font-medium leading-relaxed md:text-2xl">
+              Imagine the four best reasoning models on the planet,{" "}
+              <span className="text-gold">around one table</span>, working{" "}
+              <span className="text-gold">your hardest question</span> together.
+            </p>
+            <p className="mt-4 text-text-soft">
+              That's what <Brand /> is. A council of AI for the rest of your life.
+            </p>
+            <a
+              href="#install"
+              className="mt-8 inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+              style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+            >
+              Convene the council
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
   );
 }
 
@@ -1339,42 +1547,51 @@ function lensBlurb(id: string) {
 // Multica all share the ~/.ai/ knowledge layer.
 
 function EcosystemSection() {
-  const items = [
+  // Each item carries either a Lucide component or a custom render.
+  // The custom render lets us drop in brand SVGs (Telegram from
+  // simple-icons, our custom MCP mark) without forcing them to share
+  // Lucide's prop shape.
+  const items: Array<{
+    title: string;
+    desc: string;
+    color: string;
+    render: (cls: string) => ReactNode;
+  }> = [
     {
-      icon: Repeat,
       title: "Self-learning",
       desc: "Every council verdict, every chat, every distill writes to your vault. Over time, your vault becomes the canonical benchmark — new models get graded against you, not a generic test.",
       color: "#c4a35a",
+      render: (cls) => <Brain className={cls} />,
     },
     {
-      icon: Network,
       title: "MCP server built in",
       desc: "Expose your vault to Claude Desktop or any MCP client. Token-auth, parent-process verified, chmod 0600 by default.",
       color: "#5fbfff",
+      render: (cls) => <McpIcon className={cls} />,
     },
     {
-      icon: Send,
       title: "Telegram bridge",
       desc: "Chat with your council from any device via OpenClaw. Same vault, same verdicts — just from the lock screen.",
-      color: "#6ee787",
+      color: "#229ED9",
+      render: (cls) => <SimpleIcon icon={siTelegram} className={cls} />,
     },
     {
-      icon: Box,
       title: "Paperclip · 30 agents",
       desc: "Every domain has a specialist agent that distills, summarizes, and stays current. Daily briefs already wait in your inbox.",
       color: "#c4a8ff",
+      render: (cls) => <PaperclipIcon className={cls} />,
     },
     {
-      icon: Layers,
       title: "Multica · multi-machine",
       desc: "Mac Mini source of truth, MacBook over Tailscale, both writing the same files. Zero sync code.",
       color: "#f0c674",
+      render: (cls) => <Monitor className={cls} />,
     },
     {
-      icon: Sparkles,
       title: "Hermes-compatible",
       desc: "Plug Hermes — or any agent that reads ~/.ai/ — into the same knowledge layer. Open by design.",
       color: "#88d0ff",
+      render: (cls) => <Feather className={cls} />,
     },
   ];
   return (
@@ -1401,31 +1618,26 @@ function EcosystemSection() {
         </FadeIn>
 
         <div className="mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((it, i) => {
-            const Icon = it.icon;
-            return (
-              <FadeIn key={it.title} delay={i * 0.06}>
+          {items.map((it, i) => (
+            <FadeIn key={it.title} delay={i * 0.06}>
+              <div className="group relative h-full overflow-hidden rounded-xl border border-border-soft bg-surface-0 p-6 transition-all hover:border-border">
                 <div
-                  className="group relative h-full overflow-hidden rounded-xl border border-border-soft bg-surface-0 p-6 transition-all hover:border-border"
+                  className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${it.color}, transparent)`,
+                  }}
+                />
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: `${it.color}18`, color: it.color }}
                 >
-                  <div
-                    className="absolute inset-x-0 top-0 h-px opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{
-                      background: `linear-gradient(90deg, transparent, ${it.color}, transparent)`,
-                    }}
-                  />
-                  <div
-                    className="flex h-11 w-11 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: `${it.color}18`, color: it.color }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold">{it.title}</h3>
-                  <p className="mt-2 text-sm text-text-soft">{it.desc}</p>
+                  {it.render("h-5 w-5")}
                 </div>
-              </FadeIn>
-            );
-          })}
+                <h3 className="mt-5 text-lg font-semibold">{it.title}</h3>
+                <p className="mt-2 text-sm text-text-soft">{it.desc}</p>
+              </div>
+            </FadeIn>
+          ))}
         </div>
 
         {/* Shared filesystem hint */}
@@ -1758,6 +1970,7 @@ export default function App() {
       <main className="pt-14">
         <Hero />
         <LogoBar />
+        <HardQuestionsSection />
 
         <FeatureSection
           id="council"
