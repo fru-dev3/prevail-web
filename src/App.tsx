@@ -450,103 +450,244 @@ function DesktopAppMock() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Full 7-row ASCII PREVAIL wordmark — byte-for-byte identical to the TUI's
+// banner in src/branding.tsx. PREV + L in gold, AI in cyan.
+
+const G: Record<string, string[]> = {
+  P: ["██████╗   ", "██╔══██╗  ", "██████╔╝  ", "██╔═══╝   ", "██║       ", "██║       ", "╚═╝       "],
+  R: ["██████╗   ", "██╔══██╗  ", "██████╔╝  ", "██╔══██╗  ", "██║  ██║  ", "██║  ██║  ", "╚═╝  ╚═╝  "],
+  E: ["███████╗  ", "██╔════╝  ", "█████╗    ", "██╔══╝    ", "██║       ", "███████╗  ", "╚══════╝  "],
+  V: ["██╗   ██╗ ", "██║   ██║ ", "██║   ██║ ", "╚██╗ ██╔╝ ", " ╚████╔╝  ", "  ╚██╔╝   ", "   ╚═╝    "],
+  A: ["  █████╗  ", " ██╔══██╗ ", " ███████╗ ", " ██╔══██║ ", " ██║  ██║ ", " ██║  ██║ ", " ╚═╝  ╚═╝ "],
+  I: ["██████╗   ", "╚═██╔═╝   ", "  ██║     ", "  ██║     ", "  ██║     ", "██████╗   ", "╚═════╝   "],
+  L: ["██╗       ", "██║       ", "██║       ", "██║       ", "██║       ", "███████╗  ", "╚══════╝  "],
+};
+const compose = (letters: string[]) =>
+  Array.from({ length: 7 }, (_, r) => letters.map((l) => G[l]![r]).join(" "));
+const PREVAIL_PREV = compose(["P", "R", "E", "V"]);
+const PREVAIL_AI = compose(["A", "I"]);
+const PREVAIL_L = compose(["L"]);
+
+function AsciiPrevail({ size = "sm" }: { size?: "xs" | "sm" | "md" }) {
+  const fontSize = size === "xs" ? 5 : size === "sm" ? 6 : 8;
+  return (
+    <div
+      className="flex font-mono"
+      aria-label="Prevail"
+      style={{ fontSize: `${fontSize}px`, lineHeight: 1.05 }}
+    >
+      <pre className="text-gold">{PREVAIL_PREV.join("\n")}</pre>
+      <pre className="text-ai pl-[2px]">{PREVAIL_AI.join("\n")}</pre>
+      <pre className="text-gold pl-[2px]">{PREVAIL_L.join("\n")}</pre>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // CLI / TUI mockup — shown when the user toggles the slider to "Terminal CLI"
+// Replicates the actual TUI cockpit: full banner, sidebar, workspace tabs,
+// chat with mid-council streaming, status footer.
 
 function CliMock() {
   return (
     <WindowChrome title="iTerm — prevail">
-      <div className="bg-bg p-5 font-mono text-[11px] leading-[1.5] md:text-[12px]">
-        {/* Banner row: ASCII PREVAIL + status column */}
-        <div className="flex items-start gap-6">
-          <pre className="hidden text-gold md:block" style={{ fontSize: "9px", lineHeight: 1.05 }}>
-{`██████╗ ██████╗ ███████╗`}{"\n"}
-{`██╔══██╗██╔══██╗██╔════╝`}{"\n"}
-{`██████╔╝██████╔╝█████╗  `}{"\n"}
-{`██╔═══╝ ██╔══██╗██╔══╝  `}{"\n"}
-{`██║     ██║  ██║███████╗`}{"\n"}
-{`╚═╝     ╚═╝  ╚═╝╚══════╝`}
-          </pre>
-          <div className="flex-1 text-text-soft">
-            <div className="font-medium text-gold">
-              THURSDAY, JUNE 5 <span className="text-text-mute">· 2026</span>
+      <div className="bg-bg p-4 font-mono text-[10px] leading-[1.4] md:p-5 md:text-[11px]">
+        {/* === BANNER === full 9-row replica */}
+        <div className="border-b border-gold/40 pb-3">
+          <div className="flex items-start gap-5">
+            {/* Mascot + ASCII PREVAIL */}
+            <div className="hidden flex-col items-center text-gold md:flex">
+              <div className="text-[8px] text-gold/60">╲ │ ╱</div>
+              <div className="text-[9px] font-bold text-gold">─ ◈ ─</div>
+              <div className="text-[8px] text-gold/60">╱ │ ╲</div>
+              <div className="mt-1 text-[7px] text-text-mute">EST 2026</div>
             </div>
-            <div className="mt-0.5 text-text-mute">
-              07:48 · prevail v{VERSION_CLI} · opentui
+            <div className="hidden md:block">
+              <AsciiPrevail size="sm" />
             </div>
-            <div className="mt-0.5">
-              <span className="text-text-mute">vault</span>{" "}
-              <span className="text-text">~/Documents/prevail/vault-demo</span>
-            </div>
-            <div className="mt-1">
-              <span className="text-text-mute">defaults</span>{" "}
-              <span className="text-gold">⚖ Council ON</span>{" "}
-              <span className="text-gold">◆ BLUF</span>{" "}
-              <span className="text-gold">◇ Lens FIRST</span>
-            </div>
-            <div className="mt-0.5">
-              <span className="text-text-mute">cli</span>{" "}
-              <span style={{ color: "#6ee787" }}>✓ Claude</span>{" "}
-              <span style={{ color: "#6ee787" }}>✓ Codex</span>{" "}
-              <span style={{ color: "#6ee787" }}>✓ Antigravity</span>{" "}
-              <span style={{ color: "#f0c674" }}>! Ollama</span>
+            <div className="hidden h-[60px] w-px bg-border md:block" />
+            {/* Status column */}
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-gold">
+                  THURSDAY, JUNE 5 <span className="text-text-mute">· 2026</span>
+                </span>
+                <span className="text-text-mute">
+                  <span className="text-text">20</span> dom ·{" "}
+                  <span className="text-text">19</span> apps ·{" "}
+                  <span className="text-warn">65</span> open
+                </span>
+              </div>
+              <div className="mt-0.5 text-text-mute">
+                07:48 · prevail v{VERSION_CLI} · opentui
+              </div>
+              <div className="mt-0.5">
+                <span className="text-text-mute">vault</span>{" "}
+                <span className="text-text">~/Documents/prevail/vault-demo</span>
+              </div>
+              <div className="mt-1">
+                <span className="text-text-mute">defaults</span>{" "}
+                <span className="text-gold">⚖ Council:</span>
+                <span className="text-text">ON</span>{" "}
+                <span className="ml-1 text-gold">◆ Framework:</span>
+                <span className="text-text">BLUF</span>{" "}
+                <span className="ml-1 text-gold">◇ Lens:</span>
+                <span className="text-text">FIRST</span>
+              </div>
+              <div className="mt-0.5">
+                <span className="text-text-mute">{"        "}</span>
+                <span className="text-gold">⬡ Web:</span>
+                <span className="text-text">ON</span>
+                <span className="ml-3 text-ai">◇ configure</span>
+                <span className="ml-2 text-ai">◈ bench</span>
+                <span className="ml-2 text-ai">▸ tools</span>
+              </div>
+              <div className="mt-0.5">
+                <span className="text-text-mute">cli</span>{" "}
+                <span style={{ color: "#6ee787" }}>✓ Claude</span>{" "}
+                <span style={{ color: "#6ee787" }}>✓ Codex</span>{" "}
+                <span style={{ color: "#6ee787" }}>✓ Antigravity</span>{" "}
+                <span style={{ color: "#f0c674" }}>! Ollama</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="my-3 border-t border-border-soft" />
-
-        {/* Body — sidebar + chat preview */}
-        <div className="grid grid-cols-[140px_1fr] gap-5">
+        {/* === BODY === sidebar + workspace */}
+        <div className="mt-3 grid grid-cols-[120px_1fr] gap-4 md:grid-cols-[150px_1fr] md:gap-5">
+          {/* SIDEBAR */}
           <div>
-            <div className="font-medium text-gold">LIFE DOMAINS · 20</div>
-            <div className="mt-1.5 space-y-0.5">
+            <div className="text-[9px] font-medium text-gold">
+              LIFE DOMAINS · 20 ●
+            </div>
+            <div className="mt-2 space-y-[1px]">
               {[
-                ["chief", true],
-                ["vision", false],
-                ["wealth", false],
-                ["health", false],
-                ["tax", false],
-                ["career", false],
-                ["business", false],
-              ].map(([d, active]) => (
+                { d: "chief", g: "◆", c: "10", active: true },
+                { d: "vision", g: "★", c: "10" },
+                { d: "wealth", g: "¤", c: "14" },
+                { d: "health", g: "♥", c: "14" },
+                { d: "tax", g: "§", c: "14" },
+                { d: "calendar", g: "▦", c: "11" },
+                { d: "career", g: "▲", c: "14" },
+                { d: "business", g: "◈", c: "11" },
+                { d: "estate", g: "⌂", c: "11" },
+                { d: "real-estate", g: "⊓", c: "9" },
+                { d: "insurance", g: "+", c: "10" },
+                { d: "benefits", g: "✚", c: "11" },
+                { d: "brand", g: "※", c: "10" },
+                { d: "content", g: "¶", c: "11" },
+                { d: "social", g: "◯", c: "9" },
+              ].map((row) => (
                 <div
-                  key={d as string}
-                  className={
-                    active ? "text-text" : "text-text-mute"
-                  }
+                  key={row.d}
+                  className={`flex items-center justify-between ${
+                    row.active ? "text-text" : "text-text-mute"
+                  }`}
                 >
-                  <span className={active ? "text-gold" : ""}>
-                    {active ? "›" : " "}
-                  </span>{" "}
-                  <span className={active ? "text-gold" : ""}>◆</span> {d}
+                  <span>
+                    <span className={row.active ? "text-gold" : ""}>
+                      {row.active ? "›" : " "}
+                    </span>{" "}
+                    <span className={row.active ? "text-gold" : ""}>{row.g}</span>{" "}
+                    {row.d}
+                  </span>
+                  <span className="text-text-mute">{row.c}</span>
                 </div>
               ))}
             </div>
+            <div className="mt-3 border-t border-border-soft pt-2 text-[9px] text-gold">
+              + new domain
+            </div>
           </div>
 
-          <div>
+          {/* WORKSPACE PANE */}
+          <div className="rounded border border-border-soft p-3">
+            {/* Workspace title + tabs */}
+            <div className="mb-1.5 text-gold">chief</div>
             <div className="text-text-mute">
-              <span className="text-gold">[chat]</span> · state · prompts · skills
+              <span className="rounded border border-gold-border bg-gold-soft px-1.5 py-0.5 text-gold">
+                [chat]
+              </span>{" "}
+              · state · quick start · prompts · skills{" "}
+              <span className="ml-2" style={{ color: "#6ee787" }}>✓ ▸Claude</span>
+              <span className="ml-2" style={{ color: "#6ee787" }}>✓ Codex</span>
+              <span className="ml-2" style={{ color: "#6ee787" }}>✓ Antigravity</span>
             </div>
+
+            <div className="mt-3 text-text-mute">
+              ready · seeded with the active tab
+            </div>
+
+            {/* Council in motion */}
             <div className="mt-3">
-              <span className="text-gold">▸</span> council should I prepay the
-              mortgage?
+              <span className="text-gold">▸</span>{" "}
+              <span className="text-text">
+                /council should I prepay the mortgage or invest the delta?
+              </span>
             </div>
-            <div className="mt-2 text-text-mute">
-              <span className="pulse-soft text-gold">◆</span> convening · claude ·
-              codex · antigravity · ollama
+            <div className="mt-1.5 text-text-soft">
+              <span className="pulse-soft text-gold">◆</span> convening ·{" "}
+              <span style={{ color: "#c4a35a" }}>claude</span> ·{" "}
+              <span style={{ color: "#5fbfff" }}>codex</span> ·{" "}
+              <span style={{ color: "#6ee787" }}>antigravity</span> ·{" "}
+              <span style={{ color: "#c4a8ff" }}>ollama</span>
             </div>
-            <div className="mt-3">
-              <span className="text-gold">◇ Verdict</span>{" "}
-              <span className="text-text-mute">· synthesized by Claude</span>
+
+            {/* Disagreement panel */}
+            <div className="mt-3 rounded border-l-2 border-gold pl-3">
+              <div className="text-[9px] uppercase tracking-wider text-gold">
+                ▸ Where panelists disagreed
+              </div>
+              <div className="mt-1 text-text-soft">
+                3/4 favor investment; Ollama anchors on guaranteed return.
+                Antigravity's split framing is most actionable.
+              </div>
             </div>
-            <div className="mt-1 pl-3 text-text">
-              Invest 60% in tax-advantaged index funds. Prepay 40% quarterly.
-              Revisit annually.
-              <span className="blink text-gold">▌</span>
+
+            {/* Verdict block */}
+            <div className="mt-3 rounded border border-gold-border bg-gold-soft p-2.5">
+              <div className="text-[9px] uppercase tracking-wider text-gold">
+                ◆ Verdict · synthesized by Claude
+              </div>
+              <div className="mt-1 text-text">
+                Invest 60% in tax-advantaged index funds via your tax-deferred
+                wrapper. Prepay 40% toward principal each quarter. Revisit
+                annually.
+                <span className="blink text-gold">▌</span>
+              </div>
+            </div>
+
+            {/* Stats line */}
+            <div className="mt-3 text-text-mute">
+              0 msgs · updated today · 185 past chats · /search ·{" "}
+              <span className="text-ai">
+                ~/Documents/prevail/vault-demo/chief ↗
+              </span>
+            </div>
+
+            {/* Input row */}
+            <div className="mt-3 border-t border-border-soft pt-2">
+              <div className="text-text-mute">
+                — chat with chief · Claude · esc to return —
+              </div>
+              <div className="mt-2 rounded border border-border bg-bg p-2">
+                <span className="text-gold">›</span>{" "}
+                <span className="text-text-mute">
+                  ask anything · / for commands · enter sends · esc back
+                </span>
+                <span className="blink ml-1 text-gold">▌</span>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Footer hint */}
+        <div className="mt-3 border-t border-border-soft pt-2 text-text-mute">
+          <span className="text-gold">[n new]</span> add a domain ·{" "}
+          <span className="text-gold">[c chat]</span> talk to claude ·{" "}
+          <span className="text-gold">[e edit]</span> open in $EDITOR ·{" "}
+          <span className="text-gold">[r refresh]</span> rescan vault ·{" "}
+          <span className="text-gold">[q quit]</span> exit
         </div>
       </div>
     </WindowChrome>
