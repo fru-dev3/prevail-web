@@ -527,7 +527,6 @@ function Leaderboard() {
 
 function InstallSection() {
   const [copied, setCopied] = useState(false);
-  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   function notify(e: React.FormEvent<HTMLFormElement>) {
@@ -627,10 +626,11 @@ function InstallSection() {
           </div>
         </FadeIn>
 
-        {/* hidden references so the submitted/email/notify state stays valid even
-            though the form is gone — kept so the netlify hidden form in index.html
-            still matches a submission path for later. */}
-        <span className="hidden">{submitted ? "submitted" : email}</span>
+        {/* hidden form so Netlify still detects the notify endpoint for
+            potential future use; the visible signup CTA is gone now that
+            the DMG is downloadable. submitted state retained to avoid
+            tree-shake removing the notify handler. */}
+        <span className="hidden">{submitted ? "1" : "0"}</span>
         <form name="notify" data-netlify="true" netlify-honeypot="bot-field" hidden onSubmit={notify}>
           <input type="hidden" name="form-name" value="notify" />
           <input type="text" name="bot-field" />
