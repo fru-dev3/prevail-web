@@ -1,80 +1,175 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Manrope", "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", "Segoe UI", -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Menlo", monospace;
 
-  /* Prevail brand: dark terminal background, gold #C4A35A accent,
-     cyan AI block #5fbfff. Matches the TUI cockpit's color language. */
-  --color-background: #0d0d0e;
-  --color-surface: #16161a;
-  --color-surface-warm: #1c1c22;
-  --color-surface-strong: #232329;
-  --color-border: #2a2a32;
-  --color-border-subtle: #1e1e24;
-  --color-text-primary: #f3eee0;
-  --color-text-secondary: #b6ad99;
-  --color-text-muted: #6a6357;
-  --color-accent: #c4a35a;
-  --color-accent-hover: #d4b675;
-  --color-accent-soft: rgba(196, 163, 90, 0.08);
-  --color-accent-border: rgba(196, 163, 90, 0.22);
+  /* Prevail brand — dark by default. Light mode overrides below via
+     [data-theme="light"]. Inspired by Linear / Vercel — multiple
+     surface levels so the page never feels flat. */
+
+  /* Base background — almost-black, slight warmth */
+  --color-bg: #0a0a0c;
+  /* Surface elevations (gets lighter as you stack cards) */
+  --color-surface-0: #111114;
+  --color-surface-1: #16171b;
+  --color-surface-2: #1c1d22;
+  --color-surface-3: #24262d;
+  /* Borders — barely visible but enough to delineate */
+  --color-border: #2a2c33;
+  --color-border-soft: #1f2127;
+  --color-border-strong: #3a3d46;
+
+  /* Text */
+  --color-text: #f5f3ed;
+  --color-text-soft: #b6b1a3;
+  --color-text-mute: #6e6a5e;
+
+  /* Brand accents */
+  --color-gold: #c4a35a;
+  --color-gold-bright: #d4b675;
+  --color-gold-dim: #8a7440;
+  --color-gold-soft: rgba(196, 163, 90, 0.08);
+  --color-gold-border: rgba(196, 163, 90, 0.22);
+
   --color-ai: #5fbfff;
+  --color-ai-bright: #88d0ff;
   --color-ai-soft: rgba(95, 191, 255, 0.08);
+
+  /* Per-CLI accents (used in mockups) */
+  --color-claude: #c4a35a;
+  --color-codex: #5fbfff;
+  --color-antigravity: #6ee787;
+  --color-ollama: #c4a8ff;
+
+  /* Semantic */
+  --color-ok: #6ee787;
+  --color-warn: #f0c674;
+}
+
+/* Light theme overrides — applied by toggling data-theme="light" on
+   the <html> element. Same brand colors, inverted surfaces. */
+:root[data-theme="light"] {
+  --color-bg: #faf8f1;
+  --color-surface-0: #ffffff;
+  --color-surface-1: #f5f2e8;
+  --color-surface-2: #eee9d8;
+  --color-surface-3: #e6e0cb;
+  --color-border: #d8d1bd;
+  --color-border-soft: #e8e3d1;
+  --color-border-strong: #b8ad8e;
+
+  --color-text: #1a1814;
+  --color-text-soft: #5a544a;
+  --color-text-mute: #8a8270;
+
+  --color-gold: #a8862d;
+  --color-gold-bright: #c4a35a;
+  --color-gold-dim: #7a6020;
+  --color-gold-soft: rgba(168, 134, 45, 0.08);
+  --color-gold-border: rgba(168, 134, 45, 0.28);
+
+  --color-ai: #1976d2;
+  --color-ai-bright: #1565c0;
+  --color-ai-soft: rgba(25, 118, 210, 0.07);
+
+  --color-claude: #a8862d;
+  --color-codex: #1976d2;
+  --color-antigravity: #2e7d32;
+  --color-ollama: #6a3eb5;
+
+  --color-ok: #2e7d32;
+  --color-warn: #b87f10;
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-
+  html { scroll-behavior: smooth; }
   body {
-    @apply bg-background text-text-primary antialiased;
-    font-feature-settings: "ss01" 1, "cv03" 1, "cv11" 1;
-  }
-
-  a {
-    @apply outline-none;
+    @apply bg-bg text-text antialiased;
+    font-feature-settings: "ss01" 1, "cv11" 1;
   }
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Subtle grain texture across the page — adds Linear-style visual interest */
+.grain {
+  position: relative;
+}
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' /></filter><rect width='100%25' height='100%25' filter='url(%23n)' /></svg>");
+  mix-blend-mode: overlay;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Glow halos behind hero / sections — softer in light mode */
+.glow-gold {
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(196, 163, 90, 0.15) 0%, transparent 60%);
+}
+:root[data-theme="light"] .glow-gold {
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(196, 163, 90, 0.22) 0%, transparent 60%);
+}
+.glow-ai {
+  background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(95, 191, 255, 0.12) 0%, transparent 70%);
+}
+:root[data-theme="light"] .glow-ai {
+  background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(25, 118, 210, 0.08) 0%, transparent 70%);
 }
 
+/* Frosted glass surface — used on nav, mock window chrome */
+.frost {
+  background: rgba(17, 17, 20, 0.7);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+:root[data-theme="light"] .frost {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(196, 163, 90, 0.24);
+  background: rgba(110, 106, 94, 0.25);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
+::-webkit-scrollbar-thumb:hover { background: rgba(110, 106, 94, 0.5); }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(196, 163, 90, 0.42);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-/* Subtle blinking cursor on the hero terminal */
-@keyframes cursor-blink {
+/* Animations */
+@keyframes blink {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
-.cursor-blink {
-  animation: cursor-blink 1s steps(1) infinite;
-}
+.blink { animation: blink 1s steps(1) infinite; }
 
-/* Streaming dot for "council convening" badges */
 @keyframes pulse-soft {
-  0%, 100% { opacity: 0.45; }
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
-.pulse-soft {
-  animation: pulse-soft 1.6s ease-in-out infinite;
+.pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(196, 163, 90, 0.0) 0%,
+    rgba(196, 163, 90, 0.5) 50%,
+    rgba(196, 163, 90, 0.0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Floating subtle motion */
+@keyframes drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.drift { animation: drift 6s ease-in-out infinite; }
