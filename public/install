@@ -19,12 +19,14 @@ INSTALL_DIR="${PREVAIL_HOME:-$HOME/.prevail}"
 BIN_NAME="prevail"
 
 # ── Pretty output (no emoji — Prevail brand convention) ─────────────
-gold='\033[38;5;179m'
-cyan='\033[38;5;81m'
-green='\033[38;5;77m'
-red='\033[38;5;203m'
-dim='\033[2m'
-reset='\033[0m'
+# Use $'...' so the colors are real ESC bytes, not literal \033 strings.
+# That way they survive heredoc expansion in the "Next steps" block.
+gold=$'\033[38;5;179m'
+cyan=$'\033[38;5;81m'
+green=$'\033[38;5;77m'
+red=$'\033[38;5;203m'
+dim=$'\033[2m'
+reset=$'\033[0m'
 
 step()  { printf "${gold}◆${reset} %s\n" "$*"; }
 ok()    { printf "${green}✓${reset} %s\n" "$*"; }
@@ -134,7 +136,8 @@ main() {
   step "downloading $(basename "$asset_url")"
   local tmp
   tmp=$(mktemp -d)
-  trap 'rm -rf "$tmp"' EXIT
+  # Use ${tmp:-} so the trap tolerates `set -u` when the script exits.
+  trap 'rm -rf "${tmp:-}"' EXIT
 
   if ! curl -fsSL --progress-bar "$asset_url" -o "$tmp/prevail.tar.gz"; then
     warn "could not fetch $asset_url"
