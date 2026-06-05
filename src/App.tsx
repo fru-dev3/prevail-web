@@ -221,9 +221,9 @@ function ModelLogoRow({ size = "md" }: { size?: "sm" | "md" }) {
   );
 }
 
-// "Star on GitHub" button with a live star count fetched from the
-// GitHub REST API. Falls back to a static badge if the fetch fails or
-// hasn't returned yet (network blocked, rate limited, etc.).
+// "Star on GitHub" pill — single rounded shape, no internal divider.
+// Modeled after the Linear / Vercel / shadcn-ui pattern: cream pill on
+// dark, dark pill on light. Star icon → "Star" → live count.
 function GitHubStarButton({
   size = "sm",
   className = "",
@@ -251,23 +251,15 @@ function GitHubStarButton({
       href={GITHUB_CLI}
       target="_blank"
       rel="noreferrer"
-      className={`group inline-flex items-stretch overflow-hidden rounded-md border border-border-soft bg-surface-0 transition-all hover:border-border ${
-        isLg ? "text-sm" : "text-xs"
+      title="Star on GitHub"
+      className={`group inline-flex items-center gap-2 rounded-full bg-text text-bg transition-all hover:opacity-90 hover:-translate-y-0.5 ${
+        isLg ? "px-5 py-2.5 text-sm" : "px-3.5 py-1.5 text-xs"
       } ${className}`}
     >
-      <span
-        className={`flex items-center gap-1.5 ${isLg ? "px-4 py-2.5" : "px-3 py-1.5"} text-text-soft group-hover:text-text`}
-      >
-        <Star className={isLg ? "h-4 w-4" : "h-3.5 w-3.5"} />
-        <span className="font-medium">Star</span>
-        <span className="hidden text-text-mute sm:inline">fru-dev3/prevail</span>
-      </span>
-      <span
-        className={`flex items-center border-l border-border-soft bg-surface-1 font-mono font-medium text-text-soft ${
-          isLg ? "px-4" : "px-3"
-        }`}
-      >
-        {stars !== null ? formatStars(stars) : "★"}
+      <Star className={isLg ? "h-4 w-4" : "h-3.5 w-3.5"} />
+      <span className="font-semibold">Star</span>
+      <span className="font-semibold opacity-70">
+        {stars !== null ? formatStars(stars) : "—"}
       </span>
     </a>
   );
