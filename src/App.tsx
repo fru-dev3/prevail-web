@@ -387,9 +387,9 @@ function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.05}>
-              <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl xl:text-7xl xl:leading-[1.02]">
+              <h1 className="mt-6 text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
                 A{" "}
-                <span className="bg-gradient-to-r from-gold via-gold-bright to-gold bg-clip-text text-transparent">
+                <span className="font-serif italic text-gold">
                   Council of <span className="text-ai">AI</span>
                 </span>
                 <br />
@@ -892,9 +892,9 @@ function HardQuestionsSection() {
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
               Why one model isn't enough
             </p>
-            <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
               Your life doesn't fit{" "}
-              <span className="text-text-soft">a benchmark.</span>
+              <span className="font-serif italic text-text-soft">a benchmark.</span>
             </h2>
             <p className="mt-6 text-lg text-text-soft">
               MMLU. HumanEval. GSM8K. Useful — for someone else. None of them
@@ -1079,7 +1079,7 @@ function FeatureSection({
               <div className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
                 {eyebrow}
               </div>
-              <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
                 {title}
               </h2>
               <p className="mt-6 text-lg text-text-soft">{description}</p>
@@ -1274,8 +1274,8 @@ function Pillars() {
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
             Why <Brand />
           </p>
-          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-bold tracking-tight md:text-5xl">
-            The cockpit, not the chatbot.
+          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            The cockpit, <span className="font-serif italic text-text-soft">not the chatbot.</span>
           </h2>
         </FadeIn>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
@@ -1346,7 +1346,7 @@ function FrameworksSection() {
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
                 Frameworks
               </p>
-              <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
                 Shape every answer{" "}
                 <span className="text-text-soft">on purpose.</span>
               </h2>
@@ -1513,7 +1513,7 @@ function LensesSection() {
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
               Lenses
             </p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-bold tracking-tight md:text-5xl">
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
               Eight angles on{" "}
               <span className="text-text-soft">the same question.</span>
             </h2>
@@ -1698,7 +1698,7 @@ function EcosystemSection() {
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
               Ecosystem
             </p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-bold tracking-tight md:text-5xl">
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
               Built to live with the rest of{" "}
               <span className="text-text-soft">your agent stack.</span>
             </h2>
@@ -1789,8 +1789,8 @@ function DownloadSection() {
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
             Get it
           </p>
-          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-bold tracking-tight md:text-5xl">
-            Two ways to run it.
+          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            Two ways <span className="font-serif italic text-text-soft">to run it.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
             Native Mac app, or the original terminal cockpit. Same vault, same
@@ -1925,8 +1925,8 @@ function FAQSection() {
       <div className="mx-auto max-w-3xl px-6">
         <FadeIn>
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">FAQ</p>
-          <h2 className="mt-4 text-center text-4xl font-bold tracking-tight md:text-5xl">
-            Quick answers.
+          <h2 className="mt-4 text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+<span className="font-serif italic text-text-soft">Quick</span> answers.
           </h2>
         </FadeIn>
         <div className="mt-12 space-y-2">

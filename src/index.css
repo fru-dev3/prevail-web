@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", "Segoe UI", -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", monospace;
+  --font-sans: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", "Source Serif 4", Georgia, serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", "Menlo", monospace;
 
   /* Prevail brand — dark by default. Light mode overrides below via
      [data-theme="light"]. Inspired by Linear / Vercel — multiple
