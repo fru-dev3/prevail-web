@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── Primary SEO ──────────────────────────────────────────────────── -->
+    <title>Prevail — One question. Four engines. One verdict.</title>
+    <meta
+      name="description"
+      content="Prevail runs Claude, Codex, Antigravity, and Ollama in parallel and a chair model writes the verdict. Local-first terminal cockpit for your life domains. Free, open source, ships as a CLI today."
+    />
+    <meta
+      name="keywords"
+      content="ai council, claude code, codex, ollama, antigravity, multi-cli, terminal cockpit, ai benchmark, local ai, personal ai, llm orchestration, mcp server, opentui"
+    />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="author" content="fru.dev" />
+    <meta name="theme-color" content="#0d0d0e" />
+    <meta name="application-name" content="Prevail" />
+    <meta name="generator" content="Vite" />
+    <link rel="canonical" href="https://prevail.sh/" />
+
+    <!-- ── Open Graph ───────────────────────────────────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Prevail" />
+    <meta property="og:title" content="Prevail — One question. Four engines. One verdict." />
+    <meta
+      property="og:description"
+      content="A terminal cockpit that fans every hard question to Claude, Codex, Antigravity, and Ollama in parallel — and a chair model writes the verdict."
+    />
+    <meta property="og:url" content="https://prevail.sh/" />
+    <meta property="og:image" content="https://prevail.sh/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Prevail terminal cockpit screenshot — gold ASCII PREVAIL logo, four CLI panelists, deliberation in progress." />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ── Twitter / X Card ─────────────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Prevail — One question. Four engines. One verdict." />
+    <meta
+      name="twitter:description"
+      content="A terminal cockpit that fans every hard question to four CLIs in parallel — and a chair model writes the verdict."
+    />
+    <meta name="twitter:image" content="https://prevail.sh/og-image.png" />
+    <meta name="twitter:image:alt" content="Prevail terminal cockpit." />
+
+    <!-- ── JSON-LD Structured Data ──────────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://prevail.sh/#website",
+          "url": "https://prevail.sh/",
+          "name": "Prevail",
+          "description": "Terminal cockpit for AI council deliberation across personal life domains.",
+          "inLanguage": "en-US",
+          "publisher": { "@id": "https://prevail.sh/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://prevail.sh/#organization",
+          "name": "fru.dev",
+          "url": "https://prevail.sh/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://prevail.sh/logo.png",
+            "width": 1024,
+            "height": 1024
+          },
+          "sameAs": ["https://github.com/fru-dev3/prevail"]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://prevail.sh/#app",
+          "name": "Prevail",
+          "alternateName": ["prevail", "prevail-cli", "prevail cockpit"],
+          "description": "Prevail is a terminal cockpit that runs Claude, Codex, Antigravity, and Ollama in parallel as a council, grades them against a built-in canonical benchmark, and persists every verdict as markdown in a folder you own.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "macOS, Linux, Windows via WSL",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "description": "Free and open source under MIT license."
+          },
+          "author": { "@id": "https://prevail.sh/#organization" },
+          "publisher": { "@id": "https://prevail.sh/#organization" },
+          "featureList": [
+            "Multi-CLI council deliberation across Claude, Codex, Antigravity, and Ollama",
+            "Canonical benchmark with 21 questions across 8 capability dimensions",
+            "Local-first markdown vault — no database, no cloud",
+            "MCP server bridge exposing the vault to any MCP client",
+            "Twenty life domain chips with per-domain state, logs, and skills",
+            "Two-machine sync over Tailscale with symlinked vault",
+            "Auto-compact layout for 13-inch and split terminals",
+            "Single binary distribution via bun --compile"
+          ],
+          "screenshot": "https://prevail.sh/og-image.png",
+          "softwareVersion": "1.6.5",
+          "keywords": "ai council, multi-cli, terminal cockpit, llm benchmark, claude code, codex, antigravity, ollama, mcp"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://prevail.sh/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is a council?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A council is Prevail's core mechanic: one question fanned out to every CLI you have installed, answered in parallel, then a chair model reads all replies and writes one decisive verdict with a panel surfacing where the panelists disagreed."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does my data leave my Mac?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Your vault never leaves your machine. Prevail spawns the CLIs you are already logged into. For local-private domains, set the council to Ollama-only and nothing crosses your network."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which CLIs are supported?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Claude Code, Codex, Antigravity (Google's agy CLI), and Ollama. Prevail auto-detects whichever you have installed and probes them on boot."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How is this different from just running Claude Code?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Claude Code is one model in one terminal. Prevail is a cockpit: 20 life domains, four CLIs deliberating in parallel, a chair-synthesized verdict, scheduled briefings, an MCP bridge to your vault, and a canonical benchmark that grades every new model against your real decisions."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- ── Fonts ─────────────────────────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Netlify form for "notify me when desktop ships" email capture. Hidden
+         so Netlify's build can detect it. The form on the page submits to
+         the same endpoint. -->
+    <form name="notify" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
