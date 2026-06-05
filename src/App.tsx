@@ -609,7 +609,7 @@ function InstallSection() {
             </div>
             <div className="flex flex-col items-start gap-2 md:items-end">
               <a
-                href="https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail-macOS-arm64.dmg"
+                href="https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.1.0_aarch64.dmg"
                 className="inline-flex items-center gap-2 rounded bg-accent px-5 py-3 font-mono text-sm font-medium text-background transition-all hover:bg-accent-hover hover:-translate-y-0.5"
               >
                 download .dmg <ArrowUpRight className="h-3.5 w-3.5" />
