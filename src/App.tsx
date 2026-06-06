@@ -368,14 +368,20 @@ function Hero() {
               </a>
             </FadeIn>
 
+            <FadeIn delay={0.04}>
+              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
+                Ask a council. Prevail.
+              </p>
+            </FadeIn>
+
             <FadeIn delay={0.05}>
-              <h1 className="mt-6 text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
+              <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
                 A{" "}
                 <span className="font-serif italic text-gold">
-                  Council of <span className="text-ai">AI</span>
+                  council of <span className="text-ai">AI</span>
                 </span>
                 <br />
-                for your hard questions.
+                for life's hardest questions.
               </h1>
             </FadeIn>
 
@@ -2127,7 +2133,7 @@ function DownloadSection() {
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
-            Get it
+            Ask a council. Prevail.
           </p>
           <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
             Two ways <span className="font-serif italic text-text-soft">to run it.</span>
@@ -2367,7 +2373,12 @@ function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border-soft pt-6 text-xs text-text-mute md:flex-row md:items-center">
+        <div className="mt-14 border-t border-border-soft pt-12 text-center">
+          <p className="font-serif text-2xl italic text-text-soft md:text-3xl">
+            Ask a council. <span className="not-italic text-gold">Prevail.</span>
+          </p>
+        </div>
+        <div className="mt-10 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
           <span>© 2026 fru.dev — built local, shipped open.</span>
           <span>Built with Bun · React · Tauri · OpenTUI</span>
         </div>
