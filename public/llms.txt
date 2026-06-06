@@ -1,0 +1,33 @@
+# Prevail
+
+> Prevail is an AI harness for life's hard questions. It structures your life's context and brings it to humanity's most powerful intelligence: one question fans out to every AI CLI you have installed — Claude, Codex, Antigravity, and Ollama — they answer in parallel, and a chair model reads all the replies and writes one verdict, with a panel showing where they disagreed. Local-first, markdown-native, free and open source (MIT). Native Mac app + terminal CLI.
+
+Prevail is not a chatbot and not a coding harness — it is a "life harness." The whole system is, in essence, folders plus the discipline of organizing them so an AI can reason over your life. Every life domain (wealth, tax, health, career, estate, and ~20 more) is a plain folder; every verdict is a dated markdown file you own. There is no database and no cloud — Prevail spawns the CLIs you are already logged into, and for private domains you can run an Ollama-only council so nothing leaves the machine. A built-in benchmark (21 canonical questions across 8 capability dimensions) grades models against *your* life, and the best model for one domain is often not the best for another.
+
+## Core concepts
+
+- [The council](https://prevail.sh/#council): One question is fanned out to every installed CLI; they answer in parallel; a chair model you choose synthesizes one verdict and surfaces a disagreement panel — usually where the real decision lives.
+- [The benchmark](https://prevail.sh/#benchmark): 21 starter questions across 8 dimensions (binary decisions, document analysis, recency, cultural nuance, bias, brevity, complex tax traps, refusal-to-recommend). Scored two ways — keyword match and LLM-as-judge. A separate leaderboard per life domain. Add your own questions from real decisions.
+- [The vault](https://prevail.sh/#ecosystem): No database — just folders. Every domain is a folder; every verdict is dated markdown. Sync with git, iCloud, Tailscale, or nothing.
+
+## Install
+
+- [Install the CLI](https://prevail.sh/#install): `curl -fsSL prevail.sh/install | bash` (macOS, Linux, Windows via WSL). Current CLI version 1.6.5.
+- [Download the Mac app](https://github.com/fru-dev3/prevail-desktop/releases/latest): Native desktop app, no terminal required. Current desktop version 0.2.93.
+
+## Source & docs
+
+- [CLI repository](https://github.com/fru-dev3/prevail): Source for the Prevail CLI / terminal cockpit (MIT).
+- [Desktop repository](https://github.com/fru-dev3/prevail-desktop): Source for the native Mac app.
+- [Changelog](https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md): Release notes for the CLI.
+
+## Works with
+
+- Models / CLIs: Claude (Claude Code), Codex, Antigravity (Google's `agy` CLI), Ollama (local).
+- Ecosystem: MCP (exposes the vault to any MCP client), Tailscale (two-machine sync), Telegram.
+
+## Notes for agents
+
+- Maker: fru.dev (@fru). Brand color gold #c4a35a with cyan #5fbfff accent.
+- Positioning: "An AI harness for life's hard questions" — categorically a live/life harness, not a coding harness.
+- License: MIT, free and open source. Local-first; user data stays on the user's machine.
