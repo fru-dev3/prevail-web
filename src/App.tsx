@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Briefcase,
@@ -343,6 +343,69 @@ function Logo({ size = 24 }: { size?: number }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// HARNESS LINE — the category claim. Every other AI tool is a *coding* harness:
+// a wrapper that points a model (Claude, Codex, Antigravity, Ollama) at a
+// codebase. Prevail wraps the same models and points them at your *life*. We
+// say it the way an editor would — strike the word "coding", write "life" over
+// it. The frozen / reduced-motion / SSR state already reads "A c̶o̶d̶i̶n̶g̶ life
+// harness." so the wordplay never depends on JS running.
+function HarnessLine() {
+  const reduce = useReducedMotion();
+  // Dim "coding" only after the strike has been drawn. Reduced motion lands on
+  // the finished correction immediately.
+  const [struck, setStruck] = useState(!!reduce);
+  useEffect(() => {
+    if (reduce) return;
+    const t = setTimeout(() => setStruck(true), 1000);
+    return () => clearTimeout(t);
+  }, [reduce]);
+
+  const strikeT = reduce
+    ? { duration: 0 }
+    : { duration: 0.45, delay: 0.55, ease: EASE };
+  const lifeT = reduce
+    ? { duration: 0 }
+    : { duration: 0.5, delay: 0.95, ease: EASE };
+
+  return (
+    <div>
+      <p className="flex flex-wrap items-baseline gap-x-2 text-xl font-medium tracking-tight text-text md:text-2xl">
+        <span>A</span>
+        <span className="relative inline-block">
+          <span
+            className={`transition-colors duration-500 ${
+              struck ? "text-text-mute" : "text-text"
+            }`}
+          >
+            coding
+          </span>
+          <motion.span
+            aria-hidden
+            className="absolute inset-x-[-2px] top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-gold"
+            style={{ transformOrigin: "left center" }}
+            initial={{ scaleX: reduce ? 1 : 0 }}
+            animate={{ scaleX: 1 }}
+            transition={strikeT}
+          />
+        </span>
+        <motion.span
+          className="font-serif italic text-gold"
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={lifeT}
+        >
+          life
+        </motion.span>
+        <span>harness.</span>
+      </p>
+      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
+        Ask a council. Prevail.
+      </p>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HERO
 
 function Hero() {
@@ -371,9 +434,9 @@ function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.04}>
-              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
-                Ask a council. Prevail.
-              </p>
+              <div className="mt-6">
+                <HarnessLine />
+              </div>
             </FadeIn>
 
             <FadeIn delay={0.05}>
@@ -389,12 +452,14 @@ function Hero() {
 
             <FadeIn delay={0.12}>
               <p className="mt-6 max-w-xl text-base text-text-soft md:text-lg">
-                <Brand /> sends every hard question to{" "}
                 <span className="text-text">Claude</span>,{" "}
                 <span className="text-text">Codex</span>,{" "}
-                <span className="text-text">Antigravity</span>, and{" "}
-                <span className="text-text">Ollama</span> at once. A chair
-                model reads all their answers and writes one clear verdict.
+                <span className="text-text">Antigravity</span>,{" "}
+                <span className="text-text">Ollama</span> — the AI harnesses
+                built to write code. <Brand /> points them at your life
+                instead: every hard question goes to all of them at once, and a
+                chair model writes <span className="text-text">one clear
+                verdict</span>.
               </p>
             </FadeIn>
 
@@ -2744,12 +2809,12 @@ export default function App() {
               <span className="text-text-soft">Just folders.</span>
             </>
           }
-          description="Every life domain is a folder. Every verdict is a dated markdown file. Sync with git, iCloud, Tailscale, or nothing. Your data stays where you put it."
+          description="Honestly, that's most of it. No database, no lock-in, nothing clever — Prevail is folders, one per life domain, plus the discipline of organizing them so an AI can reason over your life. Get AI-ready and the council does the rest. Every verdict lands as a dated markdown file; sync with git, iCloud, Tailscale, or nothing."
           bullets={[
+            "Folders + the discipline of organizing — that's the whole trick",
             "Plain markdown — read it without the app",
             "20 starter domains, or bring your own",
             "Works with any sync tool, or none",
-            "Version-controllable with git",
           ]}
           mockup={<VaultMock />}
         />
