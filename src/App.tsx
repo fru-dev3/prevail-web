@@ -34,11 +34,12 @@ import {
 const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
-const DMG_URL =
-  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.2.16_aarch64.dmg";
+// Points at the latest GitHub release page (never 404s as new versions ship),
+// rather than a version-pinned .dmg asset that breaks on every release.
+const DMG_URL = "https://github.com/fru-dev3/prevail-desktop/releases/latest";
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
-const VERSION_DESKTOP = "0.2.16";
+const VERSION_DESKTOP = "0.2.5";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
