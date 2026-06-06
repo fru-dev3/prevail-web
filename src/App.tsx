@@ -416,50 +416,33 @@ function Hero() {
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-12 xl:gap-16">
           {/* LEFT — text */}
           <div>
-            <FadeIn>
-              <a
-                href={GITHUB_DESKTOP}
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 py-1 pl-1 pr-4 text-xs"
-              >
-                <span className="rounded-full bg-gold px-2 py-0.5 font-medium text-bg">
-                  New
-                </span>
-                <span className="text-text-soft">
-                  Desktop v{VERSION_DESKTOP} & CLI v{VERSION_CLI} both available
-                </span>
-                <ArrowRight className="h-3 w-3 text-text-mute transition-transform group-hover:translate-x-0.5" />
-              </a>
-            </FadeIn>
-
             <FadeIn delay={0.04}>
-              <div className="mt-6">
+              <div>
                 <HarnessLine />
               </div>
             </FadeIn>
 
             <FadeIn delay={0.05}>
               <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
-                A{" "}
-                <span className="font-serif italic text-gold">
-                  council of <span className="text-ai">AI</span>
+                <span className="font-serif italic">
+                  <span className="text-ai">AI</span>{" "}
+                  <span className="text-gold">harness</span>
                 </span>
                 <br />
-                for life's hardest questions.
+                for life's hard questions.
               </h1>
             </FadeIn>
 
             <FadeIn delay={0.12}>
               <p className="mt-6 max-w-xl text-base text-text-soft md:text-lg">
+                <Brand /> structures your life's context and brings it to{" "}
+                <span className="text-text">humanity's most powerful
+                intelligence</span>. Every hard question goes to{" "}
                 <span className="text-text">Claude</span>,{" "}
                 <span className="text-text">Codex</span>,{" "}
-                <span className="text-text">Antigravity</span>,{" "}
-                <span className="text-text">Ollama</span> — the AI harnesses
-                built to write code. <Brand /> points them at your life
-                instead: every hard question goes to all of them at once, and a
-                chair model writes <span className="text-text">one clear
-                verdict</span>.
+                <span className="text-text">Antigravity</span>, and{" "}
+                <span className="text-text">Ollama</span> at once — then a chair
+                model reads every answer and writes one clear verdict.
               </p>
             </FadeIn>
 
@@ -1096,7 +1079,9 @@ function CouncilPitch() {
               <span className="text-gold">your hardest question</span> together.
             </p>
             <p className="mt-4 text-text-soft">
-              That's what <Brand /> is. A council of AI for the rest of your life.
+              That's the harness: a <span className="text-text">council</span> of
+              AI for the rest of your life — every model you trust, convened on
+              one question.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
@@ -1290,49 +1275,144 @@ function CouncilMock() {
 // ─────────────────────────────────────────────────────────────────────────────
 // BENCHMARK MOCK — leaderboard
 
+// Per-domain leaderboards. The point: the best model for one part of your life
+// isn't the best for another — the winner (row 0) deliberately changes by
+// domain. Rows are [judge score, keyword %, model].
+const BENCH_DOMAINS: { id: string; note: string; rows: [string, string, string][] }[] = [
+  {
+    id: "wealth",
+    note: "frontier reasoning wins the horizon math",
+    rows: [
+      ["9.7", "46%", "opus-4-7"],
+      ["9.5", "43%", "sonnet-4-6"],
+      ["9.4", "41%", "opus-4-6"],
+      ["8.1", "33%", "gpt-5.4"],
+      ["6.9", "28%", "gemini-3.1"],
+    ],
+  },
+  {
+    id: "tax",
+    note: "sub-clause traps reward the deepest model",
+    rows: [
+      ["9.8", "51%", "opus-4-6"],
+      ["9.6", "47%", "opus-4-7"],
+      ["8.9", "39%", "sonnet-4-6"],
+      ["7.4", "31%", "gpt-5.4"],
+      ["6.5", "24%", "gemini-3.1"],
+    ],
+  },
+  {
+    id: "health",
+    note: "a local model leads — labs never leave the machine",
+    rows: [
+      ["9.5", "44%", "sonnet-4-6"],
+      ["9.3", "42%", "llama-local"],
+      ["9.2", "41%", "opus-4-7"],
+      ["8.2", "35%", "haiku"],
+      ["7.0", "29%", "gpt-5.4"],
+    ],
+  },
+  {
+    id: "career",
+    note: "nuance over runway flips the ranking",
+    rows: [
+      ["9.6", "45%", "opus-4-7"],
+      ["9.3", "41%", "opus-4-6"],
+      ["9.1", "40%", "sonnet-4-6"],
+      ["7.8", "33%", "gpt-5.4"],
+      ["7.1", "30%", "gemini-3.1"],
+    ],
+  },
+  {
+    id: "real estate",
+    note: "a different model takes the top row here",
+    rows: [
+      ["9.4", "43%", "gpt-5.4"],
+      ["9.3", "42%", "opus-4-7"],
+      ["9.0", "40%", "sonnet-4-6"],
+      ["8.0", "34%", "opus-4-6"],
+      ["6.7", "26%", "gemini-3.1"],
+    ],
+  },
+];
+
 function BenchmarkMock() {
-  const rows = [
-    ["9.7", "46%", "opus-4-7", true],
-    ["9.6", "42%", "opus-4-6", false],
-    ["9.5", "48%", "sonnet-4-6", false],
-    ["8.3", "34%", "haiku", false],
-    ["7.1", "31%", "gpt-5.4", false],
-    ["6.8", "27%", "gemini-3.1", false],
-  ] as const;
+  const [active, setActive] = useState(0);
+  const dom = BENCH_DOMAINS[active];
   return (
     <WindowChrome title="Prevail · benchmark">
       <div className="bg-surface-0 p-5">
-        <div className="mb-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-text-mute">
-          <span>
-            <span className="text-gold">◈</span> Leaderboard
-          </span>
-          <span>21 questions · 8 dimensions</span>
+        {/* domain tabs — switch the leaderboard per life domain */}
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {BENCH_DOMAINS.map((d, i) => (
+            <button
+              key={d.id}
+              onClick={() => setActive(i)}
+              className={`rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors ${
+                i === active
+                  ? "border-gold-border bg-gold-soft text-gold"
+                  : "border-border-soft text-text-mute hover:text-text-soft"
+              }`}
+            >
+              {d.id}
+            </button>
+          ))}
         </div>
-        <div className="grid grid-cols-[60px_60px_1fr] gap-3 px-2 pb-2 font-mono text-[9px] uppercase tracking-wider text-text-mute">
+
+        <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-text-mute">
+          <span>
+            <span className="text-gold">◈</span> {dom.id} · leaderboard
+          </span>
+          <span className="rounded-full border border-border-soft px-2 py-0.5 text-[9px] normal-case tracking-normal">
+            sample
+          </span>
+        </div>
+        <div className="grid grid-cols-[48px_52px_1fr] gap-3 px-2 pb-2 font-mono text-[9px] uppercase tracking-wider text-text-mute">
           <span>judge</span>
           <span>kw</span>
           <span>model</span>
         </div>
-        <div className="space-y-0.5">
-          {rows.map(([j, k, m, top]) => (
-            <div
-              key={m}
-              className={`grid grid-cols-[60px_60px_1fr] gap-3 rounded px-2 py-2 font-mono text-[11px] ${
-                top ? "bg-gold-soft" : ""
-              }`}
-            >
-              <span className={top ? "text-gold" : "text-text-soft"}>{j}</span>
-              <span className="text-text-mute">{k}</span>
-              <span className="text-text">
-                {top && <span className="mr-1.5 text-gold">▸</span>}
-                {m}
-              </span>
-            </div>
-          ))}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={dom.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.25, ease: EASE }}
+            className="space-y-0.5"
+          >
+            {dom.rows.map(([j, k, m], idx) => {
+              const top = idx === 0;
+              return (
+                <div
+                  key={m}
+                  className={`grid grid-cols-[48px_52px_1fr] gap-3 rounded px-2 py-2 font-mono text-[11px] ${
+                    top ? "bg-gold-soft" : ""
+                  }`}
+                >
+                  <span className={top ? "text-gold" : "text-text-soft"}>{j}</span>
+                  <span className="text-text-mute">{k}</span>
+                  <span className="text-text">
+                    {top && <span className="mr-1.5 text-gold">▸</span>}
+                    {m}
+                  </span>
+                </div>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
+        <div className="mt-4 flex items-start gap-2 text-[11px] leading-relaxed text-text-mute">
+          <span className="text-ai">▸</span>
+          <span>{dom.note}</span>
         </div>
-        <div className="mt-5 rounded-md border border-border bg-surface-1 px-3 py-2.5 font-mono text-[10px] text-text-soft">
-          <span className="text-gold">$</span> prevail bench seed --from-log wealth
+        <div className="mt-4 rounded-md border border-border bg-surface-1 px-3 py-2.5 font-mono text-[10px] text-text-soft">
+          <span className="text-gold">$</span> prevail bench --domain{" "}
+          {dom.id.replace(" ", "-")}
         </div>
+        <p className="mt-2.5 text-[10px] leading-relaxed text-text-mute">
+          Illustrative scores — your ranking comes from your own questions and
+          chair.
+        </p>
       </div>
     </WindowChrome>
   );
@@ -2446,7 +2526,7 @@ function Footer() {
           </p>
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
-          <span>© 2026 fru.dev — built local, shipped open.</span>
+          <span>© 2026 Prevail.sh — built local, shipped open.</span>
           <span>Built with Bun · React · Tauri · OpenTUI</span>
         </div>
       </div>
@@ -2578,61 +2658,105 @@ function DesktopShowcase() {
 // ─────────────────────────────────────────────────────────────────────────────
 // USE CASES — the questions people point the council at
 
-const COUNCIL_DOTS = [
-  { c: "var(--color-claude, #c4a35a)", n: "claude" },
-  { c: "var(--color-codex, #5fbfff)", n: "codex" },
-  { c: "var(--color-antigravity, #6ee787)", n: "antigravity" },
-  { c: "var(--color-ollama, #c4a8ff)", n: "ollama" },
-];
+// Brand color per engine — shared by the header dots and the panel rows so a
+// model is always the same hue wherever it appears.
+const MODEL_COLOR: Record<string, string> = {
+  claude: "#c4a35a",
+  codex: "#5fbfff",
+  antigravity: "#6ee787",
+  ollama: "#c4a8ff",
+};
+const COUNCIL_DOTS = (["claude", "codex", "antigravity", "ollama"] as const).map(
+  (n) => ({ n, c: MODEL_COLOR[n] }),
+);
 
+// Each card shows the panel disagreeing (`panel`), the crux of the split
+// (`split`), then the chair's synthesized call (`verdict`). `lean` is the
+// one-word stance used to tint each row so agreement/dissent reads at a glance.
 const USE_CASES = [
   {
     icon: Wallet,
     domain: "wealth",
     q: "Prepay the mortgage or invest the cash?",
+    panel: [
+      { m: "claude", lean: "invest", s: "Invest — the 22-yr horizon wins." },
+      { m: "codex", lean: "invest", s: "Invest, but floor cash at 6 months." },
+      { m: "antigravity", lean: "invest", s: "Only with a 12-month buffer." },
+      { m: "ollama", lean: "prepay", s: "Prepay — a guaranteed 6.2%." },
+    ],
+    split: "Codex floors cash at 6 months; Antigravity wants 12.",
     verdict:
       "Invest — if you hold ≥6 months liquidity and can ride a −30% drawdown. Else prepay.",
-    split: "Codex says a 6-month floor; Antigravity argues 12.",
   },
   {
     icon: Receipt,
     domain: "tax",
     q: "What should I move before year-end?",
+    panel: [
+      { m: "claude", lean: "convert", s: "Mega-backdoor before anything else." },
+      { m: "codex", lean: "harvest", s: "Harvest the losses first." },
+      { m: "antigravity", lean: "convert", s: "Roth up to the 24% ceiling." },
+      { m: "ollama", lean: "defer", s: "Defer — bunch it into next year." },
+    ],
+    split: "Claude flags the mega-backdoor; Codex prioritizes the harvest.",
     verdict:
       "Convert to the top of the 24% bracket, then harvest losses to soften the income.",
-    split: "Claude flags the mega-backdoor; Codex prioritizes the harvest.",
   },
   {
     icon: HeartPulse,
     domain: "health",
     q: "Statin now, or lifestyle first?",
+    panel: [
+      { m: "claude", lean: "lifestyle", s: "Lifestyle for 90 days." },
+      { m: "codex", lean: "statin", s: "Start a low-dose statin now." },
+      { m: "antigravity", lean: "lifestyle", s: "Lifestyle, then recheck ApoB." },
+      { m: "ollama", lean: "lifestyle", s: "Lifestyle — labs stay local." },
+    ],
+    split: "Run Ollama-only so your labs never leave the machine.",
     verdict:
       "Lifestyle for 90 days first — your ApoB and calcium score allow the window.",
-    split: "Run Ollama-only so your labs never leave the machine.",
   },
   {
     icon: Briefcase,
     domain: "career",
     q: "Take the offer, or counter?",
+    panel: [
+      { m: "claude", lean: "counter", s: "Counter — anchor on scope." },
+      { m: "codex", lean: "counter", s: "Counter — your runway holds." },
+      { m: "antigravity", lean: "accept", s: "Take it — the relationship matters." },
+      { m: "ollama", lean: "counter", s: "Counter, push the base." },
+    ],
+    split: "Codex weighs runway; Antigravity weighs the relationship.",
     verdict:
       "Counter — your BATNA is stronger than the offer assumes. Anchor on scope, not title.",
-    split: "Codex weighs runway; Antigravity weighs the relationship.",
   },
   {
     icon: Building2,
     domain: "real estate",
     q: "Sell the condo, or rent it out?",
+    panel: [
+      { m: "claude", lean: "rent", s: "Rent — appreciation is ahead." },
+      { m: "codex", lean: "rent", s: "Rent, but cap the landlord cost." },
+      { m: "antigravity", lean: "sell", s: "Sell — tenant risk is real." },
+      { m: "ollama", lean: "rent", s: "Rent only if you go hands-off." },
+    ],
+    split: "The panel splits on your tolerance for tenant risk.",
     verdict:
       "Rent — appreciation is likely and landlord cost is contained. Sell only to harvest gains.",
-    split: "The panel splits on your tolerance for tenant risk.",
   },
   {
     icon: Compass,
     domain: "big calls",
     q: "Should we relocate for the job?",
+    panel: [
+      { m: "claude", lean: "maybe", s: "Only if the comp clears the cost." },
+      { m: "codex", lean: "maybe", s: "Model the 5-year delta first." },
+      { m: "antigravity", lean: "caution", s: "Weigh the social cost heavily." },
+      { m: "ollama", lean: "maybe", s: "Name the number, then decide." },
+    ],
+    split: "Exactly where a council beats a single voice.",
     verdict:
       "Only if the five-year comp delta clears the social cost. Name the number first.",
-    split: "Exactly where a council beats a single voice.",
   },
 ];
 
@@ -2654,8 +2778,8 @@ function UseCasesSection() {
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            One domain, one question, one verdict — with the disagreement laid
-            bare. Here's the council at work across a life.
+            Four engines weigh in, the disagreement laid bare — then one
+            verdict. Here's the council at work across a life.
           </p>
         </FadeIn>
 
@@ -2693,8 +2817,42 @@ function UseCasesSection() {
                     </p>
                   </div>
 
-                  {/* verdict card */}
-                  <div className="px-6 pb-5 pt-4">
+                  {/* panel — the four engines disagree, in their own colors */}
+                  <div className="px-6 pt-5">
+                    <div className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-text-mute">
+                      The panel
+                    </div>
+                    <ul className="space-y-2.5">
+                      {u.panel.map((p) => {
+                        const c = MODEL_COLOR[p.m];
+                        return (
+                          <li key={p.m} className="flex items-start gap-2.5">
+                            <span
+                              className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full"
+                              style={{ background: c }}
+                            />
+                            <span
+                              className="w-[74px] shrink-0 font-mono text-[10px] uppercase tracking-wide"
+                              style={{ color: c }}
+                            >
+                              {p.m}
+                            </span>
+                            <span className="flex-1 text-[12.5px] leading-snug text-text-soft">
+                              {p.s}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+
+                  {/* split + verdict, pinned to the bottom so they line up
+                      across the row regardless of panel height */}
+                  <div className="mt-auto px-6 pb-5 pt-5">
+                    <div className="mb-3 flex items-start gap-2 text-xs leading-relaxed text-text-mute">
+                      <span className="text-ai">▸</span>
+                      <span>{u.split}</span>
+                    </div>
                     <div className="rounded-xl border border-gold-border bg-gold-soft p-4">
                       <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
                         <Scale className="h-3.5 w-3.5" />
@@ -2704,12 +2862,6 @@ function UseCasesSection() {
                         {u.verdict}
                       </p>
                     </div>
-                  </div>
-
-                  {/* divergence footer */}
-                  <div className="mt-auto flex items-start gap-2 border-t border-border-soft px-6 py-3.5 text-xs leading-relaxed text-text-mute">
-                    <span className="text-ai">▸</span>
-                    <span>{u.split}</span>
                   </div>
                 </div>
               </FadeIn>
@@ -2791,9 +2943,9 @@ export default function App() {
           }
           description="21 canonical questions ship with the app, covering 8 capability dimensions — binary decisions, document analysis, recency, cultural nuance, bias, brevity, complex tax traps, and refusal-to-recommend scenarios. Add your own from real decisions you've already made. New models get graded against your life."
           bullets={[
+            "A leaderboard per domain — the model that wins your wealth calls isn't the one that wins your health calls",
             "21 starter questions across 8 capability dimensions",
             "Scored two ways: keyword match + LLM-as-judge",
-            "Click any leaderboard row to drill into the full reply",
             "Import from your decision log with one command",
           ]}
           mockup={<BenchmarkMock />}
