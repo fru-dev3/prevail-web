@@ -2,17 +2,23 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
+  Briefcase,
+  Building2,
   Check,
+  Compass,
   Copy,
   Folder,
+  HeartPulse,
   Layers,
   MessageSquare,
   Moon,
+  Receipt,
   Scale,
   Sparkles,
   Star,
   Sun,
   Terminal,
+  Wallet,
 } from "lucide-react";
 import {
   siClaude,
@@ -29,10 +35,10 @@ const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
 const DMG_URL =
-  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.2.5_aarch64.dmg";
+  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail_0.2.16_aarch64.dmg";
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
-const VERSION_DESKTOP = "0.2.5";
+const VERSION_DESKTOP = "0.2.16";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2371,6 +2377,251 @@ function Footer() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DESKTOP SHOWCASE — real product shots of Prevail Desktop
+
+const DESKTOP_SHOTS = [
+  {
+    src: "/desktop-benchmark.png",
+    label: "Benchmark",
+    caption: "Grade every model against your real decisions.",
+  },
+  {
+    src: "/desktop-chat.png",
+    label: "Chat",
+    caption: "One engine, streaming — switch with a slash.",
+  },
+  {
+    src: "/desktop-settings.png",
+    label: "Settings",
+    caption: "Telegram bridge, MCP server, palettes.",
+  },
+];
+
+function DesktopShowcase() {
+  return (
+    <section
+      id="desktop-app"
+      className="relative border-t border-border-soft py-24 md:py-32 grain"
+    >
+      <div className="glow-gold absolute inset-0 -z-10 opacity-40" />
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
+            Prevail Desktop
+          </p>
+          <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            The cockpit,{" "}
+            <span className="font-serif italic text-text-soft">
+              no terminal required.
+            </span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
+            A native macOS app over the same vault. Pick a folder, convene the
+            council, study the benchmark.
+          </p>
+        </FadeIn>
+
+        <FadeIn delay={0.08}>
+          <figure className="mt-14 overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-2xl">
+            <img
+              src="/desktop-council.png"
+              alt="Prevail Desktop — the council panel, with four CLIs answering in parallel and a synthesized verdict"
+              className="w-full"
+              loading="lazy"
+            />
+          </figure>
+        </FadeIn>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {DESKTOP_SHOTS.map((s, i) => (
+            <FadeIn key={s.label} delay={0.12 + i * 0.06}>
+              <figure className="h-full overflow-hidden rounded-xl border border-border bg-surface-0">
+                <img
+                  src={s.src}
+                  alt={`Prevail Desktop — ${s.label}`}
+                  className="w-full"
+                  loading="lazy"
+                />
+                <figcaption className="px-4 py-3 text-sm text-text-soft">
+                  <span className="font-medium text-text">{s.label}.</span>{" "}
+                  {s.caption}
+                </figcaption>
+              </figure>
+            </FadeIn>
+          ))}
+        </div>
+
+        <FadeIn delay={0.2}>
+          <div className="mt-12 flex justify-center">
+            <a
+              href="#install"
+              className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+              style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+            >
+              Download Prevail.app
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASES — the questions people point the council at
+
+const COUNCIL_DOTS = [
+  { c: "var(--color-claude, #c4a35a)", n: "claude" },
+  { c: "var(--color-codex, #5fbfff)", n: "codex" },
+  { c: "var(--color-antigravity, #6ee787)", n: "antigravity" },
+  { c: "var(--color-ollama, #c4a8ff)", n: "ollama" },
+];
+
+const USE_CASES = [
+  {
+    icon: Wallet,
+    domain: "wealth",
+    q: "Prepay the mortgage or invest the cash?",
+    verdict:
+      "Invest — if you hold ≥6 months liquidity and can ride a −30% drawdown. Else prepay.",
+    split: "Codex says a 6-month floor; Antigravity argues 12.",
+  },
+  {
+    icon: Receipt,
+    domain: "tax",
+    q: "What should I move before year-end?",
+    verdict:
+      "Convert to the top of the 24% bracket, then harvest losses to soften the income.",
+    split: "Claude flags the mega-backdoor; Codex prioritizes the harvest.",
+  },
+  {
+    icon: HeartPulse,
+    domain: "health",
+    q: "Statin now, or lifestyle first?",
+    verdict:
+      "Lifestyle for 90 days first — your ApoB and calcium score allow the window.",
+    split: "Run Ollama-only so your labs never leave the machine.",
+  },
+  {
+    icon: Briefcase,
+    domain: "career",
+    q: "Take the offer, or counter?",
+    verdict:
+      "Counter — your BATNA is stronger than the offer assumes. Anchor on scope, not title.",
+    split: "Codex weighs runway; Antigravity weighs the relationship.",
+  },
+  {
+    icon: Building2,
+    domain: "real estate",
+    q: "Sell the condo, or rent it out?",
+    verdict:
+      "Rent — appreciation is likely and landlord cost is contained. Sell only to harvest gains.",
+    split: "The panel splits on your tolerance for tenant risk.",
+  },
+  {
+    icon: Compass,
+    domain: "big calls",
+    q: "Should we relocate for the job?",
+    verdict:
+      "Only if the five-year comp delta clears the social cost. Name the number first.",
+    split: "Exactly where a council beats a single voice.",
+  },
+];
+
+function UseCasesSection() {
+  return (
+    <section
+      id="use-cases"
+      className="relative border-t border-border-soft py-24 md:py-32"
+    >
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
+            Use cases
+          </p>
+          <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            The questions with{" "}
+            <span className="font-serif italic text-text-soft">
+              no clean answer.
+            </span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
+            One domain, one question, one verdict — with the disagreement laid
+            bare. Here's the council at work across a life.
+          </p>
+        </FadeIn>
+
+        <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {USE_CASES.map((u, i) => {
+            const Icon = u.icon;
+            return (
+              <FadeIn key={u.domain} delay={i * 0.05}>
+                <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface-0 transition-all hover:border-gold-border hover:-translate-y-1">
+                  {/* header: domain + the four engines */}
+                  <div className="flex items-center justify-between border-b border-border-soft px-6 py-4">
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-gold-border bg-gold-soft text-gold">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="text-xs font-medium uppercase tracking-[0.16em] text-text-mute">
+                        {u.domain}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5" title="claude · codex · antigravity · ollama">
+                      {COUNCIL_DOTS.map((d) => (
+                        <span
+                          key={d.n}
+                          className="h-2 w-2 rounded-full"
+                          style={{ background: d.c }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* question */}
+                  <div className="px-6 pt-5">
+                    <p className="font-mono text-[15px] leading-snug text-text">
+                      <span className="text-gold">›</span> {u.q}
+                    </p>
+                  </div>
+
+                  {/* verdict card */}
+                  <div className="px-6 pb-5 pt-4">
+                    <div className="rounded-xl border border-gold-border bg-gold-soft p-4">
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
+                        <Scale className="h-3.5 w-3.5" />
+                        Verdict
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-text">
+                        {u.verdict}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* divergence footer */}
+                  <div className="mt-auto flex items-start gap-2 border-t border-border-soft px-6 py-3.5 text-xs leading-relaxed text-text-mute">
+                    <span className="text-ai">▸</span>
+                    <span>{u.split}</span>
+                  </div>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
+
+        <FadeIn delay={0.2}>
+          <p className="mx-auto mt-12 max-w-xl text-center text-sm text-text-mute">
+            Every verdict lands in dated markdown you own — searchable forever,
+            synced however you like.
+          </p>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Root
 
 export default function App() {
@@ -2398,8 +2649,10 @@ export default function App() {
         <Hero />
         <CouncilPitch />
         <DownloadSection />
+        <DesktopShowcase />
         <LogoBar />
         <HardQuestionsSection />
+        <UseCasesSection />
 
         <FeatureSection
           id="council"
