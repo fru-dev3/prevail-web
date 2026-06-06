@@ -39,7 +39,7 @@ const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.m
 const DMG_URL = "https://github.com/fru-dev3/prevail-desktop/releases/latest";
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
-const VERSION_DESKTOP = "0.2.5";
+const VERSION_DESKTOP = "0.2.93";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
