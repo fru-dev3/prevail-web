@@ -296,8 +296,9 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
         </a>
         <div className="hidden items-center gap-6 text-sm text-text-soft md:flex">
           <a href="#council" className="hover:text-text">Council</a>
+          <a href="#use-cases" className="hover:text-text">Use cases</a>
+          <a href="#desktop-app" className="hover:text-text">Desktop</a>
           <a href="#benchmark" className="hover:text-text">Benchmark</a>
-          <a href="#lenses" className="hover:text-text">Lenses</a>
           <a href="#ecosystem" className="hover:text-text">Ecosystem</a>
           <a href="#install" className="hover:text-text">Install</a>
         </div>
@@ -2390,7 +2391,12 @@ function Footer() {
 // ─────────────────────────────────────────────────────────────────────────────
 // DESKTOP SHOWCASE — real product shots of Prevail Desktop
 
-const DESKTOP_SHOTS = [
+const DESKTOP_VIEWS = [
+  {
+    src: "/desktop-council.png",
+    label: "Council",
+    caption: "Four engines answer in parallel; the chair writes one verdict.",
+  },
   {
     src: "/desktop-benchmark.png",
     label: "Benchmark",
@@ -2409,6 +2415,8 @@ const DESKTOP_SHOTS = [
 ];
 
 function DesktopShowcase() {
+  const [active, setActive] = useState(0);
+  const view = DESKTOP_VIEWS[active];
   return (
     <section
       id="desktop-app"
@@ -2416,64 +2424,86 @@ function DesktopShowcase() {
     >
       <div className="glow-gold absolute inset-0 -z-10 opacity-40" />
       <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
+        <div className="text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">
             Prevail Desktop
           </p>
-          <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+          <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
             The cockpit,{" "}
             <span className="font-serif italic text-text-soft">
               no terminal required.
             </span>
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            A native macOS app over the same vault. Pick a folder, convene the
-            council, study the benchmark.
+          <p className="mx-auto mt-5 max-w-xl text-lg text-text-soft">
+            A native macOS app over the same vault — click through it.
           </p>
-        </FadeIn>
+        </div>
 
-        <FadeIn delay={0.08}>
-          <figure className="mt-14 overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-2xl">
-            <img
-              src="/desktop-council.png"
-              alt="Prevail Desktop — the council panel, with four CLIs answering in parallel and a synthesized verdict"
-              className="w-full"
-              loading="lazy"
-            />
-          </figure>
-        </FadeIn>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {DESKTOP_SHOTS.map((s, i) => (
-            <FadeIn key={s.label} delay={0.12 + i * 0.06}>
-              <figure className="h-full overflow-hidden rounded-xl border border-border bg-surface-0">
-                <img
-                  src={s.src}
-                  alt={`Prevail Desktop — ${s.label}`}
-                  className="w-full"
-                  loading="lazy"
-                />
-                <figcaption className="px-4 py-3 text-sm text-text-soft">
-                  <span className="font-medium text-text">{s.label}.</span>{" "}
-                  {s.caption}
-                </figcaption>
-              </figure>
-            </FadeIn>
+        {/* tabs */}
+        <div className="mt-10 flex flex-wrap justify-center gap-2">
+          {DESKTOP_VIEWS.map((v, i) => (
+            <button
+              key={v.label}
+              onClick={() => setActive(i)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                i === active
+                  ? "bg-gold text-bg"
+                  : "border border-border bg-surface-0 text-text-soft hover:text-text"
+              }`}
+            >
+              {v.label}
+            </button>
           ))}
         </div>
 
-        <FadeIn delay={0.2}>
-          <div className="mt-12 flex justify-center">
-            <a
-              href="#install"
-              className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-              style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+        {/* big active preview — always visible, crossfades on switch */}
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-2xl">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={active}
+              src={view.src}
+              alt={`Prevail Desktop — ${view.label}`}
+              className="block w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: EASE }}
+            />
+          </AnimatePresence>
+        </div>
+        <p className="mt-4 text-center text-sm text-text-soft">
+          <span className="font-medium text-text">{view.label}.</span>{" "}
+          {view.caption}
+        </p>
+
+        {/* thumbnails — click to focus */}
+        <div className="mt-6 grid grid-cols-4 gap-3 md:gap-4">
+          {DESKTOP_VIEWS.map((v, i) => (
+            <button
+              key={v.label}
+              onClick={() => setActive(i)}
+              aria-label={`Show ${v.label}`}
+              className={`overflow-hidden rounded-lg border-2 transition-all ${
+                i === active
+                  ? "border-gold"
+                  : "border-border opacity-60 hover:opacity-100"
+              }`}
             >
-              Download Prevail.app
-              <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
-        </FadeIn>
+              <img src={v.src} alt="" className="block w-full" loading="lazy" />
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-12 flex justify-center">
+          <a
+            href="#install"
+            className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+            style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+          >
+            Download Prevail.app
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
       </div>
     </section>
   );
