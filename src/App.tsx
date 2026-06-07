@@ -361,16 +361,77 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
 // Official Prevail logo — sourced directly from the canonical PNG at
 // public/logo.png (cropped + upscaled from the user's source image,
 // not a recreation). No more inline SVG drift.
-function Logo({ size = 24 }: { size?: number }) {
-  return (
+function Logo({ size = 24, animated = false }: { size?: number; animated?: boolean }) {
+  const img = (
     <img
       src="/logo.png"
       alt="Prevail"
       width={size}
       height={size}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, display: "block" }}
       draggable={false}
     />
+  );
+  if (!animated) return img;
+  // Choreographed loop on the round mark:
+  //   1. full 360° clockwise in-plane spin (Z)
+  //   2. the gold dot winks (a dark eyelid sweeps over it)
+  //   3. full 360° counter-clockwise spin
+  //   4. a 3D axis swivel (rotateY/X tilt toward/away from the viewer)
+  // We spin in-plane (Z) rather than flipping (Y) so the gold/cyan arcs never
+  // mirror; the Y swivel stays within ±55° for the same reason. The eyelid is
+  // a child of the transformed mark, but only becomes visible in step 2 when
+  // the mark is back at its home orientation, so it lands on the dot cleanly.
+  // reducedMotion="never" keeps it alive even with the OS Reduce-Motion pref.
+  const T = 13; // full sequence seconds
+  return (
+    <MotionConfig reducedMotion="never">
+      <span
+        className="group inline-block"
+        style={{ perspective: size * 5, width: size, height: size }}
+      >
+        <motion.span
+          className="relative inline-block [filter:drop-shadow(0_2px_8px_rgba(196,163,90,0.55))]"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={{
+            rotateZ: [0, 360, 360, 360, 0, 0, 0, 0],
+            rotateY: [0, 0, 0, 0, 0, 55, -55, 0],
+            rotateX: [0, 0, 0, 0, 0, 8, 8, 0],
+          }}
+          transition={{
+            duration: T,
+            ease: "easeInOut",
+            times: [0, 0.24, 0.32, 0.42, 0.64, 0.76, 0.88, 1],
+            repeat: Infinity,
+          }}
+          whileHover={{ scale: 1.12 }}
+        >
+          {img}
+          {/* winking eyelid over the gold dot (centred ~58%/39% of the mark) */}
+          <motion.span
+            aria-hidden
+            className="absolute rounded-full"
+            style={{
+              left: "58%",
+              top: "39%",
+              width: size * 0.2,
+              height: size * 0.2,
+              marginLeft: -(size * 0.2) / 2,
+              marginTop: -(size * 0.2) / 2,
+              background: "#15161a",
+              transformOrigin: "center top",
+            }}
+            animate={{ scaleY: [0, 0, 1, 0, 0] }}
+            transition={{
+              duration: T,
+              ease: "easeInOut",
+              times: [0, 0.33, 0.365, 0.4, 1],
+              repeat: Infinity,
+            }}
+          />
+        </motion.span>
+      </span>
+    </MotionConfig>
   );
 }
 
@@ -590,10 +651,20 @@ function HeroAuroras() {
 
 function Hero() {
   return (
-    <section className="relative isolate overflow-hidden pt-20 pb-12 md:pt-24 md:pb-16 grain">
+    <section className="relative isolate flex min-h-screen flex-col justify-center overflow-hidden pt-20 pb-10 grain">
       <div className="glow-gold absolute inset-0 -z-10" />
       <HeroAuroras />
       <div className="mx-auto max-w-7xl px-6">
+        {/* Centered animated logo crown (à la OpenClaw). The inner translate
+            nudges the mark down without reserving extra layout space, so the
+            content below doesn't shift. */}
+        <FadeIn delay={0.02}>
+          <div className="mb-8 flex justify-center md:mb-10">
+            <div className="translate-y-3 md:translate-y-5">
+              <Logo animated size={84} />
+            </div>
+          </div>
+        </FadeIn>
         <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12 xl:gap-16">
           {/* LEFT — text */}
           <div>
@@ -725,7 +796,7 @@ function HeroSlider() {
       {/* Swap content with crossfade. Container is height-locked so the
           hero never jumps when the user (or the auto-rotate) toggles
           tabs — both Desktop and CLI mocks share the same canvas size. */}
-      <div className="relative h-[480px] sm:h-[520px] md:h-[560px]">
+      <div className="relative h-[440px] sm:h-[470px] md:h-[500px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
