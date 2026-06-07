@@ -55,16 +55,19 @@ function FadeIn({
   children,
   delay = 0,
   y = 16,
+  className = "",
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
+  className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   return (
     <motion.div
       ref={ref}
+      className={className}
       initial={{ opacity: 0, y }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
       transition={{ duration: 0.7, delay, ease: EASE }}
@@ -343,10 +346,12 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-          <GitHubStarButton />
+          <span className="hidden sm:inline-flex">
+            <GitHubStarButton />
+          </span>
           <a
             href={DMG_URL}
-            className="inline-flex items-center gap-1.5 rounded-md bg-gold px-4 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+            className="inline-flex items-center gap-1.5 rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:px-4"
             style={{ boxShadow: "0 4px 24px rgba(196, 163, 90, 0.25)" }}
           >
             Download
@@ -373,67 +378,83 @@ function Logo({ size = 24, animated = false }: { size?: number; animated?: boole
     />
   );
   if (!animated) return img;
-  // Choreographed loop on the round mark:
-  //   1. full 360° clockwise in-plane spin (Z)
-  //   2. the gold dot winks (a dark eyelid sweeps over it)
-  //   3. full 360° counter-clockwise spin
-  //   4. a 3D axis swivel (rotateY/X tilt toward/away from the viewer)
-  // We spin in-plane (Z) rather than flipping (Y) so the gold/cyan arcs never
-  // mirror; the Y swivel stays within ±55° for the same reason. The eyelid is
-  // a child of the transformed mark, but only becomes visible in step 2 when
-  // the mark is back at its home orientation, so it lands on the dot cleanly.
-  // reducedMotion="never" keeps it alive even with the OS Reduce-Motion pref.
-  // Two cycles per loop so the wink alternates eyes: cycle 1 the GOLD dot
-  // winks, cycle 2 the CYAN dot winks. Each cycle is spin-CW -> wink ->
-  // spin-CCW -> swivel; the transform keyframes below are that cycle pattern
-  // run twice across the doubled duration.
-  const T = 26; // two full cycles
-  const lid = (pos: { left: string; top: string }, winkTimes: number[]) => (
+  // Choreographed loop on the round mark. Beats (fractions of the loop):
+  //   spin CW  -> settle TILTED (home)      -> GOLD winks            (~0.20)
+  //   rotate to HORIZONTAL (dots level)      -> CYAN winks            (~0.40)
+  //   spin CW  -> settle HORIZONTAL again    -> BOTH eyes blink       (~0.62)
+  //   rotate back to TILTED -> 3D axis swivel (rotateY tilt) -> loop
+  // The eyelids are CHILDREN of the transformed mark, so they track their dots
+  // through every rotation — a wink lands correctly whether the eyes are
+  // tilted or horizontal. We rotate in-plane (Z) so the gold/cyan arcs never
+  // mirror; the Y swivel stays modest for the same reason. "Horizontal" is the
+  // home tilt (+~53°) that levels the two dots. reducedMotion="never" keeps it
+  // alive even with the OS Reduce-Motion preference on.
+  const T = 28;
+  // Eyelids live in SCREEN space (siblings of the rotating mark, NOT children)
+  // so a blink always closes top->down like a real eyelid, regardless of how
+  // the mark is rotated. Dot centres were measured from the logo pixels (the
+  // solid filled circles, not the arcs): gold (55.5%,39%) / cyan (43.7%,59%)
+  // when TILTED (home), each ~7% radius. They level out at +59.5°, where they
+  // sit at gold (62.3%,49.3%) / cyan (39.1%,49%). Each lid is sized to its dot
+  // and parked at the exact spot the dot occupies at the orientation where it
+  // blinks, and is invisible (scaleY 0) the rest of the loop.
+  const EYE = size * 0.16; // ~dot diameter (14%) + a hair of margin
+  const lid = (
+    pos: { left: string; top: string },
+    times: number[],
+    scaleY: number[],
+  ) => (
     <motion.span
       aria-hidden
-      className="absolute rounded-full"
+      className="absolute z-10 rounded-full"
       style={{
         left: pos.left,
         top: pos.top,
-        width: size * 0.2,
-        height: size * 0.2,
-        marginLeft: -(size * 0.2) / 2,
-        marginTop: -(size * 0.2) / 2,
-        background: "#15161a",
+        width: EYE,
+        height: EYE,
+        marginLeft: -EYE / 2,
+        marginTop: -EYE / 2,
+        background: "#141416",
         transformOrigin: "center top",
       }}
-      animate={{ scaleY: [0, 0, 1, 0, 0] }}
-      transition={{ duration: T, ease: "easeInOut", times: winkTimes, repeat: Infinity }}
+      animate={{ scaleY }}
+      transition={{ duration: T, ease: "easeInOut", times, repeat: Infinity }}
     />
   );
   return (
     <MotionConfig reducedMotion="never">
       <span
-        className="group inline-block"
+        className="group relative inline-block"
         style={{ perspective: size * 5, width: size, height: size }}
       >
         <motion.span
           className="relative inline-block [filter:drop-shadow(0_2px_8px_rgba(196,163,90,0.55))]"
           style={{ transformStyle: "preserve-3d" }}
           animate={{
-            rotateZ: [0, 360, 360, 360, 0, 0, 0, 0, 360, 360, 360, 0, 0, 0, 0],
-            rotateY: [0, 0, 0, 0, 0, 55, -55, 0, 0, 0, 0, 0, 55, -55, 0],
-            rotateX: [0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 8, 8, 0],
+            rotateZ: [0, 360, 360, 420, 420, 780, 780, 720, 720, 720],
+            rotateY: [0, 0, 0, 0, 0, 0, 0, 0, 45, 0],
+            rotateX: [6, 0, 0, 0, 0, 0, 0, 0, 8, 6],
           }}
           transition={{
             duration: T,
             ease: "easeInOut",
-            times: [0, 0.12, 0.16, 0.21, 0.32, 0.38, 0.44, 0.5, 0.62, 0.66, 0.71, 0.82, 0.88, 0.94, 1],
+            times: [0, 0.15, 0.22, 0.33, 0.42, 0.55, 0.64, 0.72, 0.86, 1],
             repeat: Infinity,
           }}
           whileHover={{ scale: 1.12 }}
         >
           {img}
-          {/* GOLD dot winks in cycle 1 (~58%/39%) */}
-          {lid({ left: "58%", top: "39%" }, [0, 0.165, 0.1825, 0.2, 1])}
-          {/* CYAN dot winks in cycle 2 (~42%/60%) */}
-          {lid({ left: "42%", top: "60%" }, [0, 0.665, 0.6825, 0.7, 1])}
         </motion.span>
+        {/* GOLD @ tilted home — single wink (~0.20) */}
+        {lid({ left: "55.5%", top: "39%" }, [0, 0.18, 0.2, 0.22, 1], [0, 0, 1, 0, 0])}
+        {/* CYAN @ horizontal — single wink (~0.40) + both-blink (~0.62) */}
+        {lid(
+          { left: "39.1%", top: "49%" },
+          [0, 0.38, 0.4, 0.42, 0.6, 0.62, 0.64, 1],
+          [0, 0, 1, 0, 0, 1, 0, 0],
+        )}
+        {/* GOLD @ horizontal — both-blink (~0.62) */}
+        {lid({ left: "62.3%", top: "49.3%" }, [0, 0.6, 0.62, 0.64, 1], [0, 0, 1, 0, 0])}
       </span>
     </MotionConfig>
   );
@@ -655,7 +676,7 @@ function HeroAuroras() {
 
 function Hero() {
   return (
-    <section className="relative isolate flex min-h-screen flex-col justify-center overflow-hidden pt-20 pb-10 grain">
+    <section className="relative isolate overflow-hidden pt-24 pb-16 grain lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:pt-12 lg:pb-28">
       <div className="glow-gold absolute inset-0 -z-10" />
       <HeroAuroras />
       <div className="mx-auto max-w-7xl px-6">
@@ -663,15 +684,15 @@ function Hero() {
             nudges the mark down without reserving extra layout space, so the
             content below doesn't shift. */}
         <FadeIn delay={0.02}>
-          <div className="mb-8 flex justify-center md:mb-10">
-            <div className="translate-y-3 md:translate-y-5">
+          <div className="mb-2 flex justify-center md:mb-3">
+            <div className="translate-y-1 md:translate-y-2">
               <Logo animated size={84} />
             </div>
           </div>
         </FadeIn>
-        <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12 xl:gap-16">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12 xl:gap-16">
           {/* LEFT — text */}
-          <div>
+          <div className="min-w-0">
             <FadeIn delay={0.05}>
               <HarnessLine />
             </FadeIn>
@@ -737,7 +758,7 @@ function Hero() {
           </div>
 
           {/* RIGHT — slider */}
-          <FadeIn delay={0.28} y={20}>
+          <FadeIn delay={0.28} y={20} className="min-w-0">
             <HeroSlider />
           </FadeIn>
         </div>
@@ -800,7 +821,7 @@ function HeroSlider() {
       {/* Swap content with crossfade. Container is height-locked so the
           hero never jumps when the user (or the auto-rotate) toggles
           tabs — both Desktop and CLI mocks share the same canvas size. */}
-      <div className="relative h-[440px] sm:h-[470px] md:h-[500px]">
+      <div className="relative h-[410px] sm:h-[440px] md:h-[460px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
