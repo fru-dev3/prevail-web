@@ -36,15 +36,19 @@ import {
   siTailscale,
   siTelegram,
 } from "simple-icons";
+import { APP_VERSION } from "./version";
 
 const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
 // Direct download served from this site (public/), so clicking "Download"
 // fetches the .dmg immediately instead of bouncing to the GitHub release
-// page. Stable, version-less filename: each release overwrites the same
-// file, so this link never breaks. Anchors using it carry `download`.
+// page. Stable, version-less URL: each release overwrites the same file, so
+// the link never breaks. The `download={DMG_NAME}` attr gives the browser a
+// VERSIONED save filename (APP_VERSION, stamped by the release script) so
+// users/support can tell builds apart without the URL ever changing.
 const DMG_URL = "/Prevail-mac-arm64.dmg";
+const DMG_NAME = `Prevail-${APP_VERSION}-arm64.dmg`;
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
 const VERSION_DESKTOP = "0.2.93";
@@ -353,7 +357,7 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           </span>
           <a
             href={DMG_URL}
-            download
+            download={DMG_NAME}
             className="inline-flex items-center gap-1.5 rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:px-4"
             style={{ boxShadow: "0 4px 24px rgba(196, 163, 90, 0.25)" }}
           >
@@ -715,7 +719,7 @@ function Hero() {
               <div className="mt-8 flex w-full max-w-2xl items-center gap-3">
                 <a
                   href={DMG_URL}
-                  download
+                  download={DMG_NAME}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                   style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
                 >
@@ -2597,7 +2601,7 @@ function DownloadSection() {
 
               <a
                 href={DMG_URL}
-                download
+                download={DMG_NAME}
                 className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
