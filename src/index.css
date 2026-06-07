@@ -88,6 +88,10 @@
   body {
     @apply bg-bg text-text antialiased;
     font-feature-settings: "ss01" 1, "cv11" 1;
+    /* Guard against any stray horizontal overflow on mobile (wide mockups,
+       mono blocks). Keeps the page from scrolling sideways and lets the
+       max-width wrappers wrap text to the real viewport width. */
+    overflow-x: clip;
   }
 }
 
