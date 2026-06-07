@@ -680,7 +680,7 @@ function Hero() {
               <p className="mt-6 max-w-2xl text-base text-text-soft">
                 Bring your life's context to{" "}
                 <span className="text-text">humanity's most powerful
-                intelligence</span>.
+                agents</span>.
                 <br />
                 Unlock a <span className="text-text">council of experts</span>{" "}
                 working on your behalf, all at once.
