@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
+import { motion, useInView, useReducedMotion, AnimatePresence, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
   Briefcase,
@@ -7,12 +7,18 @@ import {
   Check,
   Compass,
   Copy,
+  BarChart3,
+  Boxes,
+  Download,
   Folder,
   HeartPulse,
   Layers,
   MessageSquare,
+  Monitor,
   Moon,
+  Paperclip,
   Receipt,
+  Users,
   Scale,
   Sparkles,
   Star,
@@ -76,8 +82,10 @@ function Brand({ className = "" }: { className?: string }) {
   );
 }
 
-// Persistent theme toggle. Defaults to dark; honors system preference on
-// first visit only. Survives reload via localStorage.
+// Persistent theme toggle. Dark is always the default — we intentionally do
+// NOT honor the OS color-scheme preference, so the brand-tuned dark theme is
+// what every first-time visitor sees. Light only applies if the user has
+// explicitly toggled it (persisted via localStorage).
 type Theme = "dark" | "light";
 const LS_THEME = "prevail.site.theme";
 
@@ -85,10 +93,7 @@ function useTheme(): [Theme, () => void] {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "dark";
     const saved = localStorage.getItem(LS_THEME) as Theme | null;
-    if (saved === "light" || saved === "dark") return saved;
-    return window.matchMedia?.("(prefers-color-scheme: light)").matches
-      ? "light"
-      : "dark";
+    return saved === "light" ? "light" : "dark";
   });
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -155,6 +160,33 @@ function HermesBrand({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+
+// OpenClaw brand mark — Fru's Telegram gateway. No canonical SVG exists,
+// so this is a bespoke three-talon claw that reads at icon scale.
+function OpenClawMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      {/* knuckle the talons spring from */}
+      <path d="M5 4c1.5 1 2 3 1.5 6.5" />
+      <path d="M9.5 3.5c1 1.5 1.2 3.5.6 7" />
+      <path d="M14.5 4c.6 1.8.4 4-.5 7" />
+      <path d="M19 5.5c0 2-.8 4-2.2 6" />
+      {/* talon tips curling in */}
+      <path d="M6.5 10.5c.4 2.2 2.4 4 5.5 4s5-1.6 6.3-3" />
+    </svg>
+  );
+}
+
+// "Works with" ecosystem strip — Fru's own systems (OpenClaw, Paperclip,
+// Hermes) alongside the model CLIs they bridge to.
+const WORKS_WITH = [
+  { name: "OpenClaw", render: (c: string) => <OpenClawMark className={c} /> },
+  { name: "Paperclip", render: (c: string) => <Paperclip className={c} /> },
+  { name: "Gemini", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
+  { name: "Codex", render: (c: string) => <OpenAIMark className={c} /> },
+  { name: "Claude", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
+  { name: "Hermes", render: (c: string) => <HermesBrand className={c} /> },
+];
 
 // Reusable model-logo row — actual brand logos in their official colors.
 // Used to anchor "the best reasoning models" claims visually.
@@ -296,12 +328,12 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           </span>
         </a>
         <div className="hidden items-center gap-6 text-sm text-text-soft md:flex">
-          <a href="#council" className="hover:text-text">Council</a>
-          <a href="#use-cases" className="hover:text-text">Use cases</a>
-          <a href="#desktop-app" className="hover:text-text">Desktop</a>
-          <a href="#benchmark" className="hover:text-text">Benchmark</a>
-          <a href="#ecosystem" className="hover:text-text">Ecosystem</a>
-          <a href="#install" className="hover:text-text">Install</a>
+          <a href="#council" className="inline-flex items-center gap-1.5 hover:text-text"><Users className="h-4 w-4" /> Council</a>
+          <a href="#use-cases" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> Use cases</a>
+          <a href="#desktop-app" className="inline-flex items-center gap-1.5 hover:text-text"><Monitor className="h-4 w-4" /> Desktop</a>
+          <a href="#benchmark" className="inline-flex items-center gap-1.5 hover:text-text"><BarChart3 className="h-4 w-4" /> Benchmark</a>
+          <a href="#ecosystem" className="inline-flex items-center gap-1.5 hover:text-text"><Boxes className="h-4 w-4" /> Ecosystem</a>
+          <a href="#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -368,10 +400,15 @@ function HarnessLine() {
     : { duration: 0.5, delay: 0.95, ease: EASE };
 
   return (
-    <div>
-      <p className="flex flex-wrap items-baseline gap-x-2 text-xl font-medium tracking-tight text-text md:text-2xl">
-        <span>A</span>
-        <span className="relative inline-block">
+    <h1 className="text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
+      <span className="font-serif italic">
+        <span className="text-ai">AI</span>{" "}
+        <span className="text-gold">harness</span>
+      </span>
+      <br />
+      <span className="inline-flex flex-wrap items-baseline gap-x-3">
+        <span className="text-text">for</span>
+        <span className="relative inline-block text-[0.5em]">
           <span
             className={`transition-colors duration-500 ${
               struck ? "text-text-mute" : "text-text"
@@ -381,7 +418,7 @@ function HarnessLine() {
           </span>
           <motion.span
             aria-hidden
-            className="absolute inset-x-[-2px] top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-gold"
+            className="absolute inset-x-[-2px] top-1/2 h-[0.06em] -translate-y-1/2 rounded-full bg-gold"
             style={{ transformOrigin: "left center" }}
             initial={{ scaleX: reduce ? 1 : 0 }}
             animate={{ scaleX: 1 }}
@@ -389,68 +426,197 @@ function HarnessLine() {
           />
         </span>
         <motion.span
-          className="font-serif italic text-gold"
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 6 }}
+          className="font-serif italic text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]"
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={lifeT}
         >
-          life
+          Life
         </motion.span>
-        <span>harness.</span>
-      </p>
-      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
-        Ask a council. Prevail.
-      </p>
-    </div>
+      </span>
+    </h1>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HERO
 
+// Deterministic dust-mote field — fixed positions so there's no hydration
+// flicker and no Math.random. Spread across the canvas, varied size/opacity.
+const DUST = Array.from({ length: 44 }, (_, i) => {
+  // cheap hash-ish spread from the index — stable across renders
+  const a = (i * 73 + 11) % 100;
+  const b = (i * 37 + 7) % 100;
+  const c = (i * 53) % 100;
+  return {
+    left: a,
+    top: b,
+    size: 1.5 + (c % 4),
+    delay: (i % 10) * 0.7,
+    dur: 9 + (c % 8),
+    drift: 14 + (c % 22),
+    opacity: 0.18 + (c % 5) * 0.06,
+  };
+});
+
+// Ambient hero background — three layers that fill the empty space with life:
+//   1. slow-drifting blurred "cloud" orbs (gold + the "AI" blue) that breathe
+//   2. a floating dust-mote field
+//   3. a gold glow that tracks the cursor
+// Layers parallax-shift with the mouse for depth. This is intentionally
+// decoration the owner wants ALWAYS on, so it does NOT gate on the OS
+// reduced-motion preference (the headline/strike animations still do).
+// aria-hidden + pointer-events-none so it never interferes with content.
+function HeroAuroras() {
+  // Normalized cursor position (-0.5 .. 0.5), spring-smoothed.
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  // Raw cursor pixels for the follow-glow.
+  const gx = useMotionValue(-1000);
+  const gy = useMotionValue(-1000);
+  const sx = useSpring(mx, { stiffness: 50, damping: 22, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 50, damping: 22, mass: 0.6 });
+  const glowX = useSpring(gx, { stiffness: 120, damping: 26, mass: 0.4 });
+  const glowY = useSpring(gy, { stiffness: 120, damping: 26, mass: 0.4 });
+
+  // Parallax offsets per depth (px). Far layers move least.
+  const farX = useTransform(sx, (v) => v * -28);
+  const farY = useTransform(sy, (v) => v * -28);
+  const midX = useTransform(sx, (v) => v * 55);
+  const midY = useTransform(sy, (v) => v * 55);
+  const nearX = useTransform(sx, (v) => v * 95);
+  const nearY = useTransform(sy, (v) => v * 95);
+
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      mx.set(e.clientX / window.innerWidth - 0.5);
+      my.set(e.clientY / window.innerHeight - 0.5);
+      gx.set(e.clientX);
+      gy.set(e.clientY);
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [mx, my, gx, gy]);
+
+  // Cool-dominant palette: the "AI" blue + neutral cool-white carry the
+  // ambient motion; gold appears only as a single low-key warm accent so the
+  // brand colour stays present without taking over.
+  const orbs = [
+    {
+      className: "left-[-10%] top-[2%] h-[46vw] w-[46vw] bg-[radial-gradient(circle,rgba(122,162,247,0.30),transparent_70%)]",
+      anim: { x: [0, 60, -20, 0], y: [0, -40, 26, 0], scale: [1, 1.12, 0.94, 1] },
+      dur: 20,
+    },
+    {
+      className: "right-[-8%] top-[-6%] h-[40vw] w-[40vw] bg-[radial-gradient(circle,rgba(180,200,255,0.16),transparent_70%)]",
+      anim: { x: [0, -48, 20, 0], y: [0, 36, -24, 0], scale: [1, 0.92, 1.1, 1] },
+      dur: 24,
+    },
+    {
+      className: "left-[34%] bottom-[-18%] h-[44vw] w-[44vw] bg-[radial-gradient(circle,rgba(196,163,90,0.14),transparent_70%)]",
+      anim: { x: [0, 40, -34, 0], y: [0, -28, 20, 0], scale: [1, 1.14, 0.88, 1] },
+      dur: 28,
+    },
+  ];
+
+  return (
+    // reducedMotion="never" forces this purely-decorative layer to animate
+    // even when the OS has Reduce Motion on (framer-motion v12 otherwise
+    // freezes all animations globally when it detects that preference).
+    <MotionConfig reducedMotion="never">
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {/* Layer 1 — drifting cloud orbs (far parallax) */}
+      <motion.div className="absolute inset-0" style={{ x: farX, y: farY }}>
+        {orbs.map((o, i) => (
+          <motion.div
+            key={i}
+            className={`absolute rounded-full blur-3xl ${o.className}`}
+            animate={o.anim}
+            transition={{ duration: o.dur, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
+          />
+        ))}
+      </motion.div>
+
+      {/* Layer 2 — floating dust motes (mid parallax) */}
+      <motion.div className="absolute inset-0" style={{ x: midX, y: midY }}>
+        {DUST.map((d, i) => (
+          <motion.span
+            key={i}
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${d.left}%`,
+              top: `${d.top}%`,
+              width: d.size + 1,
+              height: d.size + 1,
+              opacity: d.opacity * 0.8,
+              boxShadow: "0 0 6px rgba(200,212,255,0.45)",
+            }}
+            animate={{ y: [0, -d.drift, 0], opacity: [d.opacity, Math.min(d.opacity * 2.2, 0.9), d.opacity] }}
+            transition={{ duration: d.dur, delay: d.delay, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
+          />
+        ))}
+      </motion.div>
+
+      {/* Layer 3 — cursor-following glow. Cool blue-white so the reactive
+          motion reads clearly without adding more gold to the page. */}
+      <motion.div
+        className="absolute h-[55vw] w-[55vw] rounded-full blur-3xl bg-[radial-gradient(circle,rgba(150,178,255,0.34),rgba(150,178,255,0.10)_35%,transparent_65%)]"
+        style={{ left: glowX, top: glowY, x: "-50%", y: "-50%" }}
+      />
+
+      {/* Layer 4 — near sparkle layer (strongest parallax on mouse move) */}
+      <motion.div className="absolute inset-0" style={{ x: nearX, y: nearY }}>
+        {DUST.filter((_, i) => i % 3 === 0).map((d, i) => (
+          <motion.span
+            key={i}
+            className="absolute rounded-full bg-ai"
+            style={{
+              left: `${(d.left + 13) % 100}%`,
+              top: `${(d.top + 29) % 100}%`,
+              width: d.size,
+              height: d.size,
+              opacity: d.opacity * 0.9,
+              boxShadow: "0 0 6px rgba(122,162,247,0.5)",
+            }}
+            animate={{ y: [0, d.drift * 0.8, 0] }}
+            transition={{ duration: d.dur + 3, delay: d.delay, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
+          />
+        ))}
+      </motion.div>
+    </div>
+    </MotionConfig>
+  );
+}
+
 function Hero() {
   return (
-    <section className="relative overflow-hidden pt-20 pb-12 md:pt-24 md:pb-16 grain">
+    <section className="relative isolate overflow-hidden pt-20 pb-12 md:pt-24 md:pb-16 grain">
       <div className="glow-gold absolute inset-0 -z-10" />
+      <HeroAuroras />
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-12 xl:gap-16">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12 xl:gap-16">
           {/* LEFT — text */}
           <div>
-            <FadeIn delay={0.04}>
-              <div>
-                <HarnessLine />
-              </div>
-            </FadeIn>
-
             <FadeIn delay={0.05}>
-              <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
-                <span className="font-serif italic">
-                  <span className="text-ai">AI</span>{" "}
-                  <span className="text-gold">harness</span>
-                </span>
-                <br />
-                for life's hard questions.
-              </h1>
+              <HarnessLine />
             </FadeIn>
 
             <FadeIn delay={0.12}>
-              <p className="mt-6 max-w-xl text-base text-text-soft md:text-lg">
-                <Brand /> structures your life's context and brings it to{" "}
+              <p className="mt-6 max-w-2xl text-base text-text-soft">
+                Bring your life's context to{" "}
                 <span className="text-text">humanity's most powerful
-                intelligence</span>. Every hard question goes to{" "}
-                <span className="text-text">Claude</span>,{" "}
-                <span className="text-text">Codex</span>,{" "}
-                <span className="text-text">Antigravity</span>, and{" "}
-                <span className="text-text">Ollama</span> at once — then a chair
-                model reads every answer and writes one clear verdict.
+                intelligence</span>.
+                <br />
+                Unlock a <span className="text-text">council of experts</span>{" "}
+                working on your behalf, all at once.
               </p>
             </FadeIn>
 
             <FadeIn delay={0.18}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex w-full max-w-2xl items-center gap-3">
                 <a
                   href={DMG_URL}
-                  className="inline-flex items-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                   style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
                 >
                   <Folder className="h-4 w-4" />
@@ -458,12 +624,11 @@ function Hero() {
                 </a>
                 <a
                   href="#install"
-                  className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface-1 px-5 py-2.5 text-sm font-medium hover:bg-surface-2"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-1 px-5 py-2.5 text-sm font-medium hover:bg-surface-2"
                 >
                   <Terminal className="h-4 w-4" />
                   Install CLI
                 </a>
-                <GitHubStarButton size="lg" />
               </div>
             </FadeIn>
 
@@ -472,7 +637,26 @@ function Hero() {
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-mute">
                 <span><span className="text-gold">✓</span> Free, MIT</span>
                 <span><span className="text-gold">✓</span> Local-first</span>
-                <span><span className="text-gold">✓</span> Works with Claude, Codex, Gemini, Ollama</span>
+                <span><span className="text-gold">✓</span> Works with Claude, Codex, Antigravity, Ollama</span>
+              </div>
+            </FadeIn>
+
+            {/* Works-with ecosystem icons */}
+            <FadeIn delay={0.28}>
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-text-mute">
+                <span className="uppercase tracking-[0.18em]">Works with</span>
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+                  {WORKS_WITH.map((w) => (
+                    <div
+                      key={w.name}
+                      title={w.name}
+                      className="group flex items-center gap-1.5 text-text-soft transition-colors hover:text-text"
+                    >
+                      {w.render("h-5 w-5")}
+                      <span className="text-[11px]">{w.name}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </FadeIn>
           </div>
@@ -515,15 +699,15 @@ function HeroSlider() {
                   setActive(id);
                   setPaused(true);
                 }}
-                className={`relative inline-flex items-center gap-2 rounded-full px-5 py-1.5 font-medium transition-colors ${
-                  isActive ? "text-bg" : "text-text-soft hover:text-text"
+                className={`relative isolate inline-flex items-center gap-2 rounded-full px-5 py-1.5 font-medium transition-colors duration-200 ${
+                  isActive ? "text-bg delay-150" : "text-text hover:text-white"
                 }`}
               >
                 {isActive && (
                   <motion.span
                     layoutId="slider-pill"
                     className="absolute inset-0 -z-10 rounded-full bg-gold"
-                    transition={{ type: "spring", stiffness: 360, damping: 32 }}
+                    transition={{ type: "spring", stiffness: 520, damping: 40 }}
                   />
                 )}
                 {id === "desktop" ? (
