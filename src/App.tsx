@@ -383,7 +383,29 @@ function Logo({ size = 24, animated = false }: { size?: number; animated?: boole
   // a child of the transformed mark, but only becomes visible in step 2 when
   // the mark is back at its home orientation, so it lands on the dot cleanly.
   // reducedMotion="never" keeps it alive even with the OS Reduce-Motion pref.
-  const T = 13; // full sequence seconds
+  // Two cycles per loop so the wink alternates eyes: cycle 1 the GOLD dot
+  // winks, cycle 2 the CYAN dot winks. Each cycle is spin-CW -> wink ->
+  // spin-CCW -> swivel; the transform keyframes below are that cycle pattern
+  // run twice across the doubled duration.
+  const T = 26; // two full cycles
+  const lid = (pos: { left: string; top: string }, winkTimes: number[]) => (
+    <motion.span
+      aria-hidden
+      className="absolute rounded-full"
+      style={{
+        left: pos.left,
+        top: pos.top,
+        width: size * 0.2,
+        height: size * 0.2,
+        marginLeft: -(size * 0.2) / 2,
+        marginTop: -(size * 0.2) / 2,
+        background: "#15161a",
+        transformOrigin: "center top",
+      }}
+      animate={{ scaleY: [0, 0, 1, 0, 0] }}
+      transition={{ duration: T, ease: "easeInOut", times: winkTimes, repeat: Infinity }}
+    />
+  );
   return (
     <MotionConfig reducedMotion="never">
       <span
@@ -394,41 +416,23 @@ function Logo({ size = 24, animated = false }: { size?: number; animated?: boole
           className="relative inline-block [filter:drop-shadow(0_2px_8px_rgba(196,163,90,0.55))]"
           style={{ transformStyle: "preserve-3d" }}
           animate={{
-            rotateZ: [0, 360, 360, 360, 0, 0, 0, 0],
-            rotateY: [0, 0, 0, 0, 0, 55, -55, 0],
-            rotateX: [0, 0, 0, 0, 0, 8, 8, 0],
+            rotateZ: [0, 360, 360, 360, 0, 0, 0, 0, 360, 360, 360, 0, 0, 0, 0],
+            rotateY: [0, 0, 0, 0, 0, 55, -55, 0, 0, 0, 0, 0, 55, -55, 0],
+            rotateX: [0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 8, 8, 0],
           }}
           transition={{
             duration: T,
             ease: "easeInOut",
-            times: [0, 0.24, 0.32, 0.42, 0.64, 0.76, 0.88, 1],
+            times: [0, 0.12, 0.16, 0.21, 0.32, 0.38, 0.44, 0.5, 0.62, 0.66, 0.71, 0.82, 0.88, 0.94, 1],
             repeat: Infinity,
           }}
           whileHover={{ scale: 1.12 }}
         >
           {img}
-          {/* winking eyelid over the gold dot (centred ~58%/39% of the mark) */}
-          <motion.span
-            aria-hidden
-            className="absolute rounded-full"
-            style={{
-              left: "58%",
-              top: "39%",
-              width: size * 0.2,
-              height: size * 0.2,
-              marginLeft: -(size * 0.2) / 2,
-              marginTop: -(size * 0.2) / 2,
-              background: "#15161a",
-              transformOrigin: "center top",
-            }}
-            animate={{ scaleY: [0, 0, 1, 0, 0] }}
-            transition={{
-              duration: T,
-              ease: "easeInOut",
-              times: [0, 0.33, 0.365, 0.4, 1],
-              repeat: Infinity,
-            }}
-          />
+          {/* GOLD dot winks in cycle 1 (~58%/39%) */}
+          {lid({ left: "58%", top: "39%" }, [0, 0.165, 0.1825, 0.2, 1])}
+          {/* CYAN dot winks in cycle 2 (~42%/60%) */}
+          {lid({ left: "42%", top: "60%" }, [0, 0.665, 0.6825, 0.7, 1])}
         </motion.span>
       </span>
     </MotionConfig>
