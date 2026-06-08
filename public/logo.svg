@@ -10,5 +10,5 @@
   </g>
 
   <!-- Guiding star above the apex — solid electric cyan -->
-  <circle cx="256" cy="132" r="22" fill="#3CD8FF"/>
+  <circle cx="256" cy="106" r="22" fill="#3CD8FF"/>
 </svg>

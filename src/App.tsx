@@ -370,98 +370,66 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
   );
 }
 
-// Official Prevail logo — sourced directly from the canonical PNG at
-// public/logo.png (cropped + upscaled from the user's source image,
-// not a recreation). No more inline SVG drift.
+// Official Prevail mark — inline SVG (dark tile + ascending chevrons + a
+// guiding star lifted clear of the apex). Vector, so it stays crisp and the
+// star can animate on its own.
 function Logo({ size = 24, animated = false }: { size?: number; animated?: boolean }) {
-  const img = (
-    <img
-      src="/logo.png"
-      alt="Prevail"
+  const star = animated ? (
+    <motion.circle
+      cx="256"
+      r="22"
+      fill="#3CD8FF"
+      animate={{ cy: [106, 90, 106], opacity: [1, 0.75, 1] }}
+      transition={{ duration: 1.9, ease: "easeInOut", repeat: Infinity }}
+      style={{ filter: "drop-shadow(0 0 6px rgba(60,216,255,0.55))" }}
+    />
+  ) : (
+    <circle cx="256" cy="106" r="22" fill="#3CD8FF" />
+  );
+  const svg = (
+    <svg
+      viewBox="0 0 512 512"
       width={size}
       height={size}
       style={{ width: size, height: size, display: "block" }}
-      draggable={false}
-    />
+      role="img"
+      aria-label="Prevail"
+    >
+      <rect x="0" y="0" width="512" height="512" rx="116" fill="#141416" />
+      <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M116 312 L256 176 L396 312" stroke="#C4A35A" strokeWidth="56" />
+        <path d="M156 392 L256 296 L356 392" stroke="#6E5C32" strokeWidth="34" />
+      </g>
+      {star}
+    </svg>
   );
-  if (!animated) return img;
-  // Choreographed loop on the round mark. Beats (fractions of the loop):
-  //   spin CW  -> settle TILTED (home)      -> GOLD winks            (~0.20)
-  //   rotate to HORIZONTAL (dots level)      -> CYAN winks            (~0.40)
-  //   spin CW  -> settle HORIZONTAL again    -> BOTH eyes blink       (~0.62)
-  //   rotate back to TILTED -> 3D axis swivel (rotateY tilt) -> loop
-  // The eyelids are CHILDREN of the transformed mark, so they track their dots
-  // through every rotation — a wink lands correctly whether the eyes are
-  // tilted or horizontal. We rotate in-plane (Z) so the gold/cyan arcs never
-  // mirror; the Y swivel stays modest for the same reason. "Horizontal" is the
-  // home tilt (+~53°) that levels the two dots. reducedMotion="never" keeps it
-  // alive even with the OS Reduce-Motion preference on.
-  const T = 28;
-  // Eyelids live in SCREEN space (siblings of the rotating mark, NOT children)
-  // so a blink always closes top->down like a real eyelid, regardless of how
-  // the mark is rotated. Dot centres were measured from the logo pixels (the
-  // solid filled circles, not the arcs): gold (55.5%,39%) / cyan (43.7%,59%)
-  // when TILTED (home), each ~7% radius. They level out at +59.5°, where they
-  // sit at gold (62.3%,49.3%) / cyan (39.1%,49%). Each lid is sized to its dot
-  // and parked at the exact spot the dot occupies at the orientation where it
-  // blinks, and is invisible (scaleY 0) the rest of the loop.
-  const EYE = size * 0.16; // ~dot diameter (14%) + a hair of margin
-  const lid = (
-    pos: { left: string; top: string },
-    times: number[],
-    scaleY: number[],
-  ) => (
-    <motion.span
-      aria-hidden
-      className="absolute z-10 rounded-full"
-      style={{
-        left: pos.left,
-        top: pos.top,
-        width: EYE,
-        height: EYE,
-        marginLeft: -EYE / 2,
-        marginTop: -EYE / 2,
-        background: "#141416",
-        transformOrigin: "center top",
-      }}
-      animate={{ scaleY }}
-      transition={{ duration: T, ease: "easeInOut", times, repeat: Infinity }}
-    />
-  );
+  if (!animated) return svg;
+  const T = 6;
+  const float = Math.max(2, size * 0.045);
   return (
     <MotionConfig reducedMotion="never">
       <span
         className="group relative inline-block"
-        style={{ perspective: size * 5, width: size, height: size }}
+        style={{ perspective: size * 6, width: size, height: size }}
       >
         <motion.span
-          className="relative inline-block [filter:drop-shadow(0_2px_8px_rgba(196,163,90,0.55))]"
-          style={{ transformStyle: "preserve-3d" }}
+          className="relative inline-block"
+          style={{ transformStyle: "preserve-3d", willChange: "transform, filter" }}
           animate={{
-            rotateZ: [0, 360, 360, 420, 420, 780, 780, 720, 720, 720],
-            rotateY: [0, 0, 0, 0, 0, 0, 0, 0, 45, 0],
-            rotateX: [6, 0, 0, 0, 0, 0, 0, 0, 8, 6],
+            y: [0, -float, 0],
+            rotateX: [7, 2, 7],
+            rotateY: [-5, 5, -5],
+            filter: [
+              "drop-shadow(0 2px 6px rgba(196,163,90,0.35))",
+              "drop-shadow(0 8px 18px rgba(60,216,255,0.45))",
+              "drop-shadow(0 2px 6px rgba(196,163,90,0.35))",
+            ],
           }}
-          transition={{
-            duration: T,
-            ease: "easeInOut",
-            times: [0, 0.15, 0.22, 0.33, 0.42, 0.55, 0.64, 0.72, 0.86, 1],
-            repeat: Infinity,
-          }}
-          whileHover={{ scale: 1.12 }}
+          transition={{ duration: T, ease: "easeInOut", repeat: Infinity }}
+          whileHover={{ scale: 1.1 }}
         >
-          {img}
+          {svg}
         </motion.span>
-        {/* GOLD @ tilted home — single wink (~0.20) */}
-        {lid({ left: "55.5%", top: "39%" }, [0, 0.18, 0.2, 0.22, 1], [0, 0, 1, 0, 0])}
-        {/* CYAN @ horizontal — single wink (~0.40) + both-blink (~0.62) */}
-        {lid(
-          { left: "39.1%", top: "49%" },
-          [0, 0.38, 0.4, 0.42, 0.6, 0.62, 0.64, 1],
-          [0, 0, 1, 0, 0, 1, 0, 0],
-        )}
-        {/* GOLD @ horizontal — both-blink (~0.62) */}
-        {lid({ left: "62.3%", top: "49.3%" }, [0, 0.6, 0.62, 0.64, 1], [0, 0, 1, 0, 0])}
       </span>
     </MotionConfig>
   );
