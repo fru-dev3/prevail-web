@@ -51,7 +51,7 @@ const DMG_URL = "/Prevail-mac-arm64.dmg";
 const DMG_NAME = `Prevail-${APP_VERSION}-arm64.dmg`;
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
-const VERSION_DESKTOP = "0.2.93";
+const VERSION_DESKTOP = "0.4.2";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
