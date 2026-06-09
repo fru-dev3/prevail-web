@@ -170,18 +170,22 @@ function HermesBrand({ className = "" }: { className?: string }) {
   );
 }
 
-// OpenClaw brand mark — Fru's Telegram gateway. No canonical SVG exists,
-// so this is a bespoke three-talon claw that reads at icon scale.
+// OpenClaw brand mark — Fru's Telegram gateway. Its canonical logo is a
+// lobster (openclaw.ai/favicon.svg). This is that mark as a monochrome
+// silhouette (currentColor) so it tints consistently with the rest of the
+// "works with" strip; the full-color brand-red version is OpenClawBrand below.
 function OpenClawMark({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      {/* knuckle the talons spring from */}
-      <path d="M5 4c1.5 1 2 3 1.5 6.5" />
-      <path d="M9.5 3.5c1 1.5 1.2 3.5.6 7" />
-      <path d="M14.5 4c.6 1.8.4 4-.5 7" />
-      <path d="M19 5.5c0 2-.8 4-2.2 6" />
-      {/* talon tips curling in */}
-      <path d="M6.5 10.5c.4 2.2 2.4 4 5.5 4s5-1.6 6.3-3" />
+    <svg viewBox="0 0 120 120" className={className} fill="currentColor" stroke="currentColor" aria-label="OpenClaw">
+      {/* body */}
+      <path d="M60 10 C30 10 15 35 15 55 C15 75 30 95 45 100 L45 110 L55 110 L55 100 C55 100 60 102 65 100 L65 110 L75 110 L75 100 C90 95 105 75 105 55 C105 35 90 10 60 10Z" />
+      {/* left claw */}
+      <path d="M20 45 C5 40 0 50 5 60 C10 70 20 65 25 55 C28 48 25 45 20 45Z" />
+      {/* right claw */}
+      <path d="M100 45 C115 40 120 50 115 60 C110 70 100 65 95 55 C92 48 95 45 100 45Z" />
+      {/* antennae */}
+      <path d="M45 15 Q35 5 30 8" fill="none" strokeWidth="3" strokeLinecap="round" />
+      <path d="M75 15 Q85 5 90 8" fill="none" strokeWidth="3" strokeLinecap="round" />
     </svg>
   );
 }
