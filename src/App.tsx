@@ -2783,7 +2783,7 @@ function Footer() {
             Ask a council. <span className="not-italic text-gold">Prevail.</span>
           </p>
         </div>
-        <p className="mt-10 max-w-3xl text-xs leading-relaxed text-text-mute">
+        <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-text-mute">
           Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
           without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
           Bunker Mode is on, may send data to cloud providers, so always review anything important yourself. Feedback
