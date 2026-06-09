@@ -17,9 +17,9 @@ Prevail is not a chatbot and not a coding harness — it is a "life harness." Th
 
 ## Source & docs
 
-- [CLI repository](https://github.com/fru-dev3/prevail): Source for the Prevail CLI / terminal cockpit (MIT).
+- [CLI repository](https://github.com/fru-dev3/prevail-cli): Source for the Prevail CLI / terminal cockpit (MIT).
 - [Desktop repository](https://github.com/fru-dev3/prevail-desktop): Source for the native Mac app.
-- [Changelog](https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md): Release notes for the CLI.
+- [Changelog](https://github.com/fru-dev3/prevail-cli/blob/main/CHANGELOG.md): Release notes for the CLI.
 
 ## Works with
 
