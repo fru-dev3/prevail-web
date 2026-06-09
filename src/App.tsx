@@ -41,13 +41,13 @@ import { APP_VERSION } from "./version";
 const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
-// Direct download served from this site (public/), so clicking "Download"
-// fetches the .dmg immediately instead of bouncing to the GitHub release
-// page. Stable, version-less URL: each release overwrites the same file, so
-// the link never breaks. The `download={DMG_NAME}` attr gives the browser a
-// VERSIONED save filename (APP_VERSION, stamped by the release script) so
-// users/support can tell builds apart without the URL ever changing.
-const DMG_URL = "/Prevail-mac-arm64.dmg";
+// Download is served from GitHub Releases, NOT this site. GitHub has no
+// bandwidth limit for release assets; serving a ~32 MB DMG from Netlify blew
+// the free-tier bandwidth quota and took the whole site down. `latest/download`
+// + the stable asset name `Prevail-mac-arm64.dmg` (uploaded by the release
+// script) keeps the URL fixed across versions.
+const DMG_URL =
+  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail-mac-arm64.dmg";
 const DMG_NAME = `Prevail-${APP_VERSION}-arm64.dmg`;
 const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
 const VERSION_CLI = "1.6.5";
@@ -3147,6 +3147,45 @@ function UseCasesSection() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Root
 
+// Demo video — a compact, self-hosted MP4 (1.3 MB, poster + preload=metadata
+// so it only fully downloads on play). Hosting the binary DMG here is what blew
+// the bandwidth budget; a tiny lazy video is fine.
+function DemoVideo() {
+  return (
+    <section id="demo" className="border-t border-border-soft py-20 md:py-28 grain">
+      <div className="mx-auto max-w-5xl px-6">
+        <FadeIn>
+          <div className="text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
+              See it in action
+            </p>
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+              The whole thing,{" "}
+              <span className="font-serif italic text-text-soft">in two minutes.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-text-soft">
+              A real walkthrough: convene a council, watch it self-learn, and see
+              your life become markdown you own.
+            </p>
+          </div>
+        </FadeIn>
+        <FadeIn delay={0.15}>
+          <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-2xl">
+            <video
+              src="/prevail-demo.mp4"
+              poster="/prevail-demo-poster.jpg"
+              controls
+              playsInline
+              preload="metadata"
+              className="block aspect-video w-full"
+            />
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [theme, toggleTheme] = useTheme();
 
@@ -3170,6 +3209,7 @@ export default function App() {
       <Nav theme={theme} onToggleTheme={toggleTheme} />
       <main className="pt-14">
         <Hero />
+        <DemoVideo />
         <CouncilPitch />
         <DownloadSection />
         <DesktopShowcase />
