@@ -1336,8 +1336,9 @@ function CouncilPitch() {
             </p>
             <p className="mt-4 text-text-soft">
               That's the harness: a <span className="text-text">council</span> of
-              AI for the rest of your life — every model you trust, convened on
-              one question.
+              AI for the rest of your life. Every model you trust, local or cloud,
+              convened on one question. It <span className="text-text">remembers what you decide</span>,
+              so it gets sharper every time.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
@@ -2782,8 +2783,14 @@ function Footer() {
             Ask a council. <span className="not-italic text-gold">Prevail.</span>
           </p>
         </div>
-        <div className="mt-10 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
-          <span>© 2026 Prevail.sh — built local, shipped open.</span>
+        <p className="mt-10 max-w-3xl text-xs leading-relaxed text-text-mute">
+          Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
+          without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
+          Bunker Mode is on, may send data to cloud providers, so always review anything important yourself. Feedback
+          and bug reports are very welcome and directly shape what comes next.
+        </p>
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
+          <span>© 2026 Prevail.sh · built local, shipped open · alpha</span>
           <span>Built with Bun · React · Tauri · OpenTUI</span>
         </div>
       </div>
