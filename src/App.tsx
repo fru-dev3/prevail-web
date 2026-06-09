@@ -192,13 +192,16 @@ function OpenClawMark({ className = "" }: { className?: string }) {
 
 // "Works with" ecosystem strip — Fru's own systems (OpenClaw, Paperclip,
 // Hermes) alongside the model CLIs they bridge to.
+// Each mark carries its brand color so the strip reads at a glance. The icons
+// render in `currentColor`, so the wrapper sets the color per brand. OpenAI's
+// mark is monochrome by design, so it stays light on the dark strip.
 const WORKS_WITH = [
-  { name: "OpenClaw", render: (c: string) => <OpenClawMark className={c} /> },
-  { name: "Paperclip", render: (c: string) => <Paperclip className={c} /> },
-  { name: "Gemini", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
-  { name: "Codex", render: (c: string) => <OpenAIMark className={c} /> },
-  { name: "Claude", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
-  { name: "Hermes", render: (c: string) => <HermesBrand className={c} /> },
+  { name: "OpenClaw", color: "#ff4d4d", render: (c: string) => <OpenClawMark className={c} /> },
+  { name: "Paperclip", color: "#0092b7", render: (c: string) => <Paperclip className={c} /> },
+  { name: "Gemini", color: "#4285F4", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
+  { name: "Codex", color: "#ededed", render: (c: string) => <OpenAIMark className={c} /> },
+  { name: "Claude", color: "#cc785c", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
+  { name: "Hermes", color: "#c4a8ff", render: (c: string) => <HermesBrand className={c} /> },
 ];
 
 // Reusable model-logo row — actual brand logos in their official colors.
@@ -728,7 +731,9 @@ function Hero() {
                       title={w.name}
                       className="group flex items-center gap-1.5 text-text-soft transition-colors hover:text-text"
                     >
-                      {w.render("h-5 w-5")}
+                      <span style={{ color: w.color }} className="inline-flex">
+                        {w.render("h-5 w-5")}
+                      </span>
                       <span className="text-[11px]">{w.name}</span>
                     </div>
                   ))}
