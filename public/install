@@ -5,16 +5,16 @@
 #   curl -fsSL https://prevail.sh/install | bash
 #
 # Detects your platform, downloads the latest release tarball from
-# https://github.com/fru-dev3/prevail/releases, extracts to ~/.prevail,
+# https://github.com/fru-dev3/prevail-cli/releases, extracts to ~/.prevail,
 # symlinks the binary into your PATH, and prints next steps.
 #
-# Source: https://github.com/fru-dev3/prevail-site/blob/main/public/install
+# Source: https://github.com/fru-dev3/prevail-web/blob/main/public/install
 # License: MIT
 
 set -euo pipefail
 
 # ── Constants ───────────────────────────────────────────────────────
-REPO="fru-dev3/prevail"
+REPO="fru-dev3/prevail-cli"
 INSTALL_DIR="${PREVAIL_HOME:-$HOME/.prevail}"
 BIN_NAME="prevail"
 

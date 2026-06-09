@@ -38,9 +38,9 @@ import {
 } from "simple-icons";
 import { APP_VERSION } from "./version";
 
-const GITHUB_CLI = "https://github.com/fru-dev3/prevail";
+const GITHUB_CLI = "https://github.com/fru-dev3/prevail-cli";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
-const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail/blob/main/CHANGELOG.md";
+const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail-cli/blob/main/CHANGELOG.md";
 // Download is served from GitHub Releases, NOT this site. GitHub has no
 // bandwidth limit for release assets; serving a ~32 MB DMG from Netlify blew
 // the free-tier bandwidth quota and took the whole site down. `latest/download`
@@ -264,7 +264,7 @@ function GitHubStarButton({
   const [stars, setStars] = useState<number | null>(null);
   useEffect(() => {
     let cancelled = false;
-    fetch("https://api.github.com/repos/fru-dev3/prevail")
+    fetch("https://api.github.com/repos/fru-dev3/prevail-cli")
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
         if (cancelled || !j) return;
@@ -2755,14 +2755,14 @@ function Footer() {
               links: [
                 ["Prevail CLI", GITHUB_CLI],
                 ["Prevail desktop", GITHUB_DESKTOP],
-                ["Demo vault", "https://github.com/fru-dev3/prevail/tree/main/vault-demo"],
+                ["Demo vault", "https://github.com/fru-dev3/prevail-cli/tree/main/vault-demo"],
               ],
             },
             {
               title: "Legal",
               links: [
-                ["MIT License", "https://github.com/fru-dev3/prevail/blob/main/LICENSE"],
-                ["Security", "https://github.com/fru-dev3/prevail/blob/main/SECURITY.md"],
+                ["MIT License", "https://github.com/fru-dev3/prevail-cli/blob/main/LICENSE"],
+                ["Security", "https://github.com/fru-dev3/prevail-cli/blob/main/SECURITY.md"],
               ],
             },
           ].map((col) => (

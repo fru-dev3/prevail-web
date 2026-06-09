@@ -11,7 +11,7 @@ Landing page for **Prevail** — *One question. Four engines. One verdict.*
 | **Primary (custom domain)** | https://prevail.sh | DNS pending at GoDaddy |
 | **Alias** | https://prevail.fru.dev | ✅ live |
 | **Netlify default** | https://prevail-site.netlify.app | ✅ live |
-| **Repo** | https://github.com/fru-dev3/prevail-site | |
+| **Repo** | https://github.com/fru-dev3/prevail-web | |
 | **Netlify admin** | https://app.netlify.com/projects/prevail-site | |
 | **Site ID** | `68129d3b-87a5-4c7f-bc51-78078bd286e2` | |
 
@@ -105,7 +105,7 @@ Required secrets (already configured in this repo):
 Rotate by running:
 
 ```bash
-gh secret set NETLIFY_AUTH_TOKEN --repo fru-dev3/prevail-site
+gh secret set NETLIFY_AUTH_TOKEN --repo fru-dev3/prevail-web
 ```
 
 ### Preview deploys
