@@ -3195,6 +3195,288 @@ function DemoVideo() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPARISON section — sits directly under the demo video. Shows the full
+// ~/.ai crew (Prevail + its companion agents/channels) next to the external
+// all-in-one alternative (Odysseus), so a visitor sees at a glance WHAT each
+// does and WHERE Prevail fits. Prevail is the highlighted "you're here" column.
+//
+// NOTE: Hermes + Multica copy below is intentionally generic ("AI agent in the
+// ~/.ai layer") — drop in their real one-liners when ready.
+
+// Minimal Odysseus mark — no official logo, so a clean monochrome sail-on-wave
+// glyph (currentColor) for the "external alternative" card. Geometric only.
+function OdysseusMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-label="Odysseus">
+      {/* mast */}
+      <line x1="12" y1="3" x2="12" y2="17" />
+      {/* sail */}
+      <path d="M12 4 L19 14 L12 14 Z" fill="currentColor" stroke="none" />
+      {/* hull */}
+      <path d="M5 17 L19 17 L17 20 L7 20 Z" />
+      {/* wave */}
+      <path d="M3 22 Q6 20.5 9 22 T15 22 T21 22" strokeWidth="1.3" />
+    </svg>
+  );
+}
+
+// Each product is a COLUMN. `blurb` is the short 1–2 sentence description that
+// sits under the logo in the header. `hero` lights Prevail's column gold.
+const COMPARE_COLS: Array<{
+  key: string;
+  name: ReactNode;
+  tint: string;
+  blurb: string;
+  surface: string;
+  hero?: boolean;
+  external?: boolean;
+  render: (cls: string) => ReactNode;
+}> = [
+  {
+    key: "prevail",
+    name: <Brand />,
+    tint: "#C4A35A",
+    hero: true,
+    blurb: "The council cockpit. One question, every model, one verdict — with the disagreement laid bare.",
+    surface: "Terminal · desktop",
+    render: () => <Logo size={26} />,
+  },
+  {
+    key: "openclaw",
+    name: "OpenClaw",
+    tint: "#ff4d4d",
+    blurb: "The phone gateway. Reach the same vault from anywhere over Telegram.",
+    surface: "Telegram",
+    render: (cls) => <OpenClawBrand className={cls} />,
+  },
+  {
+    key: "paperclip",
+    name: "Paperclip",
+    tint: "#0092b7",
+    blurb: "The background crew. Autonomous agents that work your domains between decisions.",
+    surface: "Always-on",
+    render: (cls) => <PaperclipBrandReal className={cls} />,
+  },
+  {
+    key: "hermes",
+    name: "Hermes",
+    tint: "#c4a8ff",
+    blurb: "An AI agent on the shared ~/.ai layer.",
+    surface: "Agent",
+    render: (cls) => <HermesBrand className={cls} />,
+  },
+  {
+    key: "multica",
+    name: "Multica",
+    tint: "#f5f3ed",
+    blurb: "An AI agent on the shared ~/.ai layer.",
+    surface: "Agent",
+    render: (cls) => <MulticaBrandReal className={cls} />,
+  },
+  {
+    key: "odysseus",
+    name: "Odysseus",
+    tint: "#5fbfff",
+    external: true,
+    blurb: "The all-in-one alternative. A self-hosted workspace you stand up with Docker and a GPU.",
+    surface: "Browser · self-hosted",
+    render: (cls) => <OdysseusMark className={cls} />,
+  },
+];
+
+// Cell value: true = full, "part" = partial/indirect, false = absent.
+type Cell = boolean | "part";
+const COMPARE_FEATURES: Array<{ label: string; vals: Record<string, Cell> }> = [
+  {
+    label: "Multi-model council + synthesized verdict",
+    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+  },
+  {
+    label: "Surfaces where the models disagree",
+    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+  },
+  {
+    label: "Benchmarks new models on your real decisions",
+    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+  },
+  {
+    label: "Frameworks & lenses, per domain",
+    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+  },
+  {
+    label: "Your vault — plain markdown you own",
+    vals: { prevail: true, openclaw: true, paperclip: true, hermes: true, multica: true, odysseus: false },
+  },
+  {
+    label: "Shares the ~/.ai knowledge layer",
+    vals: { prevail: true, openclaw: true, paperclip: true, hermes: true, multica: true, odysseus: false },
+  },
+  {
+    label: "Ask from your phone",
+    vals: { prevail: true, openclaw: true, paperclip: false, hermes: false, multica: false, odysseus: "part" },
+  },
+  {
+    label: "Autonomous background agents",
+    vals: { prevail: false, openclaw: false, paperclip: true, hermes: true, multica: "part", odysseus: true },
+  },
+  {
+    label: "Local-first — no server, no Docker",
+    vals: { prevail: true, openclaw: true, paperclip: "part", hermes: "part", multica: "part", odysseus: false },
+  },
+  {
+    label: "All-in-one email · calendar · image tools",
+    vals: { prevail: false, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: true },
+  },
+  {
+    label: "Open source (MIT)",
+    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: "part" },
+  },
+];
+
+// #RRGGBB → rgba(), for the per-brand color bands and glows applied inline.
+function rgba(hex: string, a: number) {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+function CompareCell({ value, tint }: { value: Cell; tint: string }) {
+  if (value === true) {
+    return (
+      <span
+        className="text-lg font-bold"
+        style={{ color: tint, textShadow: `0 0 16px ${rgba(tint, 0.5)}` }}
+        aria-label="yes"
+      >
+        ✓
+      </span>
+    );
+  }
+  if (value === "part") {
+    return (
+      <span className="text-sm font-medium" style={{ color: rgba(tint, 0.6) }} aria-label="partial">
+        ○
+      </span>
+    );
+  }
+  return (
+    <span className="text-text-mute/30" aria-label="no">
+      –
+    </span>
+  );
+}
+
+function ComparisonSection() {
+  return (
+    <section id="compare" className="border-t border-border-soft py-24 md:py-32">
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <div className="text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
+              Where it fits
+            </p>
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+              The whole board,{" "}
+              <span className="font-serif italic text-text-soft">side by side.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-text-soft">
+              <Brand /> is the seat you sit in. The others are the crew around it —
+              and the one heavyweight you'd self-host instead. Here's what each one
+              actually brings.
+            </p>
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.15}>
+          <div className="mt-14 overflow-x-auto rounded-2xl border border-border-soft">
+            <table className="w-full min-w-[920px] border-collapse text-left">
+              <thead>
+                <tr>
+                  <th className="w-[26%] border-b border-border-soft p-4 align-bottom" />
+                  {COMPARE_COLS.map((col) => (
+                    <th
+                      key={col.key}
+                      className="border-b border-l border-border-soft p-4 align-top"
+                      style={{
+                        background: `linear-gradient(to bottom, ${rgba(col.tint, col.hero ? 0.22 : 0.12)}, ${rgba(col.tint, 0.02)})`,
+                        borderTop: `3px solid ${col.tint}`,
+                      }}
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <div
+                          className="flex h-11 w-11 items-center justify-center rounded-xl border"
+                          style={{
+                            color: col.tint,
+                            borderColor: rgba(col.tint, 0.5),
+                            background: rgba(col.tint, 0.12),
+                            boxShadow: `0 0 22px ${rgba(col.tint, 0.25)}`,
+                          }}
+                        >
+                          {col.render("h-6 w-6")}
+                        </div>
+                        <span
+                          className="mt-3 text-sm font-semibold tracking-[-0.01em]"
+                          style={{ color: col.tint }}
+                        >
+                          {col.name}
+                        </span>
+                        <span className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-text-mute">
+                          {col.surface}
+                        </span>
+                        <span className="mt-2 text-[11px] leading-snug text-text-soft">
+                          {col.blurb}
+                        </span>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARE_FEATURES.map((feat) => (
+                  <tr key={feat.label} className="group">
+                    <th
+                      scope="row"
+                      className="border-b border-border-soft p-4 text-sm font-medium text-text-soft transition-colors group-hover:text-text"
+                    >
+                      {feat.label}
+                    </th>
+                    {COMPARE_COLS.map((col) => (
+                      <td
+                        key={col.key}
+                        className="border-b border-l border-border-soft p-4 text-center"
+                        style={{ background: rgba(col.tint, col.hero ? 0.1 : 0.05) }}
+                      >
+                        <CompareCell value={feat.vals[col.key]} tint={col.tint} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.2}>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-text-mute">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="font-bold text-gold">✓</span> full
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-text-soft">○</span> partial / indirect
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="text-text-mute/60">–</span> not built for it
+            </span>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [theme, toggleTheme] = useTheme();
 
@@ -3219,6 +3501,7 @@ export default function App() {
       <main className="pt-14">
         <Hero />
         <DemoVideo />
+        <ComparisonSection />
         <CouncilPitch />
         <DownloadSection />
         <DesktopShowcase />
