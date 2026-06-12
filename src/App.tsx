@@ -2275,8 +2275,8 @@ function DownloadSection() {
             Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Native Mac app — signed, notarized, and self-contained. No terminal,
-            no setup. Download and open.
+            Native Mac app — self-contained, no terminal, no setup. Download,
+            then right-click → Open on first launch.
           </p>
         </FadeIn>
 
@@ -2296,8 +2296,8 @@ function DownloadSection() {
                 Prevail.app
               </h3>
               <p className="mt-3 text-text-soft">
-                Native Mac app. v{version}. Signed &amp; notarized — opens
-                with a double-click, no Gatekeeper warnings. No terminal required.
+                Native Mac app. v{version}. Self-contained, no terminal required.
+                First launch: right-click → Open to get past Gatekeeper.
               </p>
 
               <a
