@@ -1,6 +1,6 @@
 # Prevail
 
-> Prevail is an AI harness for life's hard questions. It structures your life's context and brings it to humanity's most powerful intelligence: one question fans out to every AI CLI you have installed — Claude, Codex, Antigravity, and Ollama — they answer in parallel, and a chair model reads all the replies and writes one verdict, with a panel showing where they disagreed. Local-first, markdown-native, free and open source (MIT). Native Mac app + terminal CLI.
+> Prevail is an AI harness for life's hard questions. It structures your life's context and brings it to humanity's most powerful intelligence: one question fans out to every AI CLI you have installed — Claude, Codex, Antigravity, and Ollama — they answer in parallel, and a chair model reads all the replies and writes one verdict, with a panel showing where they disagreed. Local-first, markdown-native, free and open source (MIT). Native Mac app for macOS — signed and notarized, no terminal required.
 
 Prevail is not a chatbot and not a coding harness — it is a "life harness." The whole system is, in essence, folders plus the discipline of organizing them so an AI can reason over your life. Every life domain (wealth, tax, health, career, estate, and ~20 more) is a plain folder; every verdict is a dated markdown file you own. There is no database and no cloud — Prevail spawns the CLIs you are already logged into, and for private domains you can run an Ollama-only council so nothing leaves the machine. A built-in benchmark (21 canonical questions across 8 capability dimensions) grades models against *your* life, and the best model for one domain is often not the best for another.
 
@@ -12,14 +12,14 @@ Prevail is not a chatbot and not a coding harness — it is a "life harness." Th
 
 ## Install
 
-- [Install the CLI](https://prevail.sh/#install): `curl -fsSL prevail.sh/install | bash` (macOS, Linux, Windows via WSL). Current CLI version 1.7.0.
-- [Download the Mac app](https://github.com/fru-dev3/prevail-desktop/releases/latest): Native desktop app, no terminal required. Current desktop version 0.7.4.
+- [Download the Mac app](https://github.com/fru-dev3/prevail-desktop/releases/latest): Native desktop app — signed, notarized, no terminal required. The recommended way to run Prevail. Current desktop version 0.7.4.
+- [Advanced: the CLI engine](https://prevail.sh/#install): `curl -fsSL prevail.sh/install | bash` (macOS, Linux, Windows via WSL). The desktop app bundles this engine; install it standalone only for headless/terminal use. Current CLI version 1.7.0.
 
 ## Source & docs
 
-- [CLI repository](https://github.com/fru-dev3/prevail-cli): Source for the Prevail CLI / terminal cockpit (MIT).
-- [Desktop repository](https://github.com/fru-dev3/prevail-desktop): Source for the native Mac app.
-- [Changelog](https://github.com/fru-dev3/prevail-cli/blob/main/CHANGELOG.md): Release notes for the CLI.
+- [Desktop repository](https://github.com/fru-dev3/prevail-desktop): Source for the native Mac app (MIT).
+- [Releases & notes](https://github.com/fru-dev3/prevail-desktop/releases): Per-version release notes for the desktop app.
+- [CLI engine repository](https://github.com/fru-dev3/prevail-cli): Source for the bundled engine the desktop app ships (MIT).
 
 ## Works with
 
