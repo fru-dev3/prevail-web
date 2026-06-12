@@ -1,0 +1,76 @@
+# Prevail Benchmark — runs the canonical question set across a model panel and
+# publishes public/benchmark-results.json (the website board reads it).
+#
+# NOT enabled on a schedule by default: a full run calls paid model APIs, so it
+# is manual (workflow_dispatch) until you add the provider secrets below and
+# uncomment the weekly schedule. Required repo secrets:
+#   OPENROUTER_API_KEY   (one key covers most models via OpenRouter)
+#   optionally ANTHROPIC_API_KEY / OPENAI_API_KEY for direct providers
+name: Prevail Benchmark
+
+on:
+  workflow_dispatch:
+  # Uncomment to run weekly once secrets are configured (Mondays 06:00 UTC):
+  # schedule:
+  #   - cron: "0 6 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+
+      - name: Checkout engine (prevail-cli)
+        uses: actions/checkout@v4
+        with:
+          repository: fru-dev3/prevail-cli
+          path: engine
+
+      - name: Checkout desktop (for the sample vault + questions)
+        uses: actions/checkout@v4
+        with:
+          repository: fru-dev3/prevail-desktop
+          path: desktop
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install engine deps
+        run: cd engine && bun install
+
+      - name: Run canonical benchmark across the panel
+        env:
+          PREVAIL_OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          VAULT="$GITHUB_WORKSPACE/desktop/src-tauri/resources/sample-vault"
+          cd engine
+          # One run per model in the panel. OpenRouter routes them all.
+          for M in "openrouter:anthropic/claude-opus-4.1" \
+                   "openrouter:anthropic/claude-sonnet-4.5" \
+                   "openrouter:openai/gpt-5.1" \
+                   "openrouter:google/gemini-2.5-pro" \
+                   "openrouter:deepseek/deepseek-chat"; do
+            CLI="${M%%:*}"; MODEL="${M#*:}"
+            bun src/index.tsx --vault "$VAULT" bench run --canonical --cli "$CLI" --model "$MODEL" || true
+          done
+          bun src/index.tsx --vault "$VAULT" bench score --all || true
+          bun src/index.tsx --vault "$VAULT" bench export-results -o "$GITHUB_WORKSPACE/public/benchmark-results.json"
+
+      - name: Commit updated results
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          if ! git diff --quiet public/benchmark-results.json; then
+            git config user.name "prevail-bot"
+            git config user.email "noreply@prevail.sh"
+            git add public/benchmark-results.json
+            git commit -m "benchmark: refresh published results"
+            git push
+          else
+            echo "no change in results"
+          fi
