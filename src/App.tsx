@@ -34,17 +34,32 @@ import {
   siTailscale,
   siTelegram,
 } from "simple-icons";
-import { APP_VERSION, useLatestVersion } from "./version";
+import { APP_VERSION, useLatestVersion, useLiveVersion } from "./version";
 
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 // Download is served from GitHub Releases, NOT this site. GitHub has no
 // bandwidth limit for release assets; serving a ~32 MB DMG from Netlify blew
 // the free-tier bandwidth quota and took the whole site down. `latest/download`
 // + the stable asset name `Prevail-mac-arm64.dmg` (uploaded by the release
-// script) keeps the URL fixed across versions.
+// workflow) keeps the URL fixed across versions.
 const DMG_URL =
   "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail-mac-arm64.dmg";
 const DMG_NAME = `Prevail-${APP_VERSION}-arm64.dmg`;
+
+// Download link. Once GitHub confirms the latest version, link to the
+// version-named asset (CI publishes Prevail_<ver>_aarch64.dmg on every
+// release) so the saved file says exactly what it is; until then, the
+// stable alias above. (`download=` is ignored cross-origin, so the
+// filename must come from the asset itself.)
+function useDmgDownload(): { url: string; name: string } {
+  const live = useLiveVersion();
+  if (live)
+    return {
+      url: `${GITHUB_DESKTOP}/releases/download/v${live}/Prevail_${live}_aarch64.dmg`,
+      name: `Prevail_${live}_aarch64.dmg`,
+    };
+  return { url: DMG_URL, name: DMG_NAME };
+}
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -327,6 +342,7 @@ function WindowChrome({
 // Nav — frosted, minimal
 
 function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
+  const dmg = useDmgDownload();
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 frost border-b border-border-soft">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
@@ -356,8 +372,8 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
             <GitHubStarButton />
           </span>
           <a
-            href={DMG_URL}
-            download={DMG_NAME}
+            href={dmg.url}
+            download={dmg.name}
             className="inline-flex items-center gap-1.5 rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:px-4"
             style={{ boxShadow: "0 4px 24px rgba(196, 163, 90, 0.25)" }}
           >
@@ -650,6 +666,7 @@ function HeroAuroras() {
 }
 
 function Hero() {
+  const dmg = useDmgDownload();
   return (
     <section className="relative isolate overflow-hidden pt-24 pb-16 grain lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:pt-12 lg:pb-28">
       <div className="glow-gold absolute inset-0 -z-10" />
@@ -686,8 +703,8 @@ function Hero() {
             <FadeIn delay={0.18}>
               <div className="mt-8 flex w-full max-w-2xl items-center gap-3">
                 <a
-                  href={DMG_URL}
-                  download={DMG_NAME}
+                  href={dmg.url}
+                  download={dmg.name}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                   style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
                 >
@@ -2263,6 +2280,7 @@ function EcosystemSection() {
 
 function DownloadSection() {
   const version = useLatestVersion();
+  const dmg = useDmgDownload();
   return (
     <section id="install" className="border-t border-border-soft py-24 md:py-32 grain">
       <div className="glow-gold absolute inset-0 -z-10 opacity-50" />
@@ -2301,8 +2319,8 @@ function DownloadSection() {
               </p>
 
               <a
-                href={DMG_URL}
-                download={`Prevail-${version}-arm64.dmg`}
+                href={dmg.url}
+                download={dmg.name}
                 className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
@@ -2404,6 +2422,7 @@ function FAQSection() {
 // Footer
 
 function Footer() {
+  const dmg = useDmgDownload();
   return (
     <footer className="border-t border-border-soft bg-surface-0">
       <div className="mx-auto max-w-6xl px-6 py-16">
@@ -2422,7 +2441,7 @@ function Footer() {
             {
               title: "Product",
               links: [
-                ["Download (DMG)", DMG_URL],
+                ["Download (DMG)", dmg.url],
                 ["All releases", `${GITHUB_DESKTOP}/releases`],
                 ["Source", GITHUB_DESKTOP],
               ],
