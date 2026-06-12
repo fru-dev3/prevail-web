@@ -6,7 +6,6 @@ import {
   Building2,
   Check,
   Compass,
-  Copy,
   BarChart3,
   Boxes,
   Download,
@@ -23,7 +22,6 @@ import {
   Sparkles,
   Star,
   Sun,
-  Terminal,
   Wallet,
 } from "lucide-react";
 import {
@@ -38,9 +36,7 @@ import {
 } from "simple-icons";
 import { APP_VERSION } from "./version";
 
-const GITHUB_CLI = "https://github.com/fru-dev3/prevail-cli";
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
-const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail-cli/blob/main/CHANGELOG.md";
 // Download is served from GitHub Releases, NOT this site. GitHub has no
 // bandwidth limit for release assets; serving a ~32 MB DMG from Netlify blew
 // the free-tier bandwidth quota and took the whole site down. `latest/download`
@@ -49,9 +45,6 @@ const CHANGELOG_CLI = "https://github.com/fru-dev3/prevail-cli/blob/main/CHANGEL
 const DMG_URL =
   "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail-mac-arm64.dmg";
 const DMG_NAME = `Prevail-${APP_VERSION}-arm64.dmg`;
-const INSTALL_CMD = "curl -fsSL prevail.sh/install | bash";
-const VERSION_CLI = "1.6.5";
-const VERSION_DESKTOP = "0.4.2";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -264,7 +257,7 @@ function GitHubStarButton({
   const [stars, setStars] = useState<number | null>(null);
   useEffect(() => {
     let cancelled = false;
-    fetch("https://api.github.com/repos/fru-dev3/prevail-cli")
+    fetch("https://api.github.com/repos/fru-dev3/prevail-desktop")
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
         if (cancelled || !j) return;
@@ -278,7 +271,7 @@ function GitHubStarButton({
   const isLg = size === "lg";
   return (
     <a
-      href={GITHUB_CLI}
+      href={GITHUB_DESKTOP}
       target="_blank"
       rel="noreferrer"
       title="Star on GitHub"
@@ -702,11 +695,11 @@ function Hero() {
                   Download for Mac
                 </a>
                 <a
-                  href="#install"
+                  href="#council"
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-1 px-5 py-2.5 text-sm font-medium hover:bg-surface-2"
                 >
-                  <Terminal className="h-4 w-4" />
-                  Install CLI
+                  <Users className="h-4 w-4" />
+                  How it works
                 </a>
               </div>
             </FadeIn>
@@ -752,90 +745,19 @@ function Hero() {
   );
 }
 
-// Slider that toggles between the Desktop app mockup and the CLI mockup.
-// Auto-rotates every 7s; clicking a tab pauses rotation.
+// Hero product shot — the native desktop app.
 function HeroSlider() {
-  const [active, setActive] = useState<"desktop" | "cli">("desktop");
-  const [paused, setPaused] = useState(false);
-
-  useEffect(() => {
-    if (paused) return;
-    const t = setTimeout(() => {
-      setActive((a) => (a === "desktop" ? "cli" : "desktop"));
-    }, 7000);
-    return () => clearTimeout(t);
-  }, [active, paused]);
-
   return (
     <div>
-      {/* Tab pill */}
-      <div className="mb-5 flex items-center justify-center">
-        <div className="flex items-center gap-1 rounded-full border border-border-soft bg-surface-0 p-1 text-sm">
-          {(["desktop", "cli"] as const).map((id) => {
-            const isActive = active === id;
-            return (
-              <button
-                key={id}
-                onClick={() => {
-                  setActive(id);
-                  setPaused(true);
-                }}
-                className={`relative isolate inline-flex items-center gap-2 rounded-full px-5 py-1.5 font-medium transition-colors duration-200 ${
-                  isActive ? "text-bg delay-150" : "text-text hover:text-white"
-                }`}
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="slider-pill"
-                    className="absolute inset-0 -z-10 rounded-full bg-gold"
-                    transition={{ type: "spring", stiffness: 520, damping: 40 }}
-                  />
-                )}
-                {id === "desktop" ? (
-                  <Folder className="h-3.5 w-3.5" />
-                ) : (
-                  <Terminal className="h-3.5 w-3.5" />
-                )}
-                {id === "desktop" ? "Desktop app" : "Terminal CLI"}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Swap content with crossfade. Container is height-locked so the
-          hero never jumps when the user (or the auto-rotate) toggles
-          tabs — both Desktop and CLI mocks share the same canvas size. */}
       <div className="relative h-[410px] sm:h-[440px] md:h-[460px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={active}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.45, ease: EASE }}
-            className="absolute inset-0"
-          >
-            {active === "desktop" ? <DesktopAppMock /> : <CliMock />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Dots */}
-      <div className="mt-5 flex items-center justify-center gap-2">
-        {(["desktop", "cli"] as const).map((id) => (
-          <button
-            key={id}
-            onClick={() => {
-              setActive(id);
-              setPaused(true);
-            }}
-            aria-label={`Show ${id}`}
-            className={`h-1.5 rounded-full transition-all ${
-              active === id ? "w-6 bg-gold" : "w-1.5 bg-border-strong hover:bg-text-mute"
-            }`}
-          />
-        ))}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: EASE }}
+          className="absolute inset-0"
+        >
+          <DesktopAppMock />
+        </motion.div>
       </div>
     </div>
   );
@@ -982,205 +904,6 @@ function DesktopAppMock() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </WindowChrome>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Full 7-row ASCII PREVAIL wordmark — byte-for-byte identical to the TUI's
-// banner in src/branding.tsx. PREV + L in gold, AI in cyan.
-
-const G: Record<string, string[]> = {
-  P: ["██████╗   ", "██╔══██╗  ", "██████╔╝  ", "██╔═══╝   ", "██║       ", "██║       ", "╚═╝       "],
-  R: ["██████╗   ", "██╔══██╗  ", "██████╔╝  ", "██╔══██╗  ", "██║  ██║  ", "██║  ██║  ", "╚═╝  ╚═╝  "],
-  E: ["███████╗  ", "██╔════╝  ", "█████╗    ", "██╔══╝    ", "██║       ", "███████╗  ", "╚══════╝  "],
-  V: ["██╗   ██╗ ", "██║   ██║ ", "██║   ██║ ", "╚██╗ ██╔╝ ", " ╚████╔╝  ", "  ╚██╔╝   ", "   ╚═╝    "],
-  A: ["  █████╗  ", " ██╔══██╗ ", " ███████╗ ", " ██╔══██║ ", " ██║  ██║ ", " ██║  ██║ ", " ╚═╝  ╚═╝ "],
-  I: ["██████╗   ", "╚═██╔═╝   ", "  ██║     ", "  ██║     ", "  ██║     ", "██████╗   ", "╚═════╝   "],
-  L: ["██╗       ", "██║       ", "██║       ", "██║       ", "██║       ", "███████╗  ", "╚══════╝  "],
-};
-const compose = (letters: string[]) =>
-  Array.from({ length: 7 }, (_, r) => letters.map((l) => G[l]![r]).join(" "));
-const PREVAIL_PREV = compose(["P", "R", "E", "V"]);
-const PREVAIL_AI = compose(["A", "I"]);
-const PREVAIL_L = compose(["L"]);
-
-function AsciiPrevail({ size = "sm" }: { size?: "xs" | "sm" | "md" }) {
-  const fontSize = size === "xs" ? 5 : size === "sm" ? 6 : 8;
-  return (
-    <div
-      className="flex font-mono"
-      aria-label="Prevail"
-      style={{ fontSize: `${fontSize}px`, lineHeight: 1.05 }}
-    >
-      <pre className="text-gold">{PREVAIL_PREV.join("\n")}</pre>
-      <pre className="text-ai pl-[2px]">{PREVAIL_AI.join("\n")}</pre>
-      <pre className="text-gold pl-[2px]">{PREVAIL_L.join("\n")}</pre>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CLI / TUI mockup — shown when the user toggles the slider to "Terminal CLI"
-// Replicates the actual TUI cockpit: full banner, sidebar, workspace tabs,
-// chat with mid-council streaming, status footer.
-
-function CliMock() {
-  return (
-    <WindowChrome title="iTerm — prevail" fillParent>
-      <div className="flex h-full flex-col overflow-hidden bg-bg p-3 font-mono text-[9px] leading-[1.35] md:p-4 md:text-[10px]">
-        {/* === BANNER === tight 5-row replica */}
-        <div className="shrink-0 border-b border-gold/40 pb-2">
-          <div className="flex items-start gap-3">
-            <div className="hidden shrink-0 md:block">
-              <AsciiPrevail size="xs" />
-            </div>
-            <div className="hidden h-[44px] w-px shrink-0 bg-border md:block" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gold">
-                  THU, JUN 5 · 2026
-                </span>
-                <span className="text-text-mute">
-                  <span className="text-text">20</span>d ·{" "}
-                  <span className="text-text">19</span>a ·{" "}
-                  <span className="text-warn">65</span>o
-                </span>
-              </div>
-              <div className="mt-0.5 truncate text-text-mute">
-                07:48 · prevail v{VERSION_CLI}
-              </div>
-              <div className="mt-0.5">
-                <span className="text-gold">⚖ Council:</span>
-                <span className="text-text">ON</span>{" "}
-                <span className="text-gold">◆ F:</span>
-                <span className="text-text">BLUF</span>{" "}
-                <span className="text-gold">◇ L:</span>
-                <span className="text-text">FIRST</span>
-              </div>
-              <div className="mt-0.5">
-                <span className="text-text-mute">cli</span>{" "}
-                <span style={{ color: "#6ee787" }}>✓ Claude</span>{" "}
-                <span style={{ color: "#6ee787" }}>✓ Codex</span>{" "}
-                <span style={{ color: "#6ee787" }}>✓ Agy</span>{" "}
-                <span style={{ color: "#f0c674" }}>! Ollama</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* === BODY === sidebar + workspace — fills remaining height */}
-        <div className="mt-2 grid min-h-0 flex-1 grid-cols-[88px_1fr] gap-3 md:grid-cols-[110px_1fr]">
-          {/* SIDEBAR — trimmed to 7 visible domains */}
-          <div className="min-h-0 overflow-hidden">
-            <div className="text-[8px] font-medium text-gold">
-              DOMAINS · 20 ●
-            </div>
-            <div className="mt-1.5 space-y-[1px]">
-              {[
-                { d: "chief", g: "◆", active: true },
-                { d: "vision", g: "★" },
-                { d: "wealth", g: "¤" },
-                { d: "health", g: "♥" },
-                { d: "tax", g: "§" },
-                { d: "career", g: "▲" },
-                { d: "business", g: "◈" },
-              ].map((row) => (
-                <div
-                  key={row.d}
-                  className={row.active ? "text-text" : "text-text-mute"}
-                >
-                  <span className={row.active ? "text-gold" : ""}>
-                    {row.active ? "›" : " "}
-                  </span>{" "}
-                  <span className={row.active ? "text-gold" : ""}>{row.g}</span>{" "}
-                  {row.d}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* WORKSPACE PANE */}
-          <div className="flex min-h-0 flex-col overflow-hidden rounded border border-border-soft p-2.5">
-            <div className="text-gold">chief</div>
-            <div className="mt-1 text-text-mute">
-              <span className="rounded border border-gold-border bg-gold-soft px-1 py-0.5 text-gold">
-                [chat]
-              </span>
-              {" "}· state · prompts · skills
-            </div>
-
-            <div className="mt-2">
-              <span className="text-gold">▸</span>{" "}
-              <span className="text-text">
-                /council should I prepay the mortgage?
-              </span>
-            </div>
-
-            {/* 4 panelist responses — one per line, terminal-styled */}
-            <div className="mt-2 space-y-[2px]">
-              {[
-                { name: "claude", color: "#c4a35a", text: "Invest. 22-yr horizon dominates.", done: true },
-                { name: "codex", color: "#5fbfff", text: "Invest. Tax wrapper > prepay.", done: true },
-                { name: "agy", color: "#6ee787", text: "Split. 60/40 toward investing.", done: true },
-                { name: "ollama", color: "#c4a8ff", text: "Prepay. Guaranteed 6.2%.", done: false },
-              ].map((p) => (
-                <div key={p.name} className="flex items-baseline gap-2">
-                  <span style={{ color: p.color }} className="shrink-0">
-                    ◇ {p.name.padEnd(7, " ")}
-                  </span>
-                  <span className="flex-1 truncate text-text">{p.text}</span>
-                  <span className="shrink-0 text-[8px]">
-                    {p.done ? (
-                      <span className="text-ok">✓</span>
-                    ) : (
-                      <span className="pulse-soft text-gold">●</span>
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-2 rounded border-l-2 border-gold bg-surface-1 pl-2 pr-1 py-1">
-              <div className="text-[8px] uppercase tracking-wider text-gold">
-                ▸ Disagreement
-              </div>
-              <div className="mt-0.5 text-text-soft">
-                3/4 favor invest; Ollama anchors on guaranteed return.
-              </div>
-            </div>
-
-            <div className="mt-2 rounded border border-gold-border bg-gold-soft p-2">
-              <div className="text-[8px] uppercase tracking-wider text-gold">
-                ◆ Verdict · by Claude
-              </div>
-              <div className="mt-0.5 text-text">
-                Invest 60% in tax-advantaged index funds. Prepay 40%
-                quarterly.
-                <span className="blink text-gold">▌</span>
-              </div>
-            </div>
-
-            <div className="mt-auto pt-2">
-              <div className="rounded border border-border bg-bg p-1.5">
-                <span className="text-gold">›</span>{" "}
-                <span className="text-text-mute">
-                  ask anything · enter sends
-                </span>
-                <span className="blink ml-1 text-gold">▌</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-2 shrink-0 border-t border-border-soft pt-1.5 text-text-mute">
-          <span className="text-gold">[n]</span> new ·{" "}
-          <span className="text-gold">[c]</span> chat ·{" "}
-          <span className="text-gold">[e]</span> edit ·{" "}
-          <span className="text-gold">[r]</span> refresh ·{" "}
-          <span className="text-gold">[q]</span> quit
         </div>
       </div>
     </WindowChrome>
@@ -2536,10 +2259,9 @@ function EcosystemSection() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DOWNLOAD / INSTALL section — desktop on left, CLI on right
+// DOWNLOAD / INSTALL section — native Mac app
 
 function DownloadSection() {
-  const [copied, setCopied] = useState(false);
   return (
     <section id="install" className="border-t border-border-soft py-24 md:py-32 grain">
       <div className="glow-gold absolute inset-0 -z-10 opacity-50" />
@@ -2549,15 +2271,15 @@ function DownloadSection() {
             Ask a council. Prevail.
           </p>
           <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-            Two ways <span className="font-serif italic text-text-soft">to run it.</span>
+            Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Native Mac app, or the original terminal cockpit. Same vault, same
-            council, same benchmark.
+            Native Mac app — signed, notarized, and self-contained. No terminal,
+            no setup. Download and open.
           </p>
         </FadeIn>
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-2">
+        <div className="mx-auto mt-16 max-w-xl">
           {/* Desktop card */}
           <FadeIn delay={0.05}>
             <div
@@ -2573,8 +2295,8 @@ function DownloadSection() {
                 Prevail.app
               </h3>
               <p className="mt-3 text-text-soft">
-                Native Mac app. v{VERSION_DESKTOP}. No terminal required.
-                Unsigned for v0.1 — right-click → Open on first launch.
+                Native Mac app. v{APP_VERSION}. Signed &amp; notarized — opens
+                with a double-click, no Gatekeeper warnings. No terminal required.
               </p>
 
               <a
@@ -2588,7 +2310,7 @@ function DownloadSection() {
               </a>
 
               <div className="mt-6 flex items-center justify-between text-xs text-text-mute">
-                <span>4.2 MB · Apple Silicon</span>
+                <span>Apple Silicon · macOS 13+</span>
                 <a
                   href={`${GITHUB_DESKTOP}/releases`}
                   target="_blank"
@@ -2596,52 +2318,6 @@ function DownloadSection() {
                   className="hover:text-gold"
                 >
                   All releases →
-                </a>
-              </div>
-            </div>
-          </FadeIn>
-
-          {/* CLI card */}
-          <FadeIn delay={0.12}>
-            <div className="h-full overflow-hidden rounded-2xl border border-border bg-surface-0 p-8">
-              <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-ai">
-                <Terminal className="h-4 w-4" />
-                CLI · macOS · linux · WSL
-              </div>
-              <h3 className="mt-5 text-3xl font-bold tracking-tight">
-                <span className="text-ai">$</span> prevail
-              </h3>
-              <p className="mt-3 text-text-soft">
-                The original. Terminal cockpit. v{VERSION_CLI}. Bun + React +
-                OpenTUI. Single binary.
-              </p>
-
-              <div className="mt-8 flex items-center gap-2 rounded-md border border-border bg-bg p-3 font-mono text-sm">
-                <span className="text-ai">$</span>
-                <code className="flex-1 truncate text-text">{INSTALL_CMD}</code>
-                <button
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(INSTALL_CMD);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 1500);
-                    } catch {}
-                  }}
-                  className="rounded border border-border px-2 py-1 text-xs text-text-mute hover:border-ai hover:text-ai"
-                >
-                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                </button>
-              </div>
-
-              <div className="mt-6 flex items-center justify-between text-xs text-text-mute">
-                <span>Single binary · Bun</span>
-                <a
-                  href={GITHUB_CLI}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-ai"
-                >
-                  GitHub →
                 </a>
               </div>
             </div>
@@ -2737,7 +2413,7 @@ function Footer() {
               <Brand className="text-lg font-semibold" />
             </div>
             <p className="mt-4 max-w-xs text-sm text-text-soft">
-              A terminal cockpit and native Mac app for AI council deliberation.
+              A native Mac app for AI council deliberation.
               Local. Open source. MIT.
             </p>
           </div>
@@ -2745,24 +2421,23 @@ function Footer() {
             {
               title: "Product",
               links: [
-                ["Desktop (DMG)", DMG_URL],
-                ["CLI", GITHUB_CLI],
-                ["Changelog", CHANGELOG_CLI],
+                ["Download (DMG)", DMG_URL],
+                ["All releases", `${GITHUB_DESKTOP}/releases`],
+                ["Source", GITHUB_DESKTOP],
               ],
             },
             {
               title: "Source",
               links: [
-                ["Prevail CLI", GITHUB_CLI],
                 ["Prevail desktop", GITHUB_DESKTOP],
-                ["Demo vault", "https://github.com/fru-dev3/prevail-cli/tree/main/vault-demo"],
+                ["Demo vault", `${GITHUB_DESKTOP}/tree/main/src-tauri/resources/sample-vault`],
               ],
             },
             {
               title: "Legal",
               links: [
-                ["MIT License", "https://github.com/fru-dev3/prevail-cli/blob/main/LICENSE"],
-                ["Security", "https://github.com/fru-dev3/prevail-cli/blob/main/SECURITY.md"],
+                ["MIT License", `${GITHUB_DESKTOP}/blob/main/LICENSE`],
+                ["Security", `${GITHUB_DESKTOP}/blob/main/SECURITY.md`],
               ],
             },
           ].map((col) => (
@@ -2800,7 +2475,7 @@ function Footer() {
         </p>
         <div className="mt-6 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
           <span>© 2026 Prevail.sh · built local, shipped open · alpha</span>
-          <span>Built with Bun · React · Tauri · OpenTUI</span>
+          <span>Built with Tauri · React · Tailwind · Rust</span>
         </div>
       </div>
     </footer>
