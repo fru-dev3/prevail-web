@@ -1,0 +1,375 @@
+{
+  "schema": "prevail.benchmark/v1",
+  "synthetic": true,
+  "generated_at": "2026-06-12T00:00:00.000Z",
+  "seed": true,
+  "domains": [
+    "calendar",
+    "career",
+    "chief",
+    "fitness",
+    "health",
+    "homestead",
+    "insurance",
+    "learning",
+    "tax",
+    "travel",
+    "wealth"
+  ],
+  "models": [
+    {
+      "key": "claude:opus",
+      "cli": "claude",
+      "model": "opus",
+      "label": "Claude Opus 4.8"
+    },
+    {
+      "key": "claude:sonnet",
+      "cli": "claude",
+      "model": "sonnet",
+      "label": "Claude Sonnet 4.6"
+    },
+    {
+      "key": "codex:gpt-5.5",
+      "cli": "codex",
+      "model": "gpt-5.5",
+      "label": "GPT-5.5"
+    },
+    {
+      "key": "antigravity:gemini",
+      "cli": "antigravity",
+      "model": "gemini",
+      "label": "Gemini 3.1 Pro"
+    },
+    {
+      "key": "openrouter:deepseek",
+      "cli": "openrouter",
+      "model": "deepseek",
+      "label": "DeepSeek"
+    }
+  ],
+  "matrix": {
+    "claude:opus": {
+      "calendar": {
+        "judge_avg": 9.0,
+        "keyword_avg": 89,
+        "n": 3
+      },
+      "career": {
+        "judge_avg": 7.8,
+        "keyword_avg": 78,
+        "n": 3
+      },
+      "chief": {
+        "judge_avg": 8.1,
+        "keyword_avg": 81,
+        "n": 3
+      },
+      "fitness": {
+        "judge_avg": 9.1,
+        "keyword_avg": 90,
+        "n": 3
+      },
+      "health": {
+        "judge_avg": 9.0,
+        "keyword_avg": 89,
+        "n": 3
+      },
+      "homestead": {
+        "judge_avg": 8.6,
+        "keyword_avg": 85,
+        "n": 3
+      },
+      "insurance": {
+        "judge_avg": 9.2,
+        "keyword_avg": 91,
+        "n": 3
+      },
+      "learning": {
+        "judge_avg": 9.1,
+        "keyword_avg": 90,
+        "n": 3
+      },
+      "tax": {
+        "judge_avg": 8.4,
+        "keyword_avg": 84,
+        "n": 3
+      },
+      "travel": {
+        "judge_avg": 8.4,
+        "keyword_avg": 84,
+        "n": 3
+      },
+      "wealth": {
+        "judge_avg": 8.8,
+        "keyword_avg": 87,
+        "n": 3
+      }
+    },
+    "claude:sonnet": {
+      "calendar": {
+        "judge_avg": 8.0,
+        "keyword_avg": 80,
+        "n": 3
+      },
+      "career": {
+        "judge_avg": 8.8,
+        "keyword_avg": 87,
+        "n": 3
+      },
+      "chief": {
+        "judge_avg": 8.5,
+        "keyword_avg": 84,
+        "n": 3
+      },
+      "fitness": {
+        "judge_avg": 8.8,
+        "keyword_avg": 87,
+        "n": 3
+      },
+      "health": {
+        "judge_avg": 7.4,
+        "keyword_avg": 75,
+        "n": 3
+      },
+      "homestead": {
+        "judge_avg": 8.8,
+        "keyword_avg": 87,
+        "n": 3
+      },
+      "insurance": {
+        "judge_avg": 8.4,
+        "keyword_avg": 84,
+        "n": 3
+      },
+      "learning": {
+        "judge_avg": 8.7,
+        "keyword_avg": 86,
+        "n": 3
+      },
+      "tax": {
+        "judge_avg": 7.3,
+        "keyword_avg": 74,
+        "n": 3
+      },
+      "travel": {
+        "judge_avg": 7.2,
+        "keyword_avg": 73,
+        "n": 3
+      },
+      "wealth": {
+        "judge_avg": 8.0,
+        "keyword_avg": 80,
+        "n": 3
+      }
+    },
+    "codex:gpt-5.5": {
+      "calendar": {
+        "judge_avg": 8.8,
+        "keyword_avg": 87,
+        "n": 3
+      },
+      "career": {
+        "judge_avg": 7.7,
+        "keyword_avg": 77,
+        "n": 3
+      },
+      "chief": {
+        "judge_avg": 8.9,
+        "keyword_avg": 88,
+        "n": 3
+      },
+      "fitness": {
+        "judge_avg": 8.9,
+        "keyword_avg": 88,
+        "n": 3
+      },
+      "health": {
+        "judge_avg": 8.2,
+        "keyword_avg": 82,
+        "n": 3
+      },
+      "homestead": {
+        "judge_avg": 8.6,
+        "keyword_avg": 85,
+        "n": 3
+      },
+      "insurance": {
+        "judge_avg": 8.1,
+        "keyword_avg": 81,
+        "n": 3
+      },
+      "learning": {
+        "judge_avg": 8.2,
+        "keyword_avg": 82,
+        "n": 3
+      },
+      "tax": {
+        "judge_avg": 7.4,
+        "keyword_avg": 75,
+        "n": 3
+      },
+      "travel": {
+        "judge_avg": 8.9,
+        "keyword_avg": 88,
+        "n": 3
+      },
+      "wealth": {
+        "judge_avg": 8.3,
+        "keyword_avg": 83,
+        "n": 3
+      }
+    },
+    "antigravity:gemini": {
+      "calendar": {
+        "judge_avg": 7.4,
+        "keyword_avg": 75,
+        "n": 3
+      },
+      "career": {
+        "judge_avg": 7.5,
+        "keyword_avg": 76,
+        "n": 3
+      },
+      "chief": {
+        "judge_avg": 8.4,
+        "keyword_avg": 84,
+        "n": 3
+      },
+      "fitness": {
+        "judge_avg": 7.3,
+        "keyword_avg": 74,
+        "n": 3
+      },
+      "health": {
+        "judge_avg": 7.5,
+        "keyword_avg": 76,
+        "n": 3
+      },
+      "homestead": {
+        "judge_avg": 7.9,
+        "keyword_avg": 79,
+        "n": 3
+      },
+      "insurance": {
+        "judge_avg": 7.9,
+        "keyword_avg": 79,
+        "n": 3
+      },
+      "learning": {
+        "judge_avg": 7.4,
+        "keyword_avg": 75,
+        "n": 3
+      },
+      "tax": {
+        "judge_avg": 7.9,
+        "keyword_avg": 79,
+        "n": 3
+      },
+      "travel": {
+        "judge_avg": 7.3,
+        "keyword_avg": 74,
+        "n": 3
+      },
+      "wealth": {
+        "judge_avg": 8.4,
+        "keyword_avg": 84,
+        "n": 3
+      }
+    },
+    "openrouter:deepseek": {
+      "calendar": {
+        "judge_avg": 6.9,
+        "keyword_avg": 70,
+        "n": 3
+      },
+      "career": {
+        "judge_avg": 7.8,
+        "keyword_avg": 78,
+        "n": 3
+      },
+      "chief": {
+        "judge_avg": 6.6,
+        "keyword_avg": 67,
+        "n": 3
+      },
+      "fitness": {
+        "judge_avg": 8.1,
+        "keyword_avg": 81,
+        "n": 3
+      },
+      "health": {
+        "judge_avg": 7.3,
+        "keyword_avg": 74,
+        "n": 3
+      },
+      "homestead": {
+        "judge_avg": 6.5,
+        "keyword_avg": 66,
+        "n": 3
+      },
+      "insurance": {
+        "judge_avg": 7.8,
+        "keyword_avg": 78,
+        "n": 3
+      },
+      "learning": {
+        "judge_avg": 7.7,
+        "keyword_avg": 77,
+        "n": 3
+      },
+      "tax": {
+        "judge_avg": 7.7,
+        "keyword_avg": 77,
+        "n": 3
+      },
+      "travel": {
+        "judge_avg": 7.7,
+        "keyword_avg": 77,
+        "n": 3
+      },
+      "wealth": {
+        "judge_avg": 7.1,
+        "keyword_avg": 72,
+        "n": 3
+      }
+    }
+  },
+  "leaderboard": [
+    {
+      "key": "claude:opus",
+      "label": "Claude Opus 4.8",
+      "judge_avg": 8.68,
+      "keyword_avg": 86,
+      "questions": 33
+    },
+    {
+      "key": "codex:gpt-5.5",
+      "label": "GPT-5.5",
+      "judge_avg": 8.36,
+      "keyword_avg": 83,
+      "questions": 33
+    },
+    {
+      "key": "claude:sonnet",
+      "label": "Claude Sonnet 4.6",
+      "judge_avg": 8.17,
+      "keyword_avg": 82,
+      "questions": 33
+    },
+    {
+      "key": "antigravity:gemini",
+      "label": "Gemini 3.1 Pro",
+      "judge_avg": 7.72,
+      "keyword_avg": 77,
+      "questions": 33
+    },
+    {
+      "key": "openrouter:deepseek",
+      "label": "DeepSeek",
+      "judge_avg": 7.38,
+      "keyword_avg": 74,
+      "questions": 33
+    }
+  ]
+}

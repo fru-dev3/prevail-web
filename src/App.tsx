@@ -356,7 +356,7 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           <a href="#council" className="inline-flex items-center gap-1.5 hover:text-text"><Users className="h-4 w-4" /> Council</a>
           <a href="#use-cases" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> Use cases</a>
           <a href="#desktop-app" className="inline-flex items-center gap-1.5 hover:text-text"><Monitor className="h-4 w-4" /> Desktop</a>
-          <a href="#benchmark" className="inline-flex items-center gap-1.5 hover:text-text"><BarChart3 className="h-4 w-4" /> Benchmark</a>
+          <a href="#benchmark-board" className="inline-flex items-center gap-1.5 hover:text-text"><BarChart3 className="h-4 w-4" /> Benchmark</a>
           <a href="#ecosystem" className="inline-flex items-center gap-1.5 hover:text-text"><Boxes className="h-4 w-4" /> Ecosystem</a>
           <a href="#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
         </div>
@@ -1341,6 +1341,116 @@ const BENCH_DOMAINS: { id: string; note: string; rows: [string, string, string][
     ],
   },
 ];
+
+type BenchResults = {
+  schema: string; synthetic: boolean; generated_at: string; seed?: boolean;
+  domains: string[];
+  models: { key: string; cli: string | null; model: string | null; label: string }[];
+  matrix: Record<string, Record<string, { judge_avg: number | null; keyword_avg: number | null; n: number }>>;
+  leaderboard: { key: string; label: string; judge_avg: number | null; keyword_avg: number | null; questions: number }[];
+};
+
+// Heat color for a 0-10 judge score: warm gold for strong, muted for weak.
+function heat(v: number | null): string {
+  if (v === null) return "rgba(127,127,127,0.08)";
+  const t = Math.max(0, Math.min(1, (v - 5) / 4.5)); // 5..9.5 -> 0..1
+  // gold #C4A35A at full strength
+  return `rgba(196,163,90,${(0.12 + t * 0.78).toFixed(2)})`;
+}
+
+// The live Prevail Benchmark: model x domain matrix + leaderboard, loaded from
+// the committed results JSON (refreshed by the weekly CI). Synthetic data.
+function BenchmarkBoard() {
+  const [data, setData] = useState<BenchResults | null>(null);
+  const [err, setErr] = useState(false);
+  useEffect(() => {
+    fetch("/benchmark-results.json")
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(setData)
+      .catch(() => setErr(true));
+  }, []);
+  if (err || !data) return null;
+  const fmt = (v: number | null) => (v === null ? "·" : v.toFixed(1));
+  const date = data.generated_at?.slice(0, 10) ?? "";
+  return (
+    <section id="benchmark-board" className="border-t border-border-soft py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">The Prevail Benchmark</p>
+          <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            Which model wins <span className="font-serif italic text-text-soft">which life decision?</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-center text-base text-text-soft">
+            {data.models.length} models graded on {data.leaderboard[0]?.questions ?? 33} real-world questions across {data.domains.length} life domains, scored by an LLM judge. The model that wins your wealth calls is rarely the one that wins your health calls.
+          </p>
+        </FadeIn>
+
+        {/* Synthetic-data disclosure — prominent and honest. */}
+        <FadeIn delay={0.05}>
+          <div className="mx-auto mt-6 flex max-w-2xl items-center justify-center gap-2 rounded-full border border-gold-border bg-surface-1 px-4 py-2 text-center text-xs text-text-soft">
+            <span className="font-mono uppercase tracking-wider text-gold">Synthetic data</span>
+            <span>One fictional household, no real person. {date && `Updated ${date}.`}</span>
+            <a href="https://github.com/fru-dev3/prevail-desktop/tree/main/src-tauri/resources/sample-vault/benchmark" target="_blank" rel="noreferrer" className="underline hover:text-gold">Dataset on GitHub ›</a>
+          </div>
+        </FadeIn>
+
+        {/* Leaderboard */}
+        <FadeIn delay={0.08}>
+          <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-2">
+            {data.leaderboard.map((e, i) => (
+              <div key={e.key} className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${i === 0 ? "border-gold bg-gold/10" : "border-border-soft bg-surface-1"}`}>
+                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-bold ${i === 0 ? "bg-gold text-bg" : "text-text-soft"}`}>{i + 1}</span>
+                <span className="min-w-0 flex-1 truncate font-semibold">{e.label}</span>
+                <span className="font-mono text-sm text-text-soft">{e.keyword_avg ?? "·"}% kw</span>
+                <span className={`font-mono text-lg font-bold ${i === 0 ? "text-gold" : "text-text"}`}>{fmt(e.judge_avg)}<span className="text-xs text-text-soft">/10</span></span>
+              </div>
+            ))}
+          </div>
+        </FadeIn>
+
+        {/* Matrix heatmap — domains as rows, models as columns. */}
+        <FadeIn delay={0.1}>
+          <div className="mx-auto mt-10 max-w-5xl overflow-x-auto rounded-2xl border border-border-soft">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-border-soft bg-surface-1">
+                  <th className="sticky left-0 bg-surface-1 px-4 py-3 text-left font-mono text-xs uppercase tracking-wider text-text-soft">Domain</th>
+                  {data.models.map((m) => (
+                    <th key={m.key} className="px-3 py-3 text-center text-xs font-semibold">{m.label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.domains.map((d) => {
+                  // Winner per domain for a subtle highlight.
+                  let best = -1; let bestKey = "";
+                  for (const m of data.models) { const v = data.matrix[m.key]?.[d]?.judge_avg ?? -1; if (v > best) { best = v; bestKey = m.key; } }
+                  return (
+                    <tr key={d} className="border-b border-border-soft/60 last:border-0">
+                      <td className="sticky left-0 bg-bg px-4 py-2.5 font-medium capitalize">{d}</td>
+                      {data.models.map((m) => {
+                        const cell = data.matrix[m.key]?.[d];
+                        const v = cell?.judge_avg ?? null;
+                        return (
+                          <td key={m.key} className="px-3 py-2.5 text-center" style={{ backgroundColor: heat(v) }}>
+                            <span className={`font-mono ${m.key === bestKey ? "font-bold text-text" : "text-text-soft"}`}>{fmt(v)}</span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </FadeIn>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-xs text-text-soft">
+          Scores are the LLM-judge average (0-10) per model per domain. {data.seed ? "Seed values shown until the first scheduled run publishes." : "Refreshed weekly."} Run it yourself on your own decisions in the Prevail desktop app.
+        </p>
+      </div>
+    </section>
+  );
+}
 
 function BenchmarkMock() {
   const [active, setActive] = useState(0);
@@ -3222,6 +3332,8 @@ export default function App() {
           ]}
           mockup={<CouncilMock />}
         />
+
+        <BenchmarkBoard />
 
         <FeatureSection
           id="benchmark"
