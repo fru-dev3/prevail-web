@@ -34,7 +34,7 @@ import {
   siTailscale,
   siTelegram,
 } from "simple-icons";
-import { APP_VERSION } from "./version";
+import { APP_VERSION, useLatestVersion } from "./version";
 
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
 // Download is served from GitHub Releases, NOT this site. GitHub has no
@@ -2262,6 +2262,7 @@ function EcosystemSection() {
 // DOWNLOAD / INSTALL section — native Mac app
 
 function DownloadSection() {
+  const version = useLatestVersion();
   return (
     <section id="install" className="border-t border-border-soft py-24 md:py-32 grain">
       <div className="glow-gold absolute inset-0 -z-10 opacity-50" />
@@ -2295,13 +2296,13 @@ function DownloadSection() {
                 Prevail.app
               </h3>
               <p className="mt-3 text-text-soft">
-                Native Mac app. v{APP_VERSION}. Signed &amp; notarized — opens
+                Native Mac app. v{version}. Signed &amp; notarized — opens
                 with a double-click, no Gatekeeper warnings. No terminal required.
               </p>
 
               <a
                 href={DMG_URL}
-                download={DMG_NAME}
+                download={`Prevail-${version}-arm64.dmg`}
                 className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
