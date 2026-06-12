@@ -9,11 +9,11 @@ import { useEffect, useState } from "react";
 export const APP_VERSION = "0.7.6";
 
 // Live latest version, fetched from GitHub Releases so the site never drifts
-// stale the way a hand-stamped constant does. Returns APP_VERSION until the
-// fetch resolves, and falls back to it on any error. Mirrors the existing
-// GitHub-API fetch used for the star count.
-export function useLatestVersion(): string {
-  const [version, setVersion] = useState<string>(APP_VERSION);
+// stale the way a hand-stamped constant does. Null until the fetch resolves
+// (or forever, on error/rate-limit) — callers that need a guaranteed-correct
+// value (like a versioned download URL) must treat null as "unknown".
+export function useLiveVersion(): string | null {
+  const [version, setVersion] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     fetch("https://api.github.com/repos/fru-dev3/prevail-desktop/releases/latest")
@@ -28,4 +28,9 @@ export function useLatestVersion(): string {
     };
   }, []);
   return version;
+}
+
+// Display version: the live value when known, APP_VERSION as first-paint fallback.
+export function useLatestVersion(): string {
+  return useLiveVersion() ?? APP_VERSION;
 }
