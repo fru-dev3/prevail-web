@@ -2275,8 +2275,8 @@ function DownloadSection() {
             Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Native Mac app — self-contained, no terminal, no setup. Download,
-            then right-click → Open on first launch.
+            Native Mac app — self-contained, no terminal, no setup. Signed
+            and notarized by Apple; download and open.
           </p>
         </FadeIn>
 
@@ -2297,7 +2297,7 @@ function DownloadSection() {
               </h3>
               <p className="mt-3 text-text-soft">
                 Native Mac app. v{version}. Self-contained, no terminal required.
-                First launch: right-click → Open to get past Gatekeeper.
+                Signed &amp; notarized by Apple — opens like any Mac app.
               </p>
 
               <a
