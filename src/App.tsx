@@ -356,7 +356,12 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           <a href="#council" className="inline-flex items-center gap-1.5 hover:text-text"><Users className="h-4 w-4" /> Council</a>
           <a href="#use-cases" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> Use cases</a>
           <a href="#desktop-app" className="inline-flex items-center gap-1.5 hover:text-text"><Monitor className="h-4 w-4" /> Desktop</a>
-          <a href="#benchmark-board" className="inline-flex items-center gap-1.5 hover:text-text"><BarChart3 className="h-4 w-4" /> Benchmark</a>
+          <a href="#benchmark-board" className="inline-flex items-center gap-1.5 hover:text-text">
+            <BarChart3 className="h-4 w-4" /> Benchmark
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-[#2fb87a]/15 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-[#2fb87a]">
+              <span className="h-1 w-1 rounded-full bg-[#2fb87a]" /> Live
+            </span>
+          </a>
           <a href="#ecosystem" className="inline-flex items-center gap-1.5 hover:text-text"><Boxes className="h-4 w-4" /> Ecosystem</a>
           <a href="#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
         </div>
@@ -1350,12 +1355,14 @@ type BenchResults = {
   leaderboard: { key: string; label: string; judge_avg: number | null; keyword_avg: number | null; questions: number }[];
 };
 
-// Heat color for a 0-10 judge score: warm gold for strong, muted for weak.
+// Heat color for a 0-10 judge score: emerald green for strong, muted slate for
+// weak. Green reads as "good" at a glance and keeps the board off the gold the
+// rest of the site uses.
 function heat(v: number | null): string {
-  if (v === null) return "rgba(127,127,127,0.08)";
+  if (v === null) return "rgba(120,130,140,0.06)";
   const t = Math.max(0, Math.min(1, (v - 5) / 4.5)); // 5..9.5 -> 0..1
-  // gold #C4A35A at full strength
-  return `rgba(196,163,90,${(0.12 + t * 0.78).toFixed(2)})`;
+  // emerald #2fb87a, alpha scales with score.
+  return `rgba(47,184,122,${(0.10 + t * 0.62).toFixed(2)})`;
 }
 
 // The live Prevail Benchmark: model x domain matrix + leaderboard, loaded from
@@ -1376,21 +1383,32 @@ function BenchmarkBoard() {
     <section id="benchmark-board" className="border-t border-border-soft py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">The Prevail Benchmark</p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-center text-xs uppercase tracking-[0.2em] text-[#2fb87a]">The Prevail Benchmark</p>
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#2fb87a]/15 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#2fb87a]">
+              <span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fb87a] opacity-70" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#2fb87a]" /></span>
+              {data.seed ? "Preview" : "Live"}
+            </span>
+          </div>
           <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
             Which model wins <span className="font-serif italic text-text-soft">which life decision?</span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-center text-base text-text-soft">
-            {data.models.length} models graded on {data.leaderboard[0]?.questions ?? 33} real-world questions across {data.domains.length} life domains, scored by an LLM judge. The model that wins your wealth calls is rarely the one that wins your health calls.
+            {data.models.length} models graded on {data.leaderboard[0]?.questions ?? 46} real-world questions across {data.domains.length} life domains, scored by an LLM judge. The model that wins your wealth calls is rarely the one that wins your health calls.
           </p>
+          {date && (
+            <p className="mt-3 text-center font-mono text-xs text-text-soft">
+              {data.seed ? "Preview scores" : "Last refreshed"} {date}{!data.seed && " · updated weekly"}
+            </p>
+          )}
         </FadeIn>
 
-        {/* Synthetic-data disclosure — prominent and honest. */}
+        {/* What this is — small honest note about the test + the data + more. */}
         <FadeIn delay={0.05}>
-          <div className="mx-auto mt-6 flex max-w-2xl items-center justify-center gap-2 rounded-full border border-gold-border bg-surface-1 px-4 py-2 text-center text-xs text-text-soft">
-            <span className="font-mono uppercase tracking-wider text-gold">Synthetic data</span>
-            <span>One fictional household, no real person. {date && `Updated ${date}.`}</span>
-            <a href="https://github.com/fru-dev3/prevail-desktop/tree/main/src-tauri/resources/sample-vault/benchmark" target="_blank" rel="noreferrer" className="underline hover:text-gold">Dataset on GitHub ›</a>
+          <div className="mx-auto mt-6 max-w-2xl rounded-xl border border-border-soft bg-surface-1 px-4 py-3 text-center text-xs text-text-soft">
+            <span className="font-mono uppercase tracking-wider text-text">About this test</span>{" "}
+            Every model answers the same {data.leaderboard[0]?.questions ?? 46} decision questions, built from one fictional household (synthetic data, no real person), and an LLM judge scores each answer 0-10.{" "}
+            <a href="https://github.com/fru-dev3/prevail-desktop/tree/main/src-tauri/resources/sample-vault/benchmark" target="_blank" rel="noreferrer" className="underline hover:text-[#2fb87a]">See the questions, methodology & raw data on GitHub ›</a>
           </div>
         </FadeIn>
 
@@ -1398,11 +1416,11 @@ function BenchmarkBoard() {
         <FadeIn delay={0.08}>
           <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-2">
             {data.leaderboard.map((e, i) => (
-              <div key={e.key} className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${i === 0 ? "border-gold bg-gold/10" : "border-border-soft bg-surface-1"}`}>
-                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-bold ${i === 0 ? "bg-gold text-bg" : "text-text-soft"}`}>{i + 1}</span>
+              <div key={e.key} className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${i === 0 ? "border-[#2fb87a] bg-[#2fb87a]/10" : "border-border-soft bg-surface-1"}`}>
+                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-bold ${i === 0 ? "bg-[#2fb87a] text-bg" : "text-text-soft"}`}>{i + 1}</span>
                 <span className="min-w-0 flex-1 truncate font-semibold">{e.label}</span>
                 <span className="font-mono text-sm text-text-soft">{e.keyword_avg ?? "·"}% kw</span>
-                <span className={`font-mono text-lg font-bold ${i === 0 ? "text-gold" : "text-text"}`}>{fmt(e.judge_avg)}<span className="text-xs text-text-soft">/10</span></span>
+                <span className={`font-mono text-lg font-bold ${i === 0 ? "text-[#2fb87a]" : "text-text"}`}>{fmt(e.judge_avg)}<span className="text-xs text-text-soft">/10</span></span>
               </div>
             ))}
           </div>
@@ -1445,7 +1463,7 @@ function BenchmarkBoard() {
           </div>
         </FadeIn>
         <p className="mx-auto mt-4 max-w-2xl text-center text-xs text-text-soft">
-          Scores are the LLM-judge average (0-10) per model per domain. {data.seed ? "Seed values shown until the first scheduled run publishes." : "Refreshed weekly."} Run it yourself on your own decisions in the Prevail desktop app.
+          Greener = stronger (LLM-judge average, 0-10, per model per domain). {data.seed ? "Preview scores until the first scheduled run publishes." : "Refreshed weekly."} Run the benchmark on your own decisions in the Prevail desktop app.
         </p>
       </div>
     </section>
