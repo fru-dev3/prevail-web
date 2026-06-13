@@ -297,7 +297,7 @@ function GitHubStarButton({
       <Star className={isLg ? "h-4 w-4" : "h-3.5 w-3.5"} />
       <span className="font-semibold">Star</span>
       <span className="font-semibold opacity-70">
-        {stars !== null ? formatStars(stars) : "—"}
+        {stars !== null ? formatStars(stars) : "-"}
       </span>
     </a>
   );
@@ -957,14 +957,14 @@ const HARD_QUESTIONS = [
     domain: "Tax",
     glyph: "§",
     color: "#f0c674",
-    q: "Roth conversion this year — does the IRMAA cliff bite?",
+    q: "Roth conversion this year: does the IRMAA cliff bite?",
     edge: "Sub-clause traps most general advice misses. The math says yes, the policy edge says wait.",
   },
   {
     domain: "Family",
     glyph: "♥",
     color: "#ffb38a",
-    q: "Sister's wedding back home — contribute $40k?",
+    q: "Sister's wedding back home: contribute $40k?",
     edge: "Western individualist advice flattens this. Real answer respects obligation and protects you.",
   },
   {
@@ -991,10 +991,10 @@ function HardQuestionsSection() {
               <span className="font-serif italic text-text-soft">a benchmark.</span>
             </h2>
             <p className="mt-6 text-lg text-text-soft">
-              MMLU. HumanEval. GSM8K. Useful — for someone else. None of them
+              MMLU. HumanEval. GSM8K. Useful: for someone else. None of them
               grade the questions you actually wrestle with. Real decisions are
               tax-coded, family-coded, body-coded, time-coded. One model gives
-              you one frame. You need four — and a chair to call it.
+              you one frame. You need four: and a chair to call it.
             </p>
           </div>
         </FadeIn>
@@ -1016,7 +1016,7 @@ function HardQuestionsSection() {
               {
                 n: "03",
                 t: "Decisions compound",
-                d: "Get the mortgage call right, the tax call right, the career call right — and 20 years compound.",
+                d: "Get the mortgage call right, the tax call right, the career call right: and 20 years compound.",
               },
             ].map((c) => (
               <div key={c.n} className="rounded-xl border border-border-soft bg-surface-0 p-6">
@@ -1309,7 +1309,7 @@ const BENCH_DOMAINS: { id: string; note: string; rows: [string, string, string][
   },
   {
     id: "health",
-    note: "a local model leads — labs never leave the machine",
+    note: "a local model leads: labs never leave the machine",
     rows: [
       ["9.5", "44%", "sonnet-4-6"],
       ["9.3", "42%", "llama-local"],
@@ -1526,7 +1526,7 @@ function BenchmarkMock() {
           {dom.id.replace(" ", "-")}
         </div>
         <p className="mt-2.5 text-[10px] leading-relaxed text-text-mute">
-          Illustrative scores — your ranking comes from your own questions and
+          Illustrative scores: your ranking comes from your own questions and
           chair.
         </p>
       </div>
@@ -1586,7 +1586,7 @@ function VaultMock() {
         </div>
         <div className="mt-4 border-t border-border-soft pt-4 text-[11px] text-text-soft">
           Every domain is a folder. Every verdict is markdown. Sync with git,
-          iCloud, Tailscale — your call.
+          iCloud, Tailscale: your call.
         </div>
       </div>
     </WindowChrome>
@@ -1656,7 +1656,7 @@ function Pillars() {
 
 const FRAMEWORKS = [
   { id: "bluf", label: "BLUF", desc: "Lead with the bottom line. Detail after." },
-  { id: "win", label: "WIN", desc: "What's Important Now — name the one next move." },
+  { id: "win", label: "WIN", desc: "What's Important Now: name the one next move." },
   { id: "scqa", label: "SCQA", desc: "Situation → Complication → Question → Answer." },
   { id: "sbar", label: "SBAR", desc: "Situation, Background, Assessment, Recommendation." },
   { id: "ooda", label: "OODA", desc: "Observe → Orient → Decide → Act." },
@@ -1682,7 +1682,7 @@ function FrameworksSection() {
               </h2>
               <p className="mt-6 text-lg text-text-soft">
                 Seven response frameworks change <em>how</em> the model
-                structures its reply — without changing the question. Pick one
+                structures its reply: without changing the question. Pick one
                 globally, or per question. The active framework is prepended
                 to every CLI call as a short directive.
               </p>
@@ -1709,7 +1709,7 @@ function FrameworksSection() {
           </FadeIn>
 
           <FadeIn delay={0.1}>
-            <WindowChrome title={`prevail — /framework ${active}`}>
+            <WindowChrome title={`prevail · /framework ${active}`}>
               <div className="space-y-3 bg-surface-0 p-5 font-mono text-[11px]">
                 <div className="text-text-mute">
                   <span className="text-gold">$</span> Should I prepay or invest the delta?
@@ -1900,7 +1900,7 @@ function FrameworkReply({ id }: { id: string }) {
         </div>
         <div className="mt-3 rounded border border-gold-border bg-gold-soft p-2 text-[11px]">
           <span className="text-gold">Weight:</span>{" "}
-          <span className="text-text">Invest wins — horizon &gt; certainty premium.</span>
+          <span className="text-text">Invest wins: horizon &gt; certainty premium.</span>
         </div>
       </div>
     ),
@@ -2035,7 +2035,7 @@ const LENS_DEMOS: Record<string, { quip: string; body: ReactNode }> = {
         <p className="text-text">
           You spent 40 minutes typing this question. You'll spend 4 more weeks
           deciding. The actual cost of the decision (delay × $2k × expected return)
-          is <span className="text-gold">~$280</span> — and growing each week you stall.
+          is <span className="text-gold">~$280</span>: and growing each week you stall.
         </p>
         <p className="mt-2 text-text-soft">
           The thing you're missing isn't the answer. It's that the question already
@@ -2049,7 +2049,7 @@ const LENS_DEMOS: Record<string, { quip: string; body: ReactNode }> = {
     body: (
       <div>
         <p className="text-text">
-          "Sweetheart — pay the house. You'll sleep better."
+          "Sweetheart: pay the house. You'll sleep better."
         </p>
         <p className="mt-2 text-text-soft">
           She's not wrong about the sleeping. She's just optimizing for a thing
@@ -2097,7 +2097,7 @@ function LensesSection() {
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-text-soft">
               A lens forces the model to attack the problem from a specific
-              angle — first principles, contrarian, executor, even your mom.
+              angle: first principles, contrarian, executor, even your mom.
               Switch to <span className="font-mono text-ai">lens = ALL</span> and
               every panelist runs every lens. 4 CLIs × 8 lenses × 1 chair pass.
               Surface the divergence; let the chair synthesize across it.
@@ -2109,7 +2109,7 @@ function LensesSection() {
             same mortgage question through that angle */}
         <FadeIn delay={0.1}>
           <div className="mt-16 overflow-hidden rounded-2xl border border-border-soft bg-surface-0">
-            <WindowChrome title={`prevail — /lens ${active}`}>
+            <WindowChrome title={`prevail · /lens ${active}`}>
               <div className="bg-bg p-5">
                 {/* Question echo */}
                 <div className="mb-4 rounded-md border border-border bg-surface-1 px-3 py-2 font-mono text-xs text-text-soft">
@@ -2202,7 +2202,7 @@ function LensesSection() {
                 </h3>
                 <p className="mt-4 text-text-soft">
                   4 CLIs × 8 lenses = 32 panelist calls. One chair pass on top.
-                  Expensive — and worth it when the question is load-bearing.
+                  Expensive: and worth it when the question is load-bearing.
                 </p>
               </div>
               <div className="rounded-lg border border-border bg-surface-0 p-4 font-mono text-[11px]">
@@ -2403,7 +2403,7 @@ function DownloadSection() {
             Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Native Mac app — self-contained, no terminal, no setup. Signed
+            Native Mac app: self-contained, no terminal, no setup. Signed
             and notarized by Apple; download and open.
           </p>
         </FadeIn>
@@ -2425,7 +2425,7 @@ function DownloadSection() {
               </h3>
               <p className="mt-3 text-text-soft">
                 Native Mac app. v{version}. Self-contained, no terminal required.
-                Signed &amp; notarized by Apple — opens like any Mac app.
+                Signed &amp; notarized by Apple: opens like any Mac app.
               </p>
 
               <a
@@ -2463,7 +2463,7 @@ function DownloadSection() {
 const FAQ = [
   {
     q: "What's a council?",
-    a: "Every available CLI is asked the same question at once. A chair model reads all the answers and writes a single verdict — plus a panel that surfaces where the panelists disagreed.",
+    a: "Every available CLI is asked the same question at once. A chair model reads all the answers and writes a single verdict: plus a panel that surfaces where the panelists disagreed.",
   },
   {
     q: "Does my data leave my Mac?",
@@ -2479,7 +2479,7 @@ const FAQ = [
   },
   {
     q: "Is it open source?",
-    a: "Yes — MIT. Read every line on GitHub.",
+    a: "Yes. MIT. Read every line on GitHub.",
   },
 ];
 
@@ -2629,7 +2629,7 @@ const DESKTOP_VIEWS = [
   {
     src: "/desktop-chat.png",
     label: "Chat",
-    caption: "One engine, streaming — switch with a slash.",
+    caption: "One engine, streaming: switch with a slash.",
   },
   {
     src: "/desktop-settings.png",
@@ -2659,7 +2659,7 @@ function DesktopShowcase() {
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-lg text-text-soft">
-            A native macOS app over the same vault — click through it.
+            A native macOS app over the same vault: click through it.
           </p>
         </div>
 
@@ -2686,7 +2686,7 @@ function DesktopShowcase() {
             <motion.img
               key={active}
               src={view.src}
-              alt={`Prevail Desktop — ${view.label}`}
+              alt={`Prevail Desktop · ${view.label}`}
               className="block w-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -2757,14 +2757,14 @@ const USE_CASES = [
     domain: "wealth",
     q: "Prepay the mortgage or invest the cash?",
     panel: [
-      { m: "claude", lean: "invest", s: "Invest — the 22-yr horizon wins." },
+      { m: "claude", lean: "invest", s: "Invest: the 22-yr horizon wins." },
       { m: "codex", lean: "invest", s: "Invest, but floor cash at 6 months." },
       { m: "antigravity", lean: "invest", s: "Only with a 12-month buffer." },
-      { m: "ollama", lean: "prepay", s: "Prepay — a guaranteed 6.2%." },
+      { m: "ollama", lean: "prepay", s: "Prepay: a guaranteed 6.2%." },
     ],
     split: "Codex floors cash at 6 months; Antigravity wants 12.",
     verdict:
-      "Invest — if you hold ≥6 months liquidity and can ride a −30% drawdown. Else prepay.",
+      "Invest: if you hold ≥6 months liquidity and can ride a −30% drawdown. Else prepay.",
   },
   {
     icon: Receipt,
@@ -2774,7 +2774,7 @@ const USE_CASES = [
       { m: "claude", lean: "convert", s: "Mega-backdoor before anything else." },
       { m: "codex", lean: "harvest", s: "Harvest the losses first." },
       { m: "antigravity", lean: "convert", s: "Roth up to the 24% ceiling." },
-      { m: "ollama", lean: "defer", s: "Defer — bunch it into next year." },
+      { m: "ollama", lean: "defer", s: "Defer: bunch it into next year." },
     ],
     split: "Claude flags the mega-backdoor; Codex prioritizes the harvest.",
     verdict:
@@ -2788,39 +2788,39 @@ const USE_CASES = [
       { m: "claude", lean: "lifestyle", s: "Lifestyle for 90 days." },
       { m: "codex", lean: "statin", s: "Start a low-dose statin now." },
       { m: "antigravity", lean: "lifestyle", s: "Lifestyle, then recheck ApoB." },
-      { m: "ollama", lean: "lifestyle", s: "Lifestyle — labs stay local." },
+      { m: "ollama", lean: "lifestyle", s: "Lifestyle: labs stay local." },
     ],
     split: "Run Ollama-only so your labs never leave the machine.",
     verdict:
-      "Lifestyle for 90 days first — your ApoB and calcium score allow the window.",
+      "Lifestyle for 90 days first: your ApoB and calcium score allow the window.",
   },
   {
     icon: Briefcase,
     domain: "career",
     q: "Take the offer, or counter?",
     panel: [
-      { m: "claude", lean: "counter", s: "Counter — anchor on scope." },
-      { m: "codex", lean: "counter", s: "Counter — your runway holds." },
-      { m: "antigravity", lean: "accept", s: "Take it — the relationship matters." },
+      { m: "claude", lean: "counter", s: "Counter: anchor on scope." },
+      { m: "codex", lean: "counter", s: "Counter: your runway holds." },
+      { m: "antigravity", lean: "accept", s: "Take it: the relationship matters." },
       { m: "ollama", lean: "counter", s: "Counter, push the base." },
     ],
     split: "Codex weighs runway; Antigravity weighs the relationship.",
     verdict:
-      "Counter — your BATNA is stronger than the offer assumes. Anchor on scope, not title.",
+      "Counter: your BATNA is stronger than the offer assumes. Anchor on scope, not title.",
   },
   {
     icon: Building2,
     domain: "real estate",
     q: "Sell the condo, or rent it out?",
     panel: [
-      { m: "claude", lean: "rent", s: "Rent — appreciation is ahead." },
+      { m: "claude", lean: "rent", s: "Rent: appreciation is ahead." },
       { m: "codex", lean: "rent", s: "Rent, but cap the landlord cost." },
-      { m: "antigravity", lean: "sell", s: "Sell — tenant risk is real." },
+      { m: "antigravity", lean: "sell", s: "Sell: tenant risk is real." },
       { m: "ollama", lean: "rent", s: "Rent only if you go hands-off." },
     ],
     split: "The panel splits on your tolerance for tenant risk.",
     verdict:
-      "Rent — appreciation is likely and landlord cost is contained. Sell only to harvest gains.",
+      "Rent: appreciation is likely and landlord cost is contained. Sell only to harvest gains.",
   },
   {
     icon: Compass,
@@ -2856,7 +2856,7 @@ function UseCasesSection() {
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Four engines weigh in, the disagreement laid bare — then one
+            Four engines weigh in, the disagreement laid bare: then one
             verdict. Here's the council at work across a life.
           </p>
         </FadeIn>
@@ -2949,7 +2949,7 @@ function UseCasesSection() {
 
         <FadeIn delay={0.2}>
           <p className="mx-auto mt-12 max-w-xl text-center text-sm text-text-mute">
-            Every verdict lands in dated markdown you own — searchable forever,
+            Every verdict lands in dated markdown you own: searchable forever,
             synced however you like.
           </p>
         </FadeIn>
@@ -3043,7 +3043,7 @@ const COMPARE_COLS: Array<{
     name: <Brand />,
     tint: "#C4A35A",
     hero: true,
-    blurb: "The council cockpit. One question, every model, one verdict — with the disagreement laid bare.",
+    blurb: "The council cockpit. One question, every model, one verdict: with the disagreement laid bare.",
     surface: "Terminal · desktop",
     render: () => <Logo size={26} />,
   },
@@ -3110,7 +3110,7 @@ const COMPARE_FEATURES: Array<{ label: string; vals: Record<string, Cell> }> = [
     vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
   },
   {
-    label: "Your vault — plain markdown you own",
+    label: "Your vault: plain markdown you own",
     vals: { prevail: true, openclaw: true, paperclip: true, hermes: true, multica: true, odysseus: false },
   },
   {
@@ -3126,7 +3126,7 @@ const COMPARE_FEATURES: Array<{ label: string; vals: Record<string, Cell> }> = [
     vals: { prevail: false, openclaw: false, paperclip: true, hermes: true, multica: "part", odysseus: true },
   },
   {
-    label: "Local-first — no server, no Docker",
+    label: "Local-first: no server, no Docker",
     vals: { prevail: true, openclaw: true, paperclip: "part", hermes: "part", multica: "part", odysseus: false },
   },
   {
@@ -3188,7 +3188,7 @@ function ComparisonSection() {
               <span className="font-serif italic text-text-soft">side by side.</span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-text-soft">
-              <Brand /> is the seat you sit in. The others are the crew around it —
+              <Brand /> is the seat you sit in. The others are the crew around it -
               and the one heavyweight you'd self-host instead. Here's what each one
               actually brings.
             </p>
@@ -3323,12 +3323,12 @@ export default function App() {
               <span className="text-text-soft">Ask all of them.</span>
             </>
           }
-          description="Every hard question fans out to every CLI you have installed. They answer in parallel. A chair model reads all the replies and writes one verdict — with a dedicated panel showing where the panelists disagreed. That's usually where the real decision lives."
+          description="Every hard question fans out to every CLI you have installed. They answer in parallel. A chair model reads all the replies and writes one verdict: with a dedicated panel showing where the panelists disagreed. That's usually where the real decision lives."
           bullets={[
             "Claude, Codex, Antigravity, and Ollama in parallel",
             "Automatic synthesis by the chair model you pick",
             "Disagreement panel surfaces the load-bearing edges",
-            "Every verdict logs to dated markdown — searchable forever",
+            "Every verdict logs to dated markdown: searchable forever",
           ]}
           mockup={<CouncilMock />}
         />
@@ -3344,9 +3344,9 @@ export default function App() {
               <span className="text-text-soft">Your real benchmark.</span>
             </>
           }
-          description="21 canonical questions ship with the app, covering 8 capability dimensions — binary decisions, document analysis, recency, cultural nuance, bias, brevity, complex tax traps, and refusal-to-recommend scenarios. Add your own from real decisions you've already made. New models get graded against your life."
+          description="21 canonical questions ship with the app, covering 8 capability dimensions: binary decisions, document analysis, recency, cultural nuance, bias, brevity, complex tax traps, and refusal-to-recommend scenarios. Add your own from real decisions you've already made. New models get graded against your life."
           bullets={[
-            "A leaderboard per domain — the model that wins your wealth calls isn't the one that wins your health calls",
+            "A leaderboard per domain: the model that wins your wealth calls isn't the one that wins your health calls",
             "21 starter questions across 8 capability dimensions",
             "Scored two ways: keyword match + LLM-as-judge",
             "Import from your decision log with one command",
@@ -3364,10 +3364,10 @@ export default function App() {
               <span className="text-text-soft">Just folders.</span>
             </>
           }
-          description="Honestly, that's most of it. No database, no lock-in, nothing clever — Prevail is folders, one per life domain, plus the discipline of organizing them so an AI can reason over your life. Get AI-ready and the council does the rest. Every verdict lands as a dated markdown file; sync with git, iCloud, Tailscale, or nothing."
+          description="Honestly, that's most of it. No database, no lock-in, nothing clever. Prevail is folders, one per life domain, plus the discipline of organizing them so an AI can reason over your life. Get AI-ready and the council does the rest. Every verdict lands as a dated markdown file; sync with git, iCloud, Tailscale, or nothing."
           bullets={[
-            "Folders + the discipline of organizing — that's the whole trick",
-            "Plain markdown — read it without the app",
+            "Folders + the discipline of organizing: that's the whole trick",
+            "Plain markdown: read it without the app",
             "20 starter domains, or bring your own",
             "Works with any sync tool, or none",
           ]}
