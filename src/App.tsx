@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
@@ -75,6 +75,15 @@ function useExeDownload(): { url: string; name: string } {
       name: `Prevail_${live}_x64-setup.exe`,
     };
   return { url: EXE_URL, name: EXE_NAME };
+}
+// Best-guess visitor OS so the primary CTA offers the right installer first
+// (Windows visitors were only ever shown "Download for Mac"). Falls back to Mac.
+function useIsWindows(): boolean {
+  return useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    const s = `${navigator.userAgent} ${navigator.platform}`.toLowerCase();
+    return s.includes("win");
+  }, []);
 }
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -358,7 +367,6 @@ function WindowChrome({
 // Nav — frosted, minimal
 
 function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
-  const dmg = useDmgDownload();
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 frost border-b border-border-soft">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
@@ -393,8 +401,7 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
             <GitHubStarButton />
           </span>
           <a
-            href={dmg.url}
-            download={dmg.name}
+            href="#install"
             className="inline-flex items-center gap-1.5 rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:px-4"
             style={{ boxShadow: "0 4px 24px rgba(196, 163, 90, 0.25)" }}
           >
@@ -688,6 +695,10 @@ function HeroAuroras() {
 
 function Hero() {
   const dmg = useDmgDownload();
+  const exe = useExeDownload();
+  const isWindows = useIsWindows();
+  const primary = isWindows ? { url: exe.url, name: exe.name, label: "Download for Windows" } : { url: dmg.url, name: dmg.name, label: "Download for Mac" };
+  const other = isWindows ? { url: dmg.url, name: dmg.name, label: "Mac" } : { url: exe.url, name: exe.name, label: "Windows" };
   return (
     <section className="relative isolate overflow-hidden pt-24 pb-16 grain lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:pt-12 lg:pb-28">
       <div className="glow-gold absolute inset-0 -z-10" />
@@ -724,13 +735,13 @@ function Hero() {
             <FadeIn delay={0.18}>
               <div className="mt-8 flex w-full max-w-2xl items-center gap-3">
                 <a
-                  href={dmg.url}
-                  download={dmg.name}
+                  href={primary.url}
+                  download={primary.name}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                   style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
                 >
                   <Folder className="h-4 w-4" />
-                  Download for Mac
+                  {primary.label}
                 </a>
                 <a
                   href="#council"
@@ -740,6 +751,14 @@ function Hero() {
                   How it works
                 </a>
               </div>
+              {/* Both platforms are available: always show a link to the other OS
+                  so Windows visitors (and Mac visitors on Windows) see their build. */}
+              <p className="mt-3 text-sm text-text-soft">
+                Also for{" "}
+                <a href={other.url} download={other.name} className="font-medium text-gold underline-offset-2 hover:underline">{other.label}</a>
+                {" · "}
+                <a href="#install" className="text-text-soft underline-offset-2 hover:text-text hover:underline">all downloads</a>
+              </p>
             </FadeIn>
 
             {/* small trust row */}
