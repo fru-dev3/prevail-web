@@ -60,6 +60,22 @@ function useDmgDownload(): { url: string; name: string } {
     };
   return { url: DMG_URL, name: DMG_NAME };
 }
+
+// Windows installer (NSIS). Same scheme as the DMG: a stable `latest/download`
+// alias (Prevail-windows-x64-setup.exe, uploaded by the release workflow) until
+// the live version resolves, then the version-named asset CI publishes.
+const EXE_URL =
+  "https://github.com/fru-dev3/prevail-desktop/releases/latest/download/Prevail-windows-x64-setup.exe";
+const EXE_NAME = `Prevail-${APP_VERSION}-x64-setup.exe`;
+function useExeDownload(): { url: string; name: string } {
+  const live = useLiveVersion();
+  if (live)
+    return {
+      url: `${GITHUB_DESKTOP}/releases/download/v${live}/Prevail_${live}_x64-setup.exe`,
+      name: `Prevail_${live}_x64-setup.exe`,
+    };
+  return { url: EXE_URL, name: EXE_NAME };
+}
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2409,6 +2425,7 @@ function EcosystemSection() {
 function DownloadSection() {
   const version = useLatestVersion();
   const dmg = useDmgDownload();
+  const exe = useExeDownload();
   return (
     <section id="install" className="border-t border-border-soft py-24 md:py-32 grain">
       <div className="glow-gold absolute inset-0 -z-10 opacity-50" />
@@ -2421,13 +2438,13 @@ function DownloadSection() {
             Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Native Mac app: self-contained, no terminal, no setup. Signed
-            and notarized by Apple; download and open.
+            Native desktop app for Mac and Windows: self-contained, no terminal,
+            no setup. Download and open.
           </p>
         </FadeIn>
 
-        <div className="mx-auto mt-16 max-w-xl">
-          {/* Desktop card */}
+        <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-2">
+          {/* Desktop card — macOS */}
           <FadeIn delay={0.05}>
             <div
               id="desktop"
@@ -2458,6 +2475,47 @@ function DownloadSection() {
 
               <div className="mt-6 flex items-center justify-between text-xs text-text-mute">
                 <span>Apple Silicon · macOS 13+</span>
+                <a
+                  href={`${GITHUB_DESKTOP}/releases`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-gold"
+                >
+                  All releases →
+                </a>
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* Desktop card — Windows */}
+          <FadeIn delay={0.1}>
+            <div className="group relative h-full overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8">
+              <div className="shimmer absolute inset-x-0 top-0 h-px" />
+              <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
+                <Folder className="h-4 w-4" />
+                Desktop · Windows x64
+              </div>
+              <h3 className="mt-5 text-3xl font-bold tracking-tight">
+                Prevail for Windows
+              </h3>
+              <p className="mt-3 text-text-soft">
+                Same app, same vault. v{version}. NSIS installer, no terminal
+                required. (Unsigned for now: Windows SmartScreen may warn on first
+                run; click More info : Run anyway.)
+              </p>
+
+              <a
+                href={exe.url}
+                download={exe.name}
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+              >
+                Download installer
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+
+              <div className="mt-6 flex items-center justify-between text-xs text-text-mute">
+                <span>Windows 10/11 · x64</span>
                 <a
                   href={`${GITHUB_DESKTOP}/releases`}
                   target="_blank"
