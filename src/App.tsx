@@ -2,19 +2,31 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useReducedMotion, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
+  Briefcase,
+  Calendar,
+  Crown,
   Download,
-  Folder,
+  FileText,
+  Gift,
+  GraduationCap,
+  Heart,
+  Home,
   Layers,
   MessageSquare,
   Moon,
   Paperclip,
-  Users,
+  Receipt,
   Scale,
+  ShieldCheck,
   Sparkles,
   Star,
   Sun,
+  TrendingUp,
+  Users,
+  X,
 } from "lucide-react";
 import {
+  siApple,
   siClaude,
   siGooglegemini,
 } from "simple-icons";
@@ -146,6 +158,16 @@ function SimpleIcon({
       fill="currentColor"
     >
       <path d={icon.path} />
+    </svg>
+  );
+}
+
+// Microsoft Windows mark — simple-icons no longer ships the Windows logo
+// (trademark), so we render the classic four-pane logotype directly.
+function WindowsMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
     </svg>
   );
 }
@@ -652,13 +674,9 @@ function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.12}>
-              <p className="mt-6 max-w-2xl text-base text-text-soft">
-                Bring your life's context to{" "}
-                <span className="text-text">humanity's most powerful
-                agents</span>.
-                <br />
-                Unlock a <span className="text-text">council of experts</span>{" "}
-                working on your behalf, all at once.
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-text-soft md:text-xl">
+                The most important AI you'll ever use won't be the one at work.{" "}
+                <span className="text-text">It'll be the one that knows your life, and keeps it yours.</span>
               </p>
             </FadeIn>
 
@@ -670,7 +688,7 @@ function Hero() {
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                   style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
                 >
-                  <Folder className="h-4 w-4" />
+                  {isWindows ? <WindowsMark className="h-4 w-4" /> : <SimpleIcon icon={siApple} className="h-4 w-4" />}
                   {primary.label}
                 </a>
                 <a
@@ -690,6 +708,10 @@ function Hero() {
                 <a href="#install" className="text-text-soft underline-offset-2 hover:text-text hover:underline">all downloads</a>
               </p>
             </FadeIn>
+
+            <div className="mt-8">
+              <SocialProof center={false} />
+            </div>
 
             {/* small trust row */}
             <FadeIn delay={0.24}>
@@ -1084,34 +1106,66 @@ function Pillars() {
             {
               icon: Scale,
               title: "A council, not a chatbot",
-              text: "Ask every model you have at once. They answer in parallel; a chair model reads all of them and writes one verdict, and shows where they disagreed.",
+              text: "Ask every model at once. A chair reads all the answers and writes one verdict, and flags where they disagree.",
               color: "#c4a35a",
+              visual: (
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex -space-x-2">
+                    {["#cc785c", "#4285F4", "#6ee787", "#ededed"].map((c) => (
+                      <span key={c} className="h-7 w-7 rounded-full ring-2 ring-surface-0" style={{ background: c }} aria-hidden />
+                    ))}
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-text-mute" />
+                  <span className="rounded-md border border-gold-border bg-gold/10 px-2.5 py-1 text-xs font-medium text-gold">one verdict</span>
+                </div>
+              ),
             },
             {
               icon: Layers,
               title: "Just folders you own",
-              text: "Your life lives in plain markdown, one folder per domain. No database, no cloud, no lock-in. Read it without the app; sync it however you like, or not at all.",
+              text: "Your life in plain markdown, one folder per domain. No database, no cloud. Read it without the app.",
               color: "#6ee787",
+              visual: (
+                <div className="rounded-lg border border-border-soft bg-bg/60 p-3 font-mono text-[11px] leading-relaxed">
+                  <div className="text-text-mute">~/prevail-vault/</div>
+                  {["wealth", "health", "career"].map((d) => (
+                    <div key={d} className="pl-3 text-text-soft">
+                      <span className="text-[#6ee787]">{d}/</span> state.md
+                    </div>
+                  ))}
+                </div>
+              ),
             },
             {
               icon: Sparkles,
               title: "It compounds",
-              text: "Every chat and decision is captured and fed back into the next answer. The AI that knows your life gets sharper the longer you use it, and never starts from zero.",
+              text: "Every chat and decision feeds the next answer. It gets sharper the longer you use it, and never starts from zero.",
               color: "#5fbfff",
+              visual: (
+                <div>
+                  <div className="flex h-16 items-end gap-1.5">
+                    {[18, 30, 40, 55, 72, 92].map((h, j) => (
+                      <span key={j} className="flex-1 rounded-sm bg-gradient-to-t from-[#5fbfff]/25 to-[#5fbfff]" style={{ height: `${h}%` }} aria-hidden />
+                    ))}
+                  </div>
+                  <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">sharper over time</div>
+                </div>
+              ),
             },
           ].map((p, i) => {
             const Icon = p.icon;
             return (
               <FadeIn key={p.title} delay={i * 0.06}>
-                <div className="group h-full rounded-xl border border-border-soft bg-surface-0 p-7 transition-all hover:border-border hover:bg-surface-1">
+                <div className="group flex h-full flex-col rounded-xl border border-border-soft bg-surface-0 p-7 transition-all hover:border-border hover:bg-surface-1">
                   <div
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-lg"
+                    className="inline-flex h-12 w-12 items-center justify-center rounded-xl"
                     style={{ backgroundColor: `${p.color}15`, color: p.color }}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-6 w-6" />
                   </div>
                   <h3 className="mt-5 text-xl font-semibold">{p.title}</h3>
-                  <p className="mt-2 text-text-soft">{p.text}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-text-soft">{p.text}</p>
+                  <div className="mt-6 pt-1">{p.visual}</div>
                 </div>
               </FadeIn>
             );
@@ -1190,7 +1244,7 @@ function DownloadSection() {
             >
               <div className="shimmer absolute inset-x-0 top-0 h-px" />
               <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                <Folder className="h-4 w-4" />
+                <SimpleIcon icon={siApple} className="h-4 w-4" />
                 Desktop · macOS arm64
               </div>
               <h3 className="mt-5 text-3xl font-bold tracking-tight">
@@ -1230,7 +1284,7 @@ function DownloadSection() {
             <div className="group relative h-full overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8">
               <div className="shimmer absolute inset-x-0 top-0 h-px" />
               <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                <Folder className="h-4 w-4" />
+                <WindowsMark className="h-4 w-4" />
                 Desktop · Windows x64
               </div>
               <h3 className="mt-5 text-3xl font-bold tracking-tight">
@@ -1347,6 +1401,7 @@ function FAQSection() {
 
 function Footer() {
   const dmg = useDmgDownload();
+  const [showLegal, setShowLegal] = useState(false);
   return (
     <footer className="border-t border-border-soft bg-surface-0">
       <div className="mx-auto max-w-6xl px-6 py-16">
@@ -1411,22 +1466,48 @@ function Footer() {
             Ask a council. <span className="not-italic text-gold">Prevail.</span>
           </p>
         </div>
-        <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-text-mute">
-          Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
-          without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
-          Bunker Mode is on, may send data to cloud providers, so always review anything important yourself. Feedback
-          and bug reports are very welcome and directly shape what comes next.
-        </p>
-        <p className="mx-auto mt-5 max-w-2xl text-center text-xs leading-relaxed text-text-mute">
-          Prevail is free, open-source software released under the GNU General Public License v3.0. Your vault,
-          chats, and decisions stay on your Mac; the app collects no telemetry unless you opt in. This marketing
-          site uses Google Analytics. Ratings and the user count shown elsewhere on this site are illustrative.
-        </p>
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setShowLegal(true)}
+            className="text-xs text-text-mute underline-offset-2 hover:text-text-soft hover:underline"
+          >
+            Disclaimer, privacy &amp; legal
+          </button>
+        </div>
         <div className="mt-6 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
           <span>© 2026 Prevail.sh · built local, shipped open · alpha</span>
           <span>Built with Tauri · React · Tailwind · Rust</span>
         </div>
       </div>
+
+      {showLegal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLegal(false)} />
+          <div className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface-0 p-7 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Disclaimer, privacy &amp; legal</h3>
+              <button
+                onClick={() => setShowLegal(false)}
+                aria-label="Close"
+                className="rounded-md p-1 text-text-mute hover:bg-surface-1 hover:text-text"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-text-soft">
+              Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
+              without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
+              Bunker Mode is on, may send data to cloud providers, so always review anything important yourself.
+              Feedback and bug reports are very welcome and directly shape what comes next.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-text-soft">
+              Prevail is free, open-source software released under the GNU General Public License v3.0. Your vault,
+              chats, and decisions stay on your Mac; the app collects no telemetry unless you opt in. This marketing
+              site uses Google Analytics. Ratings and the user count shown elsewhere on this site are illustrative.
+            </p>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }
@@ -1530,7 +1611,7 @@ const THESES = [
   },
 ];
 
-function SocialProof() {
+function SocialProof({ center = true }: { center?: boolean }) {
   // Illustrative avatars are abstract gradients, never stock photos of people
   // who aren't users. Honest placeholder + an explicit label.
   const grads = [
@@ -1542,7 +1623,7 @@ function SocialProof() {
   ];
   return (
     <FadeIn>
-      <div className="mx-auto flex max-w-xl flex-col items-center gap-4">
+      <div className={`flex max-w-xl flex-col gap-3 ${center ? "mx-auto items-center" : "items-start"}`}>
         <div className="flex items-center gap-4">
           <div className="flex -space-x-2.5">
             {grads.map((g, i) => (
@@ -1642,10 +1723,102 @@ function ThesisPage() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// LIFE DOMAINS — radial constellation of the life areas Prevail covers.
+
+const LIFE_DOMAINS: { label: string; Icon: typeof Heart }[] = [
+  { label: "Health", Icon: Heart },
+  { label: "Wealth", Icon: TrendingUp },
+  { label: "Tax", Icon: Receipt },
+  { label: "Career", Icon: Briefcase },
+  { label: "Benefits", Icon: Gift },
+  { label: "Home", Icon: Home },
+  { label: "Insure", Icon: ShieldCheck },
+  { label: "Calendar", Icon: Calendar },
+  { label: "Records", Icon: FileText },
+  { label: "Family", Icon: Users },
+  { label: "Learning", Icon: GraduationCap },
+  { label: "Chief", Icon: Crown },
+];
+
+const VAULT_QUESTIONS = [
+  { q: "Which of my documents are about to expire?", tag: "Records" },
+  { q: "Can I afford to take three months off?", tag: "Wealth" },
+  { q: "What should I ask at my next review?", tag: "Career" },
+  { q: "Is this insurance policy still worth keeping?", tag: "Insure" },
+];
+
+function LifeDomains() {
+  const [qi, setQi] = useState(0);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    if (reduce) return;
+    const t = setInterval(() => setQi((n) => (n + 1) % VAULT_QUESTIONS.length), 3200);
+    return () => clearInterval(t);
+  }, [reduce]);
+  const N = LIFE_DOMAINS.length;
+  const R = 40;
+  const nodes = LIFE_DOMAINS.map((d, i) => {
+    const ang = ((-90 + i * (360 / N)) * Math.PI) / 180;
+    return { ...d, x: 50 + R * Math.cos(ang), y: 50 + R * Math.sin(ang) };
+  });
+  return (
+    <section className="border-t border-border-soft py-24 md:py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">One place for all of it</p>
+          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            Your whole life, <span className="font-serif italic text-text-soft">one domain at a time.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-center text-text-soft">
+            Prevail organizes your life into domains, each a folder the council can reason over. Start with one, or all of them.
+          </p>
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <div className="relative mx-auto mt-14 aspect-square w-full max-w-[560px]">
+            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full text-border" aria-hidden>
+              {nodes.map((n) => (
+                <line key={n.label} x1="50" y1="50" x2={n.x} y2={n.y} stroke="currentColor" strokeWidth="0.2" strokeDasharray="0.9 0.9" />
+              ))}
+            </svg>
+            <div className="absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-gold-border bg-surface-1 shadow-lg md:h-24 md:w-24">
+              <Logo size={26} />
+              <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">You</span>
+            </div>
+            {nodes.map((n) => {
+              const Icon = n.Icon;
+              return (
+                <div
+                  key={n.label}
+                  className="group absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
+                  style={{ left: `${n.x}%`, top: `${n.y}%` }}
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full border border-border-soft bg-surface-0 text-text-soft transition-colors group-hover:border-gold-border group-hover:text-gold md:h-12 md:w-12">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-text-mute md:text-[10px]">{n.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </FadeIn>
+        <FadeIn delay={0.15}>
+          <div className="mx-auto mt-12 max-w-md text-center">
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-mute">Ask your vault</div>
+            <p key={qi} className="mt-3 text-lg italic text-text-soft md:text-xl">"{VAULT_QUESTIONS[qi].q}"</p>
+            <span className="mt-3 inline-block rounded-full border border-border-soft px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold">{VAULT_QUESTIONS[qi].tag}</span>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
 function LandingMain() {
   return (
     <main className="pt-14">
       <Hero />
+      <LifeDomains />
       <DemoVideo />
       <HardQuestionsSection />
       <Pillars />
