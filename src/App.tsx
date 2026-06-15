@@ -1383,6 +1383,64 @@ function Footer() {
             </div>
           ))}
         </div>
+        <div className="mt-14 border-t border-border-soft pt-12">
+          <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
+            Part of a family of private, local-first tools
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                name: "Memosa",
+                tagline: "Private meeting memory for Mac",
+                href: "https://memosa.dev/",
+                tile: <span className="font-serif text-xl font-semibold text-[#5fd0a8]">M</span>,
+                tileClass: "bg-[#0c0c0e]",
+              },
+              {
+                name: "Prevail",
+                tagline: "A private AI that learns you, local-first",
+                href: null,
+                tile: <Logo size={22} />,
+                tileClass: "bg-[#0c0c0e]",
+              },
+              {
+                name: "AI Ready U",
+                tagline: "Score and grow your AI readiness",
+                href: "https://aireadyu.dev/",
+                tile: <span className="text-xl font-bold text-white">U</span>,
+                tileClass: "bg-[#2f9e6f]",
+              },
+            ].map((f) => {
+              const inner = (
+                <div
+                  className={`flex h-full items-center gap-4 rounded-2xl border p-5 transition-colors ${
+                    f.href ? "border-border-soft hover:border-border hover:bg-surface-1" : "border-gold-border/60 bg-surface-1"
+                  }`}
+                >
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${f.tileClass}`}>
+                    {f.tile}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 font-semibold">
+                      {f.name}
+                      {f.href ? (
+                        <ArrowRight className="h-3.5 w-3.5 text-text-mute" />
+                      ) : (
+                        <span className="font-mono text-[9px] uppercase tracking-wider text-gold">you're here</span>
+                      )}
+                    </div>
+                    <div className="mt-0.5 text-sm text-text-soft">{f.tagline}</div>
+                  </div>
+                </div>
+              );
+              return f.href ? (
+                <a key={f.name} href={f.href} target="_blank" rel="noreferrer">{inner}</a>
+              ) : (
+                <div key={f.name}>{inner}</div>
+              );
+            })}
+          </div>
+        </div>
         <div className="mt-14 border-t border-border-soft pt-12 text-center">
           <p className="font-serif text-2xl italic text-text-soft md:text-3xl">
             Ask a council. <span className="not-italic text-gold">Prevail.</span>
