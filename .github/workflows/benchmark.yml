@@ -22,16 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout site
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout engine (prevail-cli)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: fru-dev3/prevail-cli
           path: engine
 
       - name: Checkout desktop (for the sample vault + questions)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: fru-dev3/prevail-desktop
           path: desktop
