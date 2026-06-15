@@ -1,38 +1,35 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { motion, useInView, useReducedMotion, AnimatePresence, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
+import { motion, useInView, useReducedMotion, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
   Briefcase,
-  Building2,
-  Check,
-  Compass,
-  BarChart3,
-  Boxes,
+  Calendar,
+  Crown,
   Download,
-  Folder,
-  HeartPulse,
+  FileText,
+  Gift,
+  GraduationCap,
+  Heart,
+  Home,
   Layers,
   MessageSquare,
-  Monitor,
   Moon,
   Paperclip,
   Receipt,
-  Users,
   Scale,
+  ShieldCheck,
   Sparkles,
   Star,
   Sun,
-  Wallet,
+  Target,
+  TrendingUp,
+  Users,
+  X,
 } from "lucide-react";
 import {
+  siApple,
   siClaude,
-  siDeepseek,
   siGooglegemini,
-  siMeta,
-  siMistralai,
-  siOllama,
-  siTailscale,
-  siTelegram,
 } from "simple-icons";
 import { APP_VERSION, useLatestVersion, useLiveVersion } from "./version";
 
@@ -166,22 +163,20 @@ function SimpleIcon({
   );
 }
 
-// Custom MCP server logo — Model Context Protocol uses a stylized
-// 'M' or hexagon-grid mark. The official protocol mark isn't on
-// simple-icons yet, so we render a small stylized version that reads
-// as "connected nodes" — the spirit of MCP.
-function McpIcon({ className = "" }: { className?: string }) {
+// Microsoft Windows mark — simple-icons no longer ships the Windows logo
+// (trademark), so we render the classic four-pane logotype directly.
+function WindowsMark({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="5" r="2" />
-      <circle cx="5" cy="18" r="2" />
-      <circle cx="19" cy="18" r="2" />
-      <path d="M12 7v3M10.5 11.5L7 16M13.5 11.5L17 16" strokeLinecap="round" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
     </svg>
   );
 }
 
+// Custom MCP server logo — Model Context Protocol uses a stylized
+// 'M' or hexagon-grid mark. The official protocol mark isn't on
+// simple-icons yet, so we render a small stylized version that reads
+// as "connected nodes" — the spirit of MCP.
 // Hermes AI brand mark — winged caduceus. References the Greek
 // messenger god Hermes (caduceus = the winged staff with two snakes).
 // Stylized + simplified for icon-scale rendering. No canonical public
@@ -239,16 +234,6 @@ const WORKS_WITH = [
 
 // Reusable model-logo row — actual brand logos in their official colors.
 // Used to anchor "the best reasoning models" claims visually.
-const COUNCIL_MODELS = [
-  { name: "Claude", icon: siClaude, color: "#cc785c" },
-  { name: "Gemini", icon: siGooglegemini, color: "#4285F4" },
-  { name: "OpenAI", custom: "openai" as const, color: "#10a37f" },
-  { name: "Llama", icon: siMeta, color: "#0866FF" },
-  { name: "Ollama", icon: siOllama, color: "#a3a3a3" },
-  { name: "Mistral", icon: siMistralai, color: "#FF7000" },
-  { name: "DeepSeek", icon: siDeepseek, color: "#4D6BFE" },
-];
-
 // OpenAI starburst — simple-icons doesn't ship one due to trademark
 // constraints, so we render the public-domain hexagonal knot
 // approximation used by community marks.
@@ -257,30 +242,6 @@ function OpenAIMark({ className = "" }: { className?: string }) {
     <svg viewBox="0 0 24 24" className={className} fill="currentColor">
       <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.205 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.074zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.142-.08 4.774-2.757a.795.795 0 0 0 .392-.681v-6.737l2.018 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.488 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.78 2.756a.78.78 0 0 0 .785 0l5.843-3.369v2.33a.082.082 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.594 3.855L13.075 8.37l2.02-1.169a.076.076 0 0 1 .071 0l4.83 2.792a4.504 4.504 0 0 1-.681 8.116v-5.678a.79.79 0 0 0-.392-.679zm2.01-3.02l-.141-.085-4.774-2.776a.795.795 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.676 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v3l-2.597 1.5-2.607-1.5z" />
     </svg>
-  );
-}
-
-function ModelLogoRow({ size = "md" }: { size?: "sm" | "md" }) {
-  const dim = size === "sm" ? "h-6 w-6" : "h-8 w-8";
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
-      {COUNCIL_MODELS.map((m) => (
-        <div
-          key={m.name}
-          title={m.name}
-          className="flex flex-col items-center gap-1.5 text-text-mute transition-colors hover:text-text"
-        >
-          <div className={dim} style={{ color: m.color }}>
-            {m.custom === "openai" ? (
-              <OpenAIMark className="h-full w-full" />
-            ) : m.icon ? (
-              <SimpleIcon icon={m.icon} className="h-full w-full" />
-            ) : null}
-          </div>
-          <span className="text-[10px] uppercase tracking-wider">{m.name}</span>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -377,17 +338,9 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           </span>
         </a>
         <div className="hidden items-center gap-6 text-sm text-text-soft md:flex">
-          <a href="#council" className="inline-flex items-center gap-1.5 hover:text-text"><Users className="h-4 w-4" /> Council</a>
-          <a href="#use-cases" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> Use cases</a>
-          <a href="#desktop-app" className="inline-flex items-center gap-1.5 hover:text-text"><Monitor className="h-4 w-4" /> Desktop</a>
-          <a href="#benchmark-board" className="inline-flex items-center gap-1.5 hover:text-text">
-            <BarChart3 className="h-4 w-4" /> Benchmark
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-[#2fb87a]/15 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-[#2fb87a]">
-              <span className="h-1 w-1 rounded-full bg-[#2fb87a]" /> Live
-            </span>
-          </a>
-          <a href="#ecosystem" className="inline-flex items-center gap-1.5 hover:text-text"><Boxes className="h-4 w-4" /> Ecosystem</a>
-          <a href="#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
+          <a href="/#how" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> How it works</a>
+          <a href="/thesis" className="inline-flex items-center gap-1.5 hover:text-text"><Sparkles className="h-4 w-4" /> Thesis</a>
+          <a href="/#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -722,13 +675,9 @@ function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.12}>
-              <p className="mt-6 max-w-2xl text-base text-text-soft">
-                Bring your life's context to{" "}
-                <span className="text-text">humanity's most powerful
-                agents</span>.
-                <br />
-                Unlock a <span className="text-text">council of experts</span>{" "}
-                working on your behalf, all at once.
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-text-soft md:text-xl">
+                The most important AI you'll ever use won't be the one at work.{" "}
+                <span className="text-text">It'll be the one that knows your life, and keeps it yours.</span>
               </p>
             </FadeIn>
 
@@ -740,7 +689,7 @@ function Hero() {
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                   style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
                 >
-                  <Folder className="h-4 w-4" />
+                  {isWindows ? <WindowsMark className="h-4 w-4" /> : <SimpleIcon icon={siApple} className="h-4 w-4" />}
                   {primary.label}
                 </a>
                 <a
@@ -760,6 +709,10 @@ function Hero() {
                 <a href="#install" className="text-text-soft underline-offset-2 hover:text-text hover:underline">all downloads</a>
               </p>
             </FadeIn>
+
+            <div className="mt-8">
+              <SocialProof center={false} showMeta={false} />
+            </div>
 
             {/* small trust row */}
             <FadeIn delay={0.24}>
@@ -972,48 +925,12 @@ function DesktopAppMock() {
 // One agent isn't enough. Generic benchmarks don't grade your life.
 
 const HARD_QUESTIONS = [
-  {
-    domain: "Wealth",
-    glyph: "¤",
-    color: "#c4a35a",
-    q: "Should I prepay the mortgage or invest the delta?",
-    edge: "Tax-bracket sensitivity. Horizon math. The wrong default kills six figures.",
-  },
-  {
-    domain: "Career",
-    glyph: "▲",
-    color: "#5fbfff",
-    q: "Take the Series B offer or stay where I am?",
-    edge: "Equity dilution model + comp ladder + 5-year founder bet, weighed against vested RSUs.",
-  },
-  {
-    domain: "Health",
-    glyph: "♥",
-    color: "#6ee787",
-    q: "Lab panel just landed. What do I act on first?",
-    edge: "Signal vs noise across 47 markers. Most important: which yellow flags are downstream of one upstream cause.",
-  },
-  {
-    domain: "Tax",
-    glyph: "§",
-    color: "#f0c674",
-    q: "Roth conversion this year: does the IRMAA cliff bite?",
-    edge: "Sub-clause traps most general advice misses. The math says yes, the policy edge says wait.",
-  },
-  {
-    domain: "Family",
-    glyph: "♥",
-    color: "#ffb38a",
-    q: "Sister's wedding back home: contribute $40k?",
-    edge: "Western individualist advice flattens this. Real answer respects obligation and protects you.",
-  },
-  {
-    domain: "Estate",
-    glyph: "⌂",
-    color: "#c4a8ff",
-    q: "Term life vs whole life for my situation?",
-    edge: "The product pitch is wrong 80% of the time. The right answer depends on your dependents and runway.",
-  },
+  { domain: "Wealth", Icon: TrendingUp, color: "#c4a35a", q: "Prepay the mortgage, or invest the delta?" },
+  { domain: "Career", Icon: Briefcase, color: "#5fbfff", q: "Take the Series B offer, or stay where I am?" },
+  { domain: "Health", Icon: Heart, color: "#6ee787", q: "Lab panel just landed: what do I act on first?" },
+  { domain: "Tax", Icon: Receipt, color: "#f0c674", q: "Roth conversion this year: does the IRMAA cliff bite?" },
+  { domain: "Family", Icon: Users, color: "#ffb38a", q: "Sister's wedding back home: contribute $40k?" },
+  { domain: "Estate", Icon: ShieldCheck, color: "#c4a8ff", q: "Term life or whole life, for my situation?" },
 ];
 
 function HardQuestionsSection() {
@@ -1022,7 +939,7 @@ function HardQuestionsSection() {
       <div className="glow-ai absolute inset-0 -z-10 opacity-30" />
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
               Why one model isn't enough
             </p>
@@ -1030,78 +947,36 @@ function HardQuestionsSection() {
               Your life doesn't fit{" "}
               <span className="font-serif italic text-text-soft">a benchmark.</span>
             </h2>
-            <p className="mt-6 text-lg text-text-soft">
-              MMLU. HumanEval. GSM8K. Useful: for someone else. None of them
-              grade the questions you actually wrestle with. Real decisions are
-              tax-coded, family-coded, body-coded, time-coded. One model gives
-              you one frame. You need four: and a chair to call it.
+            <p className="mt-5 text-lg text-text-soft">
+              The benchmarks that rank models never grade the questions you
+              actually wrestle with. These are the ones <Brand /> is for.
             </p>
           </div>
         </FadeIn>
 
-        {/* Three-column reasoning */}
-        <FadeIn delay={0.1}>
-          <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-3">
-            {[
-              {
-                n: "01",
-                t: "One model is one frame",
-                d: "Even the best frontier model has blind spots. You only see them when a second model disagrees.",
-              },
-              {
-                n: "02",
-                t: "Generic benchmarks miss you",
-                d: "MMLU doesn't know your tax bracket. HumanEval doesn't know your dependents. Your benchmark must be yours.",
-              },
-              {
-                n: "03",
-                t: "Decisions compound",
-                d: "Get the mortgage call right, the tax call right, the career call right: and 20 years compound.",
-              },
-            ].map((c) => (
-              <div key={c.n} className="rounded-xl border border-border-soft bg-surface-0 p-6">
-                <div className="font-mono text-xs text-gold">{c.n}</div>
-                <div className="mt-3 font-semibold">{c.t}</div>
-                <p className="mt-2 text-sm text-text-soft">{c.d}</p>
-              </div>
-            ))}
-          </div>
-        </FadeIn>
-
-        {/* Hard question list */}
-        <FadeIn delay={0.2}>
-          <div className="mx-auto mt-16 max-w-5xl">
-            <div className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-text-mute">
-              <span className="text-gold">◇</span> Questions <Brand /> was built for
-            </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              {HARD_QUESTIONS.map((q, i) => (
-                <FadeIn key={q.q} delay={0.05 * i}>
-                  <div className="group relative h-full overflow-hidden rounded-xl border border-border-soft bg-surface-0 p-5 transition-all hover:border-border hover:bg-surface-1">
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base"
-                        style={{ backgroundColor: `${q.color}18`, color: q.color }}
-                      >
-                        {q.glyph}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-mute">
-                          {q.domain}
-                        </div>
-                        <div className="mt-1.5 font-medium text-text">{q.q}</div>
-                        <div className="mt-2 text-xs text-text-soft">
-                          <span className="text-gold">▸</span> {q.edge}
-                        </div>
-                      </div>
-                    </div>
+        <div className="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {HARD_QUESTIONS.map((q, i) => {
+            const Icon = q.Icon;
+            return (
+              <FadeIn key={q.q} delay={0.05 * i}>
+                <div className="group flex h-full flex-col gap-3 rounded-2xl border border-border-soft bg-surface-0 p-6 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${q.color}18`, color: q.color }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-mute">
+                      {q.domain}
+                    </span>
                   </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
-
+                  <div className="text-lg font-medium leading-snug text-text">{q.q}</div>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -1111,212 +986,14 @@ function HardQuestionsSection() {
 // COUNCIL PITCH — model logos + "around one table" + Convene CTA + GitHub
 // star button. Lives right under the hero, above the install section.
 
-function CouncilPitch() {
-  return (
-    <section className="border-t border-border-soft py-16 md:py-20">
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <div className="mx-auto max-w-4xl rounded-2xl border border-gold-border bg-gradient-to-br from-gold-soft to-transparent p-8 text-center md:p-12">
-            <ModelLogoRow />
-            <p className="mt-10 text-xl font-medium leading-relaxed md:text-2xl">
-              Imagine the best reasoning models on the planet,{" "}
-              <span className="text-gold">around one table</span>, working{" "}
-              <span className="text-gold">your hardest question</span> together.
-            </p>
-            <p className="mt-4 text-text-soft">
-              That's the harness: a <span className="text-text">council</span> of
-              AI for the rest of your life. Every model you trust, local or cloud,
-              convened on one question. It <span className="text-text">remembers what you decide</span>,
-              so it gets sharper every time.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="#install"
-                className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-                style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-              >
-                Convene the council
-                <ArrowRight className="h-4 w-4" />
-              </a>
-              <GitHubStarButton size="lg" />
-            </div>
-          </div>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // LOGO BAR — gentle social proof / "what you use it with"
-
-function LogoBar() {
-  // Real brand logos — every dot has been replaced with an actual SVG
-  // mark in its official brand color. Models on the left, ecosystem
-  // tools on the right.
-  const items: Array<{
-    label: string;
-    color: string;
-    render: (cls: string) => ReactNode;
-  }> = [
-    { label: "Claude", color: "#cc785c", render: (c) => <SimpleIcon icon={siClaude} className={c} /> },
-    { label: "Codex", color: "#10a37f", render: (c) => <OpenAIMark className={c} /> },
-    { label: "Antigravity", color: "#4285F4", render: (c) => <SimpleIcon icon={siGooglegemini} className={c} /> },
-    { label: "Ollama", color: "#f5f3ed", render: (c) => <SimpleIcon icon={siOllama} className={c} /> },
-    { label: "MCP", color: "#5fbfff", render: (c) => <McpIcon className={c} /> },
-    { label: "Tailscale", color: "#f5f3ed", render: (c) => <SimpleIcon icon={siTailscale} className={c} /> },
-    { label: "Telegram", color: "#229ED9", render: (c) => <SimpleIcon icon={siTelegram} className={c} /> },
-    { label: "Multica AI", color: "#f5f3ed", render: (c) => <MulticaBrandReal className={c} /> },
-    { label: "Paperclip AI", color: "#0092b7", render: (c) => <PaperclipBrandReal className={c} /> },
-    { label: "OpenClaw", color: "#ff4d4d", render: (c) => <OpenClawBrand className={c} /> },
-    { label: "Hermes AI", color: "#c4a8ff", render: (c) => <HermesBrand className={c} /> },
-  ];
-  return (
-    <section className="border-y border-border-soft bg-surface-0/30 py-12">
-      <div className="mx-auto max-w-6xl px-6">
-        <p className="mb-8 text-center text-xs uppercase tracking-[0.2em] text-text-mute">
-          Plays with the tools you already use
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 md:gap-x-14">
-          {items.map((it) => (
-            <div
-              key={it.label}
-              title={it.label}
-              className="flex items-center gap-2.5 text-sm font-medium text-text-soft transition-colors hover:text-text"
-            >
-              <span
-                className="flex h-5 w-5 items-center justify-center"
-                style={{ color: it.color }}
-              >
-                {it.render("h-5 w-5")}
-              </span>
-              <span>{it.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FEATURE SECTION — reusable, alternating layout
 
-function FeatureSection({
-  eyebrow,
-  title,
-  description,
-  bullets,
-  mockup,
-  reverse = false,
-  glow = "gold",
-  id,
-}: {
-  eyebrow: string;
-  title: ReactNode;
-  description: string;
-  bullets?: string[];
-  mockup: ReactNode;
-  reverse?: boolean;
-  glow?: "gold" | "ai" | "none";
-  id?: string;
-}) {
-  return (
-    <section id={id} className="relative border-t border-border-soft py-24 md:py-32">
-      {glow === "gold" && (
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="glow-gold absolute inset-0 opacity-40" />
-        </div>
-      )}
-      {glow === "ai" && (
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="glow-ai absolute inset-0 opacity-40" />
-        </div>
-      )}
-      <div className="mx-auto max-w-6xl px-6">
-        <div
-          className={`grid gap-16 md:gap-20 lg:grid-cols-2 lg:items-center ${
-            reverse ? "" : ""
-          }`}
-        >
-          <FadeIn>
-            <div className={reverse ? "lg:order-2" : ""}>
-              <div className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                {eyebrow}
-              </div>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-                {title}
-              </h2>
-              <p className="mt-6 text-lg text-text-soft">{description}</p>
-              {bullets && (
-                <ul className="mt-8 space-y-3">
-                  {bullets.map((b) => (
-                    <li key={b} className="flex items-start gap-3 text-text-soft">
-                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.1} y={30}>
-            <div className={reverse ? "lg:order-1" : ""}>{mockup}</div>
-          </FadeIn>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // COUNCIL MOCK — fan-out + verdict, 4 panelist replies streaming
-
-function CouncilMock() {
-  return (
-    <WindowChrome title="Prevail · /council">
-      <div className="space-y-3 bg-surface-0 p-5">
-        <div className="rounded-md bg-surface-1 px-3 py-2 font-mono text-[11px] text-text-soft">
-          <span className="text-gold">$</span> council should I prepay the mortgage?
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {[
-            { name: "claude", color: "#c4a35a", text: "Invest. Rate < return.", done: true },
-            { name: "codex", color: "#5fbfff", text: "Invest. Tax-deferred wins.", done: true },
-            { name: "agy", color: "#6ee787", text: "Split. 60 / 40.", done: true },
-            { name: "ollama", color: "#c4a8ff", text: "Prepay. Guaranteed 6.2%.", done: false },
-          ].map((p) => (
-            <div
-              key={p.name}
-              className="overflow-hidden rounded-lg border border-border bg-surface-1"
-            >
-              <div className="flex items-center justify-between border-b border-border-soft bg-surface-2 px-3 py-1.5 font-mono text-[10px]">
-                <span style={{ color: p.color }}>◇ {p.name}</span>
-                {p.done ? (
-                  <span className="text-ok">✓</span>
-                ) : (
-                  <span className="pulse-soft text-gold">stream</span>
-                )}
-              </div>
-              <div className="px-3 py-2 text-[11px] text-text-soft">{p.text}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-lg border border-gold-border bg-gold-soft p-4">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em] text-gold">
-            <span>◆</span> Verdict · synthesized by claude
-          </div>
-          <div className="mt-2 text-[11px] text-text">
-            Invest 60% in tax-advantaged index funds. Prepay 40% quarterly. Revisit
-            annually.
-          </div>
-        </div>
-      </div>
-    </WindowChrome>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BENCHMARK MOCK — leaderboard
@@ -1324,376 +1001,94 @@ function CouncilMock() {
 // Per-domain leaderboards. The point: the best model for one part of your life
 // isn't the best for another — the winner (row 0) deliberately changes by
 // domain. Rows are [judge score, keyword %, model].
-const BENCH_DOMAINS: { id: string; note: string; rows: [string, string, string][] }[] = [
-  {
-    id: "wealth",
-    note: "frontier reasoning wins the horizon math",
-    rows: [
-      ["9.7", "46%", "opus-4-7"],
-      ["9.5", "43%", "sonnet-4-6"],
-      ["9.4", "41%", "opus-4-6"],
-      ["8.1", "33%", "gpt-5.4"],
-      ["6.9", "28%", "gemini-3.1"],
-    ],
-  },
-  {
-    id: "tax",
-    note: "sub-clause traps reward the deepest model",
-    rows: [
-      ["9.8", "51%", "opus-4-6"],
-      ["9.6", "47%", "opus-4-7"],
-      ["8.9", "39%", "sonnet-4-6"],
-      ["7.4", "31%", "gpt-5.4"],
-      ["6.5", "24%", "gemini-3.1"],
-    ],
-  },
-  {
-    id: "health",
-    note: "a local model leads: labs never leave the machine",
-    rows: [
-      ["9.5", "44%", "sonnet-4-6"],
-      ["9.3", "42%", "llama-local"],
-      ["9.2", "41%", "opus-4-7"],
-      ["8.2", "35%", "haiku"],
-      ["7.0", "29%", "gpt-5.4"],
-    ],
-  },
-  {
-    id: "career",
-    note: "nuance over runway flips the ranking",
-    rows: [
-      ["9.6", "45%", "opus-4-7"],
-      ["9.3", "41%", "opus-4-6"],
-      ["9.1", "40%", "sonnet-4-6"],
-      ["7.8", "33%", "gpt-5.4"],
-      ["7.1", "30%", "gemini-3.1"],
-    ],
-  },
-  {
-    id: "real estate",
-    note: "a different model takes the top row here",
-    rows: [
-      ["9.4", "43%", "gpt-5.4"],
-      ["9.3", "42%", "opus-4-7"],
-      ["9.0", "40%", "sonnet-4-6"],
-      ["8.0", "34%", "opus-4-6"],
-      ["6.7", "26%", "gemini-3.1"],
-    ],
-  },
-];
-
-type BenchResults = {
-  schema: string; synthetic: boolean; generated_at: string; seed?: boolean;
-  domains: string[];
-  models: { key: string; cli: string | null; model: string | null; label: string }[];
-  matrix: Record<string, Record<string, { judge_avg: number | null; keyword_avg: number | null; n: number }>>;
-  leaderboard: { key: string; label: string; judge_avg: number | null; keyword_avg: number | null; questions: number }[];
-};
-
 // Heat color for a 0-10 judge score: emerald green for strong, muted slate for
 // weak. Green reads as "good" at a glance and keeps the board off the gold the
 // rest of the site uses.
-function heat(v: number | null): string {
-  if (v === null) return "rgba(120,130,140,0.06)";
-  const t = Math.max(0, Math.min(1, (v - 5) / 4.5)); // 5..9.5 -> 0..1
-  // emerald #2fb87a, alpha scales with score.
-  return `rgba(47,184,122,${(0.10 + t * 0.62).toFixed(2)})`;
-}
-
 // The live Prevail Benchmark: model x domain matrix + leaderboard, loaded from
 // the committed results JSON (refreshed by the weekly CI). Synthetic data.
-function BenchmarkBoard() {
-  const [data, setData] = useState<BenchResults | null>(null);
-  const [err, setErr] = useState(false);
-  useEffect(() => {
-    fetch("/benchmark-results.json")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then(setData)
-      .catch(() => setErr(true));
-  }, []);
-  if (err || !data) return null;
-  const fmt = (v: number | null) => (v === null ? "·" : v.toFixed(1));
-  const date = data.generated_at?.slice(0, 10) ?? "";
-  return (
-    <section id="benchmark-board" className="border-t border-border-soft py-20 md:py-28">
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <div className="flex items-center justify-center gap-2">
-            <p className="text-center text-xs uppercase tracking-[0.2em] text-[#2fb87a]">The Prevail Benchmark</p>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#2fb87a]/15 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#2fb87a]">
-              <span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2fb87a] opacity-70" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#2fb87a]" /></span>
-              {data.seed ? "Preview" : "Live"}
-            </span>
-          </div>
-          <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-            Which model wins <span className="font-serif italic text-text-soft">which life decision?</span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-center text-base text-text-soft">
-            {data.models.length} models graded on {data.leaderboard[0]?.questions ?? 46} real-world questions across {data.domains.length} life domains, scored by an LLM judge. The model that wins your wealth calls is rarely the one that wins your health calls.
-          </p>
-          {date && (
-            <p className="mt-3 text-center font-mono text-xs text-text-soft">
-              {data.seed ? "Preview scores" : "Last refreshed"} {date}{!data.seed && " · updated weekly"}
-            </p>
-          )}
-        </FadeIn>
-
-        {/* What this is — small honest note about the test + the data + more. */}
-        <FadeIn delay={0.05}>
-          <div className="mx-auto mt-6 max-w-2xl rounded-xl border border-border-soft bg-surface-1 px-4 py-3 text-center text-xs text-text-soft">
-            <span className="font-mono uppercase tracking-wider text-text">About this test</span>{" "}
-            Every model answers the same {data.leaderboard[0]?.questions ?? 46} decision questions, built from one fictional household (synthetic data, no real person), and an LLM judge scores each answer 0-10.{" "}
-            <a href="https://github.com/fru-dev3/prevail-desktop/tree/main/src-tauri/resources/sample-vault/benchmark" target="_blank" rel="noreferrer" className="underline hover:text-[#2fb87a]">See the questions, methodology & raw data on GitHub ›</a>
-          </div>
-        </FadeIn>
-
-        {/* Leaderboard */}
-        <FadeIn delay={0.08}>
-          <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-2">
-            {data.leaderboard.map((e, i) => (
-              <div key={e.key} className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${i === 0 ? "border-[#2fb87a] bg-[#2fb87a]/10" : "border-border-soft bg-surface-1"}`}>
-                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-bold ${i === 0 ? "bg-[#2fb87a] text-bg" : "text-text-soft"}`}>{i + 1}</span>
-                <span className="min-w-0 flex-1 truncate font-semibold">{e.label}</span>
-                <span className="font-mono text-sm text-text-soft">{e.keyword_avg ?? "·"}% kw</span>
-                <span className={`font-mono text-lg font-bold ${i === 0 ? "text-[#2fb87a]" : "text-text"}`}>{fmt(e.judge_avg)}<span className="text-xs text-text-soft">/10</span></span>
-              </div>
-            ))}
-          </div>
-        </FadeIn>
-
-        {/* Matrix heatmap — domains as rows, models as columns. */}
-        <FadeIn delay={0.1}>
-          <div className="mx-auto mt-10 max-w-5xl overflow-x-auto rounded-2xl border border-border-soft">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-border-soft bg-surface-1">
-                  <th className="sticky left-0 bg-surface-1 px-4 py-3 text-left font-mono text-xs uppercase tracking-wider text-text-soft">Domain</th>
-                  {data.models.map((m) => (
-                    <th key={m.key} className="px-3 py-3 text-center text-xs font-semibold">{m.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.domains.map((d) => {
-                  // Winner per domain for a subtle highlight.
-                  let best = -1; let bestKey = "";
-                  for (const m of data.models) { const v = data.matrix[m.key]?.[d]?.judge_avg ?? -1; if (v > best) { best = v; bestKey = m.key; } }
-                  return (
-                    <tr key={d} className="border-b border-border-soft/60 last:border-0">
-                      <td className="sticky left-0 bg-bg px-4 py-2.5 font-medium capitalize">{d}</td>
-                      {data.models.map((m) => {
-                        const cell = data.matrix[m.key]?.[d];
-                        const v = cell?.judge_avg ?? null;
-                        return (
-                          <td key={m.key} className="px-3 py-2.5 text-center" style={{ backgroundColor: heat(v) }}>
-                            <span className={`font-mono ${m.key === bestKey ? "font-bold text-text" : "text-text-soft"}`}>{fmt(v)}</span>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </FadeIn>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-xs text-text-soft">
-          Greener = stronger (LLM-judge average, 0-10, per model per domain). {data.seed ? "Preview scores until the first scheduled run publishes." : "Refreshed weekly."} Run the benchmark on your own decisions in the Prevail desktop app.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function BenchmarkMock() {
-  const [active, setActive] = useState(0);
-  const dom = BENCH_DOMAINS[active];
-  return (
-    <WindowChrome title="Prevail · benchmark">
-      <div className="bg-surface-0 p-5">
-        {/* domain tabs — switch the leaderboard per life domain */}
-        <div className="mb-4 flex flex-wrap gap-1.5">
-          {BENCH_DOMAINS.map((d, i) => (
-            <button
-              key={d.id}
-              onClick={() => setActive(i)}
-              className={`rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors ${
-                i === active
-                  ? "border-gold-border bg-gold-soft text-gold"
-                  : "border-border-soft text-text-mute hover:text-text-soft"
-              }`}
-            >
-              {d.id}
-            </button>
-          ))}
-        </div>
-
-        <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-text-mute">
-          <span>
-            <span className="text-gold">◈</span> {dom.id} · leaderboard
-          </span>
-          <span className="rounded-full border border-border-soft px-2 py-0.5 text-[9px] normal-case tracking-normal">
-            sample
-          </span>
-        </div>
-        <div className="grid grid-cols-[48px_52px_1fr] gap-3 px-2 pb-2 font-mono text-[9px] uppercase tracking-wider text-text-mute">
-          <span>judge</span>
-          <span>kw</span>
-          <span>model</span>
-        </div>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={dom.id}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.25, ease: EASE }}
-            className="space-y-0.5"
-          >
-            {dom.rows.map(([j, k, m], idx) => {
-              const top = idx === 0;
-              return (
-                <div
-                  key={m}
-                  className={`grid grid-cols-[48px_52px_1fr] gap-3 rounded px-2 py-2 font-mono text-[11px] ${
-                    top ? "bg-gold-soft" : ""
-                  }`}
-                >
-                  <span className={top ? "text-gold" : "text-text-soft"}>{j}</span>
-                  <span className="text-text-mute">{k}</span>
-                  <span className="text-text">
-                    {top && <span className="mr-1.5 text-gold">▸</span>}
-                    {m}
-                  </span>
-                </div>
-              );
-            })}
-          </motion.div>
-        </AnimatePresence>
-        <div className="mt-4 flex items-start gap-2 text-[11px] leading-relaxed text-text-mute">
-          <span className="text-ai">▸</span>
-          <span>{dom.note}</span>
-        </div>
-        <div className="mt-4 rounded-md border border-border bg-surface-1 px-3 py-2.5 font-mono text-[10px] text-text-soft">
-          <span className="text-gold">$</span> prevail bench --domain{" "}
-          {dom.id.replace(" ", "-")}
-        </div>
-        <p className="mt-2.5 text-[10px] leading-relaxed text-text-mute">
-          Illustrative scores: your ranking comes from your own questions and
-          chair.
-        </p>
-      </div>
-    </WindowChrome>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // VAULT MOCK — folder tree
-
-function VaultMock() {
-  const tree = [
-    { d: 0, n: "vault/", g: "◆" },
-    { d: 1, n: "chief/", g: "◆" },
-    { d: 2, n: "state.md", g: "·" },
-    { d: 2, n: "_log/", g: "·" },
-    { d: 1, n: "wealth/", g: "◆" },
-    { d: 2, n: "state.md", g: "·" },
-    { d: 2, n: "decisions.md", g: "·" },
-    { d: 2, n: "_log/2026-06-04.md", g: "·" },
-    { d: 1, n: "health/", g: "◆" },
-    { d: 1, n: "tax/", g: "◆" },
-    { d: 1, n: "benchmark/", g: "◈" },
-    { d: 2, n: "questions/", g: "·" },
-    { d: 2, n: "runs/", g: "·" },
-  ];
-  return (
-    <WindowChrome title="~/Documents/prevail/vault-demo">
-      <div className="bg-surface-0 p-5">
-        <div className="space-y-0.5 font-mono text-[12px]">
-          {tree.map((t, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2"
-              style={{ paddingLeft: `${t.d * 16}px` }}
-            >
-              <span
-                className={
-                  t.g === "◆"
-                    ? "text-gold"
-                    : t.g === "◈"
-                      ? "text-ai"
-                      : "text-text-mute"
-                }
-              >
-                {t.g}
-              </span>
-              <span
-                className={
-                  t.n.endsWith("/") ? "text-text-soft" : "text-text-mute"
-                }
-              >
-                {t.n}
-              </span>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 border-t border-border-soft pt-4 text-[11px] text-text-soft">
-          Every domain is a folder. Every verdict is markdown. Sync with git,
-          iCloud, Tailscale: your call.
-        </div>
-      </div>
-    </WindowChrome>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PILLARS — three small cards
 
 function Pillars() {
   return (
-    <section className="border-t border-border-soft py-24 md:py-28">
+    <section id="how" className="scroll-mt-20 border-t border-border-soft py-24 md:py-28">
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
-            Why <Brand />
+            How <Brand /> works
           </p>
           <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-            The cockpit, <span className="font-serif italic text-text-soft">not the chatbot.</span>
+            Three ideas. <span className="font-serif italic text-text-soft">That's the whole app.</span>
           </h2>
         </FadeIn>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           {[
             {
               icon: Scale,
-              title: "Multi-model by default",
-              text: "Stop A/B testing one model at a time. Run them in parallel, see who's right at a glance.",
+              title: "A council, not a chatbot",
+              text: "Ask every model at once. A chair reads all the answers and writes one verdict, and flags where they disagree.",
               color: "#c4a35a",
-            },
-            {
-              icon: Sparkles,
-              title: "Graded against your life",
-              text: "21 canonical questions ship with the app. Add your own. New models get graded against decisions you've already made.",
-              color: "#5fbfff",
+              visual: (
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex -space-x-2">
+                    {["#cc785c", "#4285F4", "#6ee787", "#ededed"].map((c) => (
+                      <span key={c} className="h-7 w-7 rounded-full ring-2 ring-surface-0" style={{ background: c }} aria-hidden />
+                    ))}
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-text-mute" />
+                  <span className="rounded-md border border-gold-border bg-gold/10 px-2.5 py-1 text-xs font-medium text-gold">one verdict</span>
+                </div>
+              ),
             },
             {
               icon: Layers,
-              title: "Local-first, forever",
-              text: "Your vault is markdown. No database. No cloud. No subscription. Sync however you want.",
+              title: "Just folders you own",
+              text: "Your life in plain markdown, one folder per domain. No database, no cloud. Read it without the app.",
               color: "#6ee787",
+              visual: (
+                <div className="rounded-lg border border-border-soft bg-bg/60 p-3 font-mono text-[11px] leading-relaxed">
+                  <div className="text-text-mute">~/prevail-vault/</div>
+                  {["wealth", "health", "career"].map((d) => (
+                    <div key={d} className="pl-3 text-text-soft">
+                      <span className="text-[#6ee787]">{d}/</span> state.md
+                    </div>
+                  ))}
+                </div>
+              ),
+            },
+            {
+              icon: Sparkles,
+              title: "It compounds",
+              text: "Every chat and decision feeds the next answer. It gets sharper the longer you use it, and never starts from zero.",
+              color: "#5fbfff",
+              visual: (
+                <div>
+                  <div className="flex h-16 items-end gap-1.5">
+                    {[18, 30, 40, 55, 72, 92].map((h, j) => (
+                      <span key={j} className="flex-1 rounded-sm bg-gradient-to-t from-[#5fbfff]/25 to-[#5fbfff]" style={{ height: `${h}%` }} aria-hidden />
+                    ))}
+                  </div>
+                  <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">sharper over time</div>
+                </div>
+              ),
             },
           ].map((p, i) => {
             const Icon = p.icon;
             return (
               <FadeIn key={p.title} delay={i * 0.06}>
-                <div className="group h-full rounded-xl border border-border-soft bg-surface-0 p-7 transition-all hover:border-border hover:bg-surface-1">
+                <div className="group flex h-full flex-col rounded-xl border border-border-soft bg-surface-0 p-7 transition-all hover:border-border hover:bg-surface-1">
                   <div
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-lg"
+                    className="inline-flex h-12 w-12 items-center justify-center rounded-xl"
                     style={{ backgroundColor: `${p.color}15`, color: p.color }}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-6 w-6" />
                   </div>
                   <h3 className="mt-5 text-xl font-semibold">{p.title}</h3>
-                  <p className="mt-2 text-text-soft">{p.text}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-text-soft">{p.text}</p>
+                  <div className="mt-6 pt-1">{p.visual}</div>
                 </div>
               </FadeIn>
             );
@@ -1707,619 +1102,17 @@ function Pillars() {
 // ─────────────────────────────────────────────────────────────────────────────
 // FRAMEWORKS — how Prevail SHAPES the answer (BLUF, WIN, SCQA, ...)
 
-const FRAMEWORKS = [
-  { id: "bluf", label: "BLUF", desc: "Lead with the bottom line. Detail after." },
-  { id: "win", label: "WIN", desc: "What's Important Now: name the one next move." },
-  { id: "scqa", label: "SCQA", desc: "Situation → Complication → Question → Answer." },
-  { id: "sbar", label: "SBAR", desc: "Situation, Background, Assessment, Recommendation." },
-  { id: "ooda", label: "OODA", desc: "Observe → Orient → Decide → Act." },
-  { id: "proscons", label: "PROS/CONS", desc: "Structured trade-off with weight." },
-  { id: "steelman", label: "STEELMAN", desc: "Strongest version of the other side first." },
-];
-
-function FrameworksSection() {
-  const [active, setActive] = useState("bluf");
-  return (
-    <section className="relative border-t border-border-soft py-24 md:py-32">
-      <div className="glow-gold absolute inset-0 -z-10 opacity-30" />
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:items-center">
-          <FadeIn>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                Frameworks
-              </p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-                Shape every answer{" "}
-                <span className="text-text-soft">on purpose.</span>
-              </h2>
-              <p className="mt-6 text-lg text-text-soft">
-                Seven response frameworks change <em>how</em> the model
-                structures its reply: without changing the question. Pick one
-                globally, or per question. The active framework is prepended
-                to every CLI call as a short directive.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {FRAMEWORKS.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => setActive(f.id)}
-                    className={`rounded-md border px-3 py-1.5 font-mono text-xs font-medium transition-all ${
-                      active === f.id
-                        ? "border-gold-border bg-gold text-bg"
-                        : "border-border-soft bg-surface-0 text-text-soft hover:border-border hover:text-text"
-                    }`}
-                  >
-                    ◆ {f.label}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-6 text-sm text-text-soft">
-                <span className="text-gold">▸</span>{" "}
-                {FRAMEWORKS.find((f) => f.id === active)?.desc}
-              </p>
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.1}>
-            <WindowChrome title={`prevail · /framework ${active}`}>
-              <div className="space-y-3 bg-surface-0 p-5 font-mono text-[11px]">
-                <div className="text-text-mute">
-                  <span className="text-gold">$</span> Should I prepay or invest the delta?
-                </div>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={active}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <FrameworkReply id={active} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </WindowChrome>
-          </FadeIn>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // Each framework gets a STRUCTURALLY distinct rendering — the visual
 // shape should reveal the framework. Banner labels, dividers, grids,
 // loops — not just colored prefix letters on similar paragraphs.
-
-function FwLabel({ children, color = "gold" }: { children: ReactNode; color?: string }) {
-  return (
-    <div
-      className={`inline-block rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] ${
-        color === "ok" ? "bg-ok/20 text-ok" : color === "warn" ? "bg-warn/20 text-warn" : "bg-gold-soft text-gold"
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function FwDivider() {
-  return <div className="my-2 h-px bg-border-soft" />;
-}
-
-function FrameworkReply({ id }: { id: string }) {
-  const sample: Record<string, ReactNode> = {
-    // BLUF — banner-style verdict at top, hairline divider, supporting detail below
-    bluf: (
-      <div>
-        <FwLabel>Bottom Line</FwLabel>
-        <p className="mt-1.5 text-base font-semibold text-text">
-          Invest. Compounding wins at your horizon.
-        </p>
-        <FwDivider />
-        <FwLabel>Detail</FwLabel>
-        <p className="mt-1.5 text-text-soft">
-          At 6.2% APR over 22 years, tax-advantaged equities outpace the
-          mortgage by ~$160k after-tax. Keep the emergency fund first.
-        </p>
-      </div>
-    ),
-
-    // WIN — single boxed move + tiny defer note
-    win: (
-      <div>
-        <FwLabel>What's Important Now</FwLabel>
-        <div className="mt-1.5 rounded border border-gold-border bg-gold-soft p-3">
-          <div className="text-[9px] uppercase tracking-wider text-gold">
-            ⟶ Next move
-          </div>
-          <div className="mt-1 text-base font-semibold text-text">
-            Move $2,000 into VTI this Friday.
-          </div>
-        </div>
-        <p className="mt-3 text-[11px] italic text-text-mute">
-          Defer everything else until the January review.
-        </p>
-      </div>
-    ),
-
-    // SCQA — 4 labeled blocks stacked, each with letter chip
-    scqa: (
-      <div className="space-y-2">
-        {[
-          ["S", "Situation", "$2k/mo of optional cash."],
-          ["C", "Complication", "Mortgage at 6.2%, market noisy."],
-          ["Q", "Question", "Prepay or invest?"],
-          ["A", "Answer", "Invest. 22-yr horizon dominates."],
-        ].map(([letter, label, text]) => (
-          <div key={letter} className="flex gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-gold-soft text-sm font-bold text-gold">
-              {letter}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[9px] uppercase tracking-wider text-text-mute">
-                {label}
-              </div>
-              <div className="text-text">{text}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    ),
-
-    // SBAR — same pattern as SCQA but different content + cyan accent
-    sbar: (
-      <div className="space-y-2">
-        {[
-          ["S", "Situation", "Mortgage rate 6.2%, 22yr left."],
-          ["B", "Background", "$2k/mo surplus, no high-interest debt."],
-          ["A", "Assessment", "Compounding beats prepay after-tax."],
-          ["R", "Recommendation", "Invest 60%, prepay 40%."],
-        ].map(([letter, label, text]) => (
-          <div key={letter} className="flex gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-ai/15 text-sm font-bold text-ai">
-              {letter}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[9px] uppercase tracking-wider text-text-mute">
-                {label}
-              </div>
-              <div className="text-text">{text}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    ),
-
-    // OODA — 4 stages in a horizontal loop with arrows between
-    ooda: (
-      <div>
-        <FwLabel>OODA Loop</FwLabel>
-        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] gap-1.5">
-          {[
-            ["Observe", "mortgage 6.2%, 22y"],
-            ["Orient", "long horizon → equities"],
-            ["Decide", "60/40 split"],
-            ["Act", "auto-debit Friday"],
-          ].flatMap(([stage, text], i, arr) => {
-            const card = (
-              <div
-                key={`s-${stage}`}
-                className="col-span-3 grid grid-cols-[1fr_auto_1fr] items-center gap-1.5"
-              >
-                <div className="rounded border border-border bg-surface-1 p-2">
-                  <div className="text-[9px] uppercase tracking-wider text-gold">
-                    {stage}
-                  </div>
-                  <div className="mt-0.5 text-[11px] text-text">{text}</div>
-                </div>
-                {i < arr.length - 1 && (
-                  <div className="col-span-3 flex justify-center text-text-mute">
-                    ↓
-                  </div>
-                )}
-              </div>
-            );
-            return [card];
-          })}
-        </div>
-      </div>
-    ),
-
-    // PROS/CONS — two-column ledger with green + warn columns
-    proscons: (
-      <div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded border border-ok/30 bg-ok/10 p-2.5">
-            <div className="text-[9px] font-semibold uppercase tracking-wider text-ok">
-              + Invest
-            </div>
-            <ul className="mt-1.5 space-y-1 text-[11px] text-text">
-              <li className="flex gap-1.5"><span className="text-ok">+</span> compounds longer</li>
-              <li className="flex gap-1.5"><span className="text-ok">+</span> tax wrapper</li>
-              <li className="flex gap-1.5"><span className="text-ok">+</span> stays liquid</li>
-            </ul>
-          </div>
-          <div className="rounded border border-warn/30 bg-warn/10 p-2.5">
-            <div className="text-[9px] font-semibold uppercase tracking-wider text-warn">
-              − Prepay
-            </div>
-            <ul className="mt-1.5 space-y-1 text-[11px] text-text">
-              <li className="flex gap-1.5"><span className="text-warn">−</span> guaranteed 6.2%</li>
-              <li className="flex gap-1.5"><span className="text-warn">−</span> psych anchor</li>
-              <li className="flex gap-1.5"><span className="text-warn">−</span> illiquid</li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-3 rounded border border-gold-border bg-gold-soft p-2 text-[11px]">
-          <span className="text-gold">Weight:</span>{" "}
-          <span className="text-text">Invest wins: horizon &gt; certainty premium.</span>
-        </div>
-      </div>
-    ),
-
-    // STEELMAN — opposing view in muted quote, then your verdict
-    steelman: (
-      <div>
-        <FwLabel color="warn">Strongest opposing case</FwLabel>
-        <blockquote className="mt-1.5 border-l-2 border-warn/60 bg-warn/5 pl-3 py-2 italic text-text-soft">
-          Prepayment guarantees a 6.2% return, builds psychological
-          discipline, and lets you ignore the market for two decades.
-        </blockquote>
-
-        <div className="mt-3 flex items-center gap-2 text-[9px] uppercase tracking-wider text-text-mute">
-          <div className="h-px flex-1 bg-border-soft" />
-          <span>and yet</span>
-          <div className="h-px flex-1 bg-border-soft" />
-        </div>
-
-        <div className="mt-3">
-          <FwLabel>Verdict</FwLabel>
-          <p className="mt-1.5 text-text">
-            Compounding in a tax wrapper still wins at your horizon.
-            Steelman noted; <span className="font-semibold text-gold">invest anyway.</span>
-          </p>
-        </div>
-      </div>
-    ),
-  };
-  return <>{sample[id]}</>;
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LENSES — different angles of attack. With lens=ALL, every panelist runs
 // every lens, then the chair synthesizes across all of them.
 
-const LENSES = [
-  { id: "first-principles", label: "FIRST PRINCIPLES", glyph: "◇", color: "#c4a35a" },
-  { id: "outsider", label: "OUTSIDER", glyph: "◈", color: "#5fbfff" },
-  { id: "contrarian", label: "CONTRARIAN", glyph: "◆", color: "#f0c674" },
-  { id: "expansionist", label: "EXPANSIONIST", glyph: "✦", color: "#6ee787" },
-  { id: "executor", label: "EXECUTOR", glyph: "▸", color: "#c4a8ff" },
-  { id: "alien", label: "ALIEN", glyph: "◉", color: "#88d0ff" },
-  { id: "mom", label: "MOM", glyph: "♥", color: "#ffb38a" },
-  { id: "dad", label: "DAD", glyph: "▲", color: "#d4b675" },
-];
-
 // What each lens does to the same mortgage question — used by the
 // interactive demo. Each rendering should LOOK like the lens worked on
 // it (terminal-styled snippet inside the mock window).
-const LENS_DEMOS: Record<string, { quip: string; body: ReactNode }> = {
-  "first-principles": {
-    quip: "Stripped to mechanics",
-    body: (
-      <div>
-        <p className="text-text">
-          Money has two costs: <span className="text-gold">rate</span> and{" "}
-          <span className="text-gold">time</span>. Mortgage rate is fixed at 6.2%.
-          Equity expected return (after-tax, in your wrapper) is roughly 7-8% over
-          22 years. The arithmetic isn't subtle.
-        </p>
-        <p className="mt-2 text-text-soft">
-          Forget norms, forget what other people do. The number wins. Invest.
-        </p>
-      </div>
-    ),
-  },
-  outsider: {
-    quip: "Doesn't know your bias",
-    body: (
-      <div>
-        <p className="text-text">
-          A stranger looking at this: you have $2k/mo of surplus, no high-interest
-          debt, a 22-year horizon, and access to tax-advantaged accounts. You're
-          asking whether to give that up for a 6.2% locked return.
-        </p>
-        <p className="mt-2 text-text-soft">
-          Why would anyone in your position choose to compound less?
-        </p>
-      </div>
-    ),
-  },
-  contrarian: {
-    quip: "Argues against you",
-    body: (
-      <div>
-        <p className="text-text">
-          The "invest the delta" advice assumes you'll actually invest it. Most
-          people don't. They invest in month one, skip month four, take it out for
-          a car in year three.
-        </p>
-        <p className="mt-2 text-text-soft">
-          If discipline is your weak link, the forced savings of prepayment beats
-          the optimal-on-paper plan you won't execute.
-        </p>
-      </div>
-    ),
-  },
-  expansionist: {
-    quip: "Bigger version",
-    body: (
-      <div>
-        <p className="text-text">
-          The real question isn't "prepay or invest." It's: what's your{" "}
-          <span className="text-gold">capital allocation policy</span> for every
-          dollar of monthly surplus, forever?
-        </p>
-        <p className="mt-2 text-text-soft">
-          Pick a rule (e.g., 70% invest / 20% prepay / 10% cash). Apply it on
-          autopilot. Stop relitigating monthly.
-        </p>
-      </div>
-    ),
-  },
-  executor: {
-    quip: "Just do it",
-    body: (
-      <div>
-        <ol className="space-y-1.5 text-text">
-          <li><span className="text-gold">1.</span> Friday: open Fidelity VTI position.</li>
-          <li><span className="text-gold">2.</span> Set $2,000/mo recurring transfer.</li>
-          <li><span className="text-gold">3.</span> Mute the mortgage debate for 12 months.</li>
-        </ol>
-        <p className="mt-3 text-text-soft">Done.</p>
-      </div>
-    ),
-  },
-  alien: {
-    quip: "Sees the obvious",
-    body: (
-      <div>
-        <p className="text-text">
-          You spent 40 minutes typing this question. You'll spend 4 more weeks
-          deciding. The actual cost of the decision (delay × $2k × expected return)
-          is <span className="text-gold">~$280</span>: and growing each week you stall.
-        </p>
-        <p className="mt-2 text-text-soft">
-          The thing you're missing isn't the answer. It's that the question already
-          cost more than acting wrong would.
-        </p>
-      </div>
-    ),
-  },
-  mom: {
-    quip: "Plain English",
-    body: (
-      <div>
-        <p className="text-text">
-          "Sweetheart: pay the house. You'll sleep better."
-        </p>
-        <p className="mt-2 text-text-soft">
-          She's not wrong about the sleeping. She's just optimizing for a thing
-          your spreadsheet doesn't price. Decide which one you care about more.
-        </p>
-      </div>
-    ),
-  },
-  dad: {
-    quip: "Hard-nosed",
-    body: (
-      <div>
-        <p className="text-text">
-          Trap: "invest the delta" only works if you actually invest it{" "}
-          <span className="italic">and</span> stay invested through a 30% drawdown
-          without selling.
-        </p>
-        <p className="mt-2 text-text-soft">
-          If you can't honestly say yes to both, prepay. The "optimal" plan you
-          abandon mid-cycle is worse than the suboptimal one you keep.
-        </p>
-      </div>
-    ),
-  },
-};
-
-function LensesSection() {
-  const [active, setActive] = useState<string>("first-principles");
-  const activeLens = LENSES.find((l) => l.id === active)!;
-  return (
-    <section
-      id="lenses"
-      className="relative border-t border-border-soft py-24 md:py-32"
-    >
-      <div className="glow-ai absolute inset-0 -z-10 opacity-40" />
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
-              Lenses
-            </p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-              Eight angles on{" "}
-              <span className="text-text-soft">the same question.</span>
-            </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-text-soft">
-              A lens forces the model to attack the problem from a specific
-              angle: first principles, contrarian, executor, even your mom.
-              Switch to <span className="font-mono text-ai">lens = ALL</span> and
-              every panelist runs every lens. 4 CLIs × 8 lenses × 1 chair pass.
-              Surface the divergence; let the chair synthesize across it.
-            </p>
-          </div>
-        </FadeIn>
-
-        {/* Interactive lens demo — pick a lens, see how it reframes the
-            same mortgage question through that angle */}
-        <FadeIn delay={0.1}>
-          <div className="mt-16 overflow-hidden rounded-2xl border border-border-soft bg-surface-0">
-            <WindowChrome title={`prevail · /lens ${active}`}>
-              <div className="bg-bg p-5">
-                {/* Question echo */}
-                <div className="mb-4 rounded-md border border-border bg-surface-1 px-3 py-2 font-mono text-xs text-text-soft">
-                  <span className="text-ai">$</span> Should I prepay the mortgage
-                  or invest the delta?
-                </div>
-
-                {/* Active lens header */}
-                <div className="flex items-center gap-3 border-b border-border-soft pb-3">
-                  <span
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-lg"
-                    style={{ backgroundColor: `${activeLens.color}18`, color: activeLens.color }}
-                  >
-                    {activeLens.glyph}
-                  </span>
-                  <div>
-                    <div className="font-mono text-sm font-semibold tracking-wider" style={{ color: activeLens.color }}>
-                      {activeLens.label}
-                    </div>
-                    <div className="text-xs text-text-mute italic">
-                      {LENS_DEMOS[active]?.quip}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Lens-applied reply, animates between selections */}
-                <div className="min-h-[160px] pt-4">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={active}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.25 }}
-                      className="text-sm leading-relaxed"
-                    >
-                      {LENS_DEMOS[active]?.body}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
-            </WindowChrome>
-          </div>
-        </FadeIn>
-
-        {/* Lens chips — click to switch the active lens above */}
-        <FadeIn delay={0.18}>
-          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {LENSES.map((l) => {
-              const isActive = l.id === active;
-              return (
-                <button
-                  key={l.id}
-                  onClick={() => setActive(l.id)}
-                  className={`group rounded-xl border p-4 text-left transition-all ${
-                    isActive
-                      ? "border-ai/40 bg-ai/5"
-                      : "border-border-soft bg-surface-0 hover:bg-surface-1"
-                  }`}
-                  style={isActive ? {} : { borderColor: `${l.color}22` }}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-base"
-                      style={{ backgroundColor: `${l.color}18`, color: l.color }}
-                    >
-                      {l.glyph}
-                    </span>
-                    <div className="min-w-0 font-mono text-xs font-semibold tracking-wider">
-                      {l.label}
-                    </div>
-                  </div>
-                  <p className="mt-2 text-xs text-text-soft">{lensBlurb(l.id)}</p>
-                </button>
-              );
-            })}
-          </div>
-        </FadeIn>
-
-        {/* ALL fan-out highlight */}
-        <FadeIn delay={0.3}>
-          <div className="mt-12 overflow-hidden rounded-2xl border border-ai/30 bg-gradient-to-br from-surface-0 to-surface-1 p-6 md:p-8">
-            <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-center">
-              <div>
-                <div className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
-                  Fan-out · lens = ALL
-                </div>
-                <h3 className="mt-3 text-2xl font-bold tracking-tight md:text-3xl">
-                  The full council, every angle.
-                </h3>
-                <p className="mt-4 text-text-soft">
-                  4 CLIs × 8 lenses = 32 panelist calls. One chair pass on top.
-                  Expensive: and worth it when the question is load-bearing.
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-surface-0 p-4 font-mono text-[11px]">
-                <div className="text-text-mute">
-                  <span className="text-ai">$</span> /lens all
-                </div>
-                <div className="mt-2 grid grid-cols-4 gap-1.5 text-[9px]">
-                  {["claude", "codex", "agy", "ollama"].map((c, ci) => (
-                    <div key={c} className="space-y-0.5">
-                      <div
-                        className="border-b pb-0.5 text-center font-medium"
-                        style={{
-                          color: ["#c4a35a", "#5fbfff", "#6ee787", "#c4a8ff"][ci],
-                          borderColor: ["#c4a35a", "#5fbfff", "#6ee787", "#c4a8ff"][ci],
-                        }}
-                      >
-                        {c}
-                      </div>
-                      {LENSES.map((l) => (
-                        <div key={l.id} className="text-center text-text-mute">
-                          {l.glyph}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 border-t border-border-soft pt-2 text-center text-ai">
-                  ↓
-                </div>
-                <div className="mt-2 rounded border border-gold-border bg-gold-soft py-1.5 text-center text-gold">
-                  ◆ chair synthesizes
-                </div>
-              </div>
-            </div>
-          </div>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
-
-function lensBlurb(id: string) {
-  switch (id) {
-    case "first-principles":
-      return "Strip the problem to fundamentals. No appeal to precedent.";
-    case "outsider":
-      return "Challenge the thinking. Ignore prior knowledge.";
-    case "contrarian":
-      return "Argue the strongest case against the obvious answer.";
-    case "expansionist":
-      return "What's the bigger version of this question?";
-    case "executor":
-      return "Skip the framing. What's the literal next step today?";
-    case "alien":
-      return "An outsider would notice what's obvious to you.";
-    case "mom":
-      return "Plain English. What would she actually do?";
-    case "dad":
-      return "Hard-nosed. What's the trap you're not seeing?";
-    default:
-      return "";
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // SELF-LEARNING / ECOSYSTEM — combined section
 //
@@ -2333,111 +1126,14 @@ function lensBlurb(id: string) {
 // with teal pupils. Recolored via currentColor on the wrapping span,
 // but the gradient defs are inlined so the brand red shows through
 // even on a tinted wrapper.
-function OpenClawBrand({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="openclaw-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ff4d4d"/>
-          <stop offset="100%" stopColor="#991b1b"/>
-        </linearGradient>
-      </defs>
-      {/* Body */}
-      <path d="M60 10 C30 10 15 35 15 55 C15 75 30 95 45 100 L45 110 L55 110 L55 100 C55 100 60 102 65 100 L65 110 L75 110 L75 100 C90 95 105 75 105 55 C105 35 90 10 60 10Z" fill="url(#openclaw-grad)"/>
-      {/* Left Claw */}
-      <path d="M20 45 C5 40 0 50 5 60 C10 70 20 65 25 55 C28 48 25 45 20 45Z" fill="url(#openclaw-grad)"/>
-      {/* Right Claw */}
-      <path d="M100 45 C115 40 120 50 115 60 C110 70 100 65 95 55 C92 48 95 45 100 45Z" fill="url(#openclaw-grad)"/>
-      {/* Antennae */}
-      <path d="M45 15 Q35 5 30 8" stroke="#ff4d4d" strokeWidth="3" strokeLinecap="round"/>
-      <path d="M75 15 Q85 5 90 8" stroke="#ff4d4d" strokeWidth="3" strokeLinecap="round"/>
-      {/* Eyes */}
-      <circle cx="45" cy="35" r="6" fill="#050810"/>
-      <circle cx="75" cy="35" r="6" fill="#050810"/>
-      <circle cx="46" cy="34" r="2.5" fill="#00e5cc"/>
-      <circle cx="76" cy="34" r="2.5" fill="#00e5cc"/>
-    </svg>
-  );
-}
-
 // Real Multica logo — pulled verbatim from https://multica.ai/favicon.svg.
 // 8-spoke star/cross polygon; we recolor to currentColor so it picks up the
 // brand tint we set on the wrapper.
-function MulticaBrandReal({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 100 100" className={className} fill="currentColor" aria-label="Multica">
-      <polygon points="45,62.1 45,100 55,100 55,62.1 81.8,88.9 88.9,81.8 62.1,55 100,55 100,45 62.1,45 88.9,18.2 81.8,11.1 55,37.9 55,0 45,0 45,37.9 18.2,11.1 11.1,18.2 37.9,45 0,45 0,55 37.9,55 11.1,81.8 18.2,88.9" />
-    </svg>
-  );
-}
-
 // Real Paperclip AI logo mark — extracted from paperclip-logo.svg. The
 // original is wordmark+mark; we keep only the mark on the left (a stylized
 // paper corner with arrow). Colors use currentColor so it tints to brand.
-function PaperclipBrandReal({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 55 80" className={className} fill="currentColor" aria-label="Paperclip AI">
-      <path d="M43.99,0 L0,25.56 L.27,27.14 L4.84,26.37 L5.1,27.95 L40.64,7.3 L49.44,54.21 L24.94,71.84 L23.29,61.39 L40.29,49.57 L19.06,64.33 L21.54,80 L54.53,56.25 L43.99,0Z" opacity="0.85" />
-      <path d="M35.73,23.93 L31.17,24.74 L31.78,28.18 L35.2,47.46 L18.26,59.24 L11.21,64.14 L5.1,27.95 L4.84,26.37 L.27,27.14 L7.86,72.12 L19.06,64.33 L40.29,49.57 L35.73,23.93 Z M14.27,33.96 L18.26,59.24 L35.2,47.46 L22.49,56.3 L19.31,36.21 L31.78,28.18 L31.17,24.74 L35.73,23.93 L35.12,20.5 L14.27,33.96 Z" />
-    </svg>
-  );
-}
-
 // Ecosystem section — icons only, no titles, no descriptions.
 // Just a clean strip of brand marks showing 'plays with these tools'.
-function EcosystemSection() {
-  const logos: Array<{
-    name: string;
-    color: string;
-    render: (cls: string) => ReactNode;
-  }> = [
-    { name: "Multica AI", color: "#f5f3ed", render: (cls) => <MulticaBrandReal className={cls} /> },
-    { name: "Paperclip AI", color: "#0092b7", render: (cls) => <PaperclipBrandReal className={cls} /> },
-    { name: "OpenClaw", color: "#ff4d4d", render: (cls) => <OpenClawBrand className={cls} /> },
-    { name: "Hermes AI", color: "#c4a8ff", render: (cls) => <HermesBrand className={cls} /> },
-    { name: "MCP", color: "#5fbfff", render: (cls) => <McpIcon className={cls} /> },
-    { name: "Telegram", color: "#229ED9", render: (cls) => <SimpleIcon icon={siTelegram} className={cls} /> },
-  ];
-  return (
-    <section
-      id="ecosystem"
-      className="relative border-t border-border-soft py-24 md:py-28"
-    >
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
-              Ecosystem
-            </p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-              Plays well with{" "}
-              <span className="font-serif italic text-text-soft">your stack.</span>
-            </h2>
-          </div>
-        </FadeIn>
-
-        {/* Icons-only strip — no titles, no descriptions, just marks */}
-        <FadeIn delay={0.15}>
-          <div className="mt-16 grid grid-cols-3 gap-3 md:grid-cols-6 md:gap-4">
-            {logos.map((it) => (
-              <div
-                key={it.name}
-                title={it.name}
-                className="group flex aspect-square items-center justify-center rounded-xl border border-border-soft bg-surface-0 transition-all hover:border-border hover:bg-surface-1 hover:-translate-y-1"
-                style={{ color: it.color }}
-              >
-                <div className="opacity-80 transition-opacity group-hover:opacity-100">
-                  {it.render("h-10 w-10 md:h-12 md:w-12")}
-                </div>
-              </div>
-            ))}
-          </div>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // DOWNLOAD / INSTALL section — native Mac app
 
@@ -2467,17 +1163,17 @@ function DownloadSection() {
           <FadeIn delay={0.05}>
             <div
               id="desktop"
-              className="group relative h-full overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8"
+              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8"
             >
               <div className="shimmer absolute inset-x-0 top-0 h-px" />
               <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                <Folder className="h-4 w-4" />
+                <SimpleIcon icon={siApple} className="h-4 w-4" />
                 Desktop · macOS arm64
               </div>
               <h3 className="mt-5 text-3xl font-bold tracking-tight">
                 Prevail.app
               </h3>
-              <p className="mt-3 text-text-soft">
+              <p className="mt-3 mb-8 text-text-soft">
                 Native Mac app. v{version}. Self-contained, no terminal required.
                 Signed &amp; notarized by Apple: opens like any Mac app.
               </p>
@@ -2485,7 +1181,7 @@ function DownloadSection() {
               <a
                 href={dmg.url}
                 download={dmg.name}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
                 Download .dmg
@@ -2511,22 +1207,21 @@ function DownloadSection() {
             <div className="group relative h-full overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8">
               <div className="shimmer absolute inset-x-0 top-0 h-px" />
               <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                <Folder className="h-4 w-4" />
+                <WindowsMark className="h-4 w-4" />
                 Desktop · Windows x64
               </div>
               <h3 className="mt-5 text-3xl font-bold tracking-tight">
                 Prevail for Windows
               </h3>
-              <p className="mt-3 text-text-soft">
+              <p className="mt-3 mb-8 text-text-soft">
                 Same app, same vault. v{version}. NSIS installer, no terminal
-                required. (Unsigned for now: Windows SmartScreen may warn on first
-                run; click More info : Run anyway.)
+                required. Unsigned for now; SmartScreen may warn at first.
               </p>
 
               <a
                 href={exe.url}
                 download={exe.name}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
                 Download installer
@@ -2562,11 +1257,15 @@ const FAQ = [
   },
   {
     q: "Does my data leave my Mac?",
-    a: "Your vault stays on your machine. Prevail spawns whichever AI CLIs you've already logged into. Want zero network? Set the council to Ollama-only.",
+    a: "Your vault always stays on your Mac, in plain files you own. Whether anything leaves is your call: Bunker Mode keeps everything on-device with local models; Cloud Mode sends your prompts to the frontier models you pick. You choose, per question.",
   },
   {
-    q: "Which CLIs work?",
-    a: "Claude Code, Codex, Antigravity (Google's agy), and Ollama. Auto-detected at startup. Add or remove from any council with one click.",
+    q: "Bunker Mode or Cloud Mode?",
+    a: "Bunker Mode runs entirely on local models (via Ollama): nothing leaves your machine. Cloud Mode brings in the frontier, Claude, GPT, Gemini, when you want their horsepower. Same vault, same council, you decide how private versus how powerful.",
+  },
+  {
+    q: "Which models can sit on the council?",
+    a: "Claude, Codex, Gemini, and local Ollama models, auto-detected at startup. You pick who's on the council for any given question, and a chair model you choose writes the verdict.",
   },
   {
     q: "Do I have to use the desktop app?",
@@ -2628,6 +1327,7 @@ function FAQSection() {
 
 function Footer() {
   const dmg = useDmgDownload();
+  const [showLegal, setShowLegal] = useState(false);
   return (
     <footer className="border-t border-border-soft bg-surface-0">
       <div className="mx-auto max-w-6xl px-6 py-16">
@@ -2687,22 +1387,113 @@ function Footer() {
             </div>
           ))}
         </div>
+        <div className="mt-14 border-t border-border-soft pt-12">
+          <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
+            Part of a family of private, local-first tools
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                name: "Memosa",
+                tagline: "Private meeting memory for Mac",
+                href: "https://memosa.dev/",
+                tile: <span className="font-serif text-xl font-semibold text-[#5fd0a8]">M</span>,
+                tileClass: "bg-[#0c0c0e]",
+              },
+              {
+                name: "Prevail",
+                tagline: "A private AI that learns you, local-first",
+                href: null,
+                tile: <Logo size={22} />,
+                tileClass: "bg-[#0c0c0e]",
+              },
+              {
+                name: "AI Ready U",
+                tagline: "Score and grow your AI readiness",
+                href: "https://aireadyu.dev/",
+                tile: <span className="text-xl font-bold text-white">U</span>,
+                tileClass: "bg-[#2f9e6f]",
+              },
+            ].map((f) => {
+              const inner = (
+                <div
+                  className={`flex h-full items-center gap-4 rounded-2xl border p-5 transition-colors ${
+                    f.href ? "border-border-soft hover:border-border hover:bg-surface-1" : "border-gold-border/60 bg-surface-1"
+                  }`}
+                >
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${f.tileClass}`}>
+                    {f.tile}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 font-semibold">
+                      {f.name}
+                      {f.href ? (
+                        <ArrowRight className="h-3.5 w-3.5 text-text-mute" />
+                      ) : (
+                        <span className="font-mono text-[9px] uppercase tracking-wider text-gold">you're here</span>
+                      )}
+                    </div>
+                    <div className="mt-0.5 text-sm text-text-soft">{f.tagline}</div>
+                  </div>
+                </div>
+              );
+              return f.href ? (
+                <a key={f.name} href={f.href} target="_blank" rel="noreferrer">{inner}</a>
+              ) : (
+                <div key={f.name}>{inner}</div>
+              );
+            })}
+          </div>
+        </div>
         <div className="mt-14 border-t border-border-soft pt-12 text-center">
           <p className="font-serif text-2xl italic text-text-soft md:text-3xl">
             Ask a council. <span className="not-italic text-gold">Prevail.</span>
           </p>
         </div>
-        <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-text-mute">
-          Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
-          without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
-          Bunker Mode is on, may send data to cloud providers, so always review anything important yourself. Feedback
-          and bug reports are very welcome and directly shape what comes next.
-        </p>
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setShowLegal(true)}
+            className="text-xs text-text-mute underline-offset-2 hover:text-text-soft hover:underline"
+          >
+            Disclaimer, privacy &amp; legal
+          </button>
+        </div>
         <div className="mt-6 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
           <span>© 2026 Prevail.sh · built local, shipped open · alpha</span>
           <span>Built with Tauri · React · Tailwind · Rust</span>
         </div>
       </div>
+
+      {showLegal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLegal(false)} />
+          <div className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface-0 p-7 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Disclaimer, privacy &amp; legal</h3>
+              <button
+                onClick={() => setShowLegal(false)}
+                aria-label="Close"
+                className="rounded-md p-1 text-text-mute hover:bg-surface-1 hover:text-text"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-text-soft">
+              Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
+              without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
+              Bunker Mode is on, may send data to cloud providers, so always review anything important yourself.
+              Feedback and bug reports are very welcome and directly shape what comes next.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-text-soft">
+              Prevail is free, open-source software released under the GNU General Public License v3.0. Your vault
+              lives on your Mac in plain files you own. In Bunker Mode nothing leaves your machine; in Cloud Mode
+              your prompts go to the model providers you choose. The app collects no telemetry unless you opt in.
+              This marketing site uses Google Analytics. Ratings and the user count shown elsewhere on this site
+              are illustrative.
+            </p>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }
@@ -2710,349 +1501,14 @@ function Footer() {
 // ─────────────────────────────────────────────────────────────────────────────
 // DESKTOP SHOWCASE — real product shots of Prevail Desktop
 
-const DESKTOP_VIEWS = [
-  {
-    src: "/desktop-council.png",
-    label: "Council",
-    caption: "Four engines answer in parallel; the chair writes one verdict.",
-  },
-  {
-    src: "/desktop-benchmark.png",
-    label: "Benchmark",
-    caption: "Grade every model against your real decisions.",
-  },
-  {
-    src: "/desktop-chat.png",
-    label: "Chat",
-    caption: "One engine, streaming: switch with a slash.",
-  },
-  {
-    src: "/desktop-settings.png",
-    label: "Settings",
-    caption: "Telegram bridge, MCP server, palettes.",
-  },
-];
-
-function DesktopShowcase() {
-  const [active, setActive] = useState(0);
-  const view = DESKTOP_VIEWS[active];
-  return (
-    <section
-      id="desktop-app"
-      className="relative border-t border-border-soft py-24 md:py-32 grain"
-    >
-      <div className="glow-gold absolute inset-0 -z-10 opacity-40" />
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">
-            Prevail Desktop
-          </p>
-          <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-            The cockpit,{" "}
-            <span className="font-serif italic text-text-soft">
-              no terminal required.
-            </span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-text-soft">
-            A native macOS app over the same vault: click through it.
-          </p>
-        </div>
-
-        {/* tabs */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2">
-          {DESKTOP_VIEWS.map((v, i) => (
-            <button
-              key={v.label}
-              onClick={() => setActive(i)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                i === active
-                  ? "bg-gold text-bg"
-                  : "border border-border bg-surface-0 text-text-soft hover:text-text"
-              }`}
-            >
-              {v.label}
-            </button>
-          ))}
-        </div>
-
-        {/* big active preview — always visible, crossfades on switch */}
-        <div className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-2xl">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={active}
-              src={view.src}
-              alt={`Prevail Desktop · ${view.label}`}
-              className="block w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: EASE }}
-            />
-          </AnimatePresence>
-        </div>
-        <p className="mt-4 text-center text-sm text-text-soft">
-          <span className="font-medium text-text">{view.label}.</span>{" "}
-          {view.caption}
-        </p>
-
-        {/* thumbnails — click to focus */}
-        <div className="mt-6 grid grid-cols-4 gap-3 md:gap-4">
-          {DESKTOP_VIEWS.map((v, i) => (
-            <button
-              key={v.label}
-              onClick={() => setActive(i)}
-              aria-label={`Show ${v.label}`}
-              className={`overflow-hidden rounded-lg border-2 transition-all ${
-                i === active
-                  ? "border-gold"
-                  : "border-border opacity-60 hover:opacity-100"
-              }`}
-            >
-              <img src={v.src} alt="" className="block w-full" loading="lazy" />
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-12 flex justify-center">
-          <a
-            href="#install"
-            className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-            style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-          >
-            Download Prevail.app
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // USE CASES — the questions people point the council at
 
 // Brand color per engine — shared by the header dots and the panel rows so a
 // model is always the same hue wherever it appears.
-const MODEL_COLOR: Record<string, string> = {
-  claude: "#c4a35a",
-  codex: "#5fbfff",
-  antigravity: "#6ee787",
-  ollama: "#c4a8ff",
-};
-const COUNCIL_DOTS = (["claude", "codex", "antigravity", "ollama"] as const).map(
-  (n) => ({ n, c: MODEL_COLOR[n] }),
-);
-
 // Each card shows the panel disagreeing (`panel`), the crux of the split
 // (`split`), then the chair's synthesized call (`verdict`). `lean` is the
 // one-word stance used to tint each row so agreement/dissent reads at a glance.
-const USE_CASES = [
-  {
-    icon: Wallet,
-    domain: "wealth",
-    q: "Prepay the mortgage or invest the cash?",
-    panel: [
-      { m: "claude", lean: "invest", s: "Invest: the 22-yr horizon wins." },
-      { m: "codex", lean: "invest", s: "Invest, but floor cash at 6 months." },
-      { m: "antigravity", lean: "invest", s: "Only with a 12-month buffer." },
-      { m: "ollama", lean: "prepay", s: "Prepay: a guaranteed 6.2%." },
-    ],
-    split: "Codex floors cash at 6 months; Antigravity wants 12.",
-    verdict:
-      "Invest: if you hold ≥6 months liquidity and can ride a −30% drawdown. Else prepay.",
-  },
-  {
-    icon: Receipt,
-    domain: "tax",
-    q: "What should I move before year-end?",
-    panel: [
-      { m: "claude", lean: "convert", s: "Mega-backdoor before anything else." },
-      { m: "codex", lean: "harvest", s: "Harvest the losses first." },
-      { m: "antigravity", lean: "convert", s: "Roth up to the 24% ceiling." },
-      { m: "ollama", lean: "defer", s: "Defer: bunch it into next year." },
-    ],
-    split: "Claude flags the mega-backdoor; Codex prioritizes the harvest.",
-    verdict:
-      "Convert to the top of the 24% bracket, then harvest losses to soften the income.",
-  },
-  {
-    icon: HeartPulse,
-    domain: "health",
-    q: "Statin now, or lifestyle first?",
-    panel: [
-      { m: "claude", lean: "lifestyle", s: "Lifestyle for 90 days." },
-      { m: "codex", lean: "statin", s: "Start a low-dose statin now." },
-      { m: "antigravity", lean: "lifestyle", s: "Lifestyle, then recheck ApoB." },
-      { m: "ollama", lean: "lifestyle", s: "Lifestyle: labs stay local." },
-    ],
-    split: "Run Ollama-only so your labs never leave the machine.",
-    verdict:
-      "Lifestyle for 90 days first: your ApoB and calcium score allow the window.",
-  },
-  {
-    icon: Briefcase,
-    domain: "career",
-    q: "Take the offer, or counter?",
-    panel: [
-      { m: "claude", lean: "counter", s: "Counter: anchor on scope." },
-      { m: "codex", lean: "counter", s: "Counter: your runway holds." },
-      { m: "antigravity", lean: "accept", s: "Take it: the relationship matters." },
-      { m: "ollama", lean: "counter", s: "Counter, push the base." },
-    ],
-    split: "Codex weighs runway; Antigravity weighs the relationship.",
-    verdict:
-      "Counter: your BATNA is stronger than the offer assumes. Anchor on scope, not title.",
-  },
-  {
-    icon: Building2,
-    domain: "real estate",
-    q: "Sell the condo, or rent it out?",
-    panel: [
-      { m: "claude", lean: "rent", s: "Rent: appreciation is ahead." },
-      { m: "codex", lean: "rent", s: "Rent, but cap the landlord cost." },
-      { m: "antigravity", lean: "sell", s: "Sell: tenant risk is real." },
-      { m: "ollama", lean: "rent", s: "Rent only if you go hands-off." },
-    ],
-    split: "The panel splits on your tolerance for tenant risk.",
-    verdict:
-      "Rent: appreciation is likely and landlord cost is contained. Sell only to harvest gains.",
-  },
-  {
-    icon: Compass,
-    domain: "big calls",
-    q: "Should we relocate for the job?",
-    panel: [
-      { m: "claude", lean: "maybe", s: "Only if the comp clears the cost." },
-      { m: "codex", lean: "maybe", s: "Model the 5-year delta first." },
-      { m: "antigravity", lean: "caution", s: "Weigh the social cost heavily." },
-      { m: "ollama", lean: "maybe", s: "Name the number, then decide." },
-    ],
-    split: "Exactly where a council beats a single voice.",
-    verdict:
-      "Only if the five-year comp delta clears the social cost. Name the number first.",
-  },
-];
-
-function UseCasesSection() {
-  return (
-    <section
-      id="use-cases"
-      className="relative border-t border-border-soft py-24 md:py-32"
-    >
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
-            Use cases
-          </p>
-          <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-            The questions with{" "}
-            <span className="font-serif italic text-text-soft">
-              no clean answer.
-            </span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Four engines weigh in, the disagreement laid bare: then one
-            verdict. Here's the council at work across a life.
-          </p>
-        </FadeIn>
-
-        <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {USE_CASES.map((u, i) => {
-            const Icon = u.icon;
-            return (
-              <FadeIn key={u.domain} delay={i * 0.05}>
-                <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface-0 transition-all hover:border-gold-border hover:-translate-y-1">
-                  {/* header: domain + the four engines */}
-                  <div className="flex items-center justify-between border-b border-border-soft px-6 py-4">
-                    <div className="flex items-center gap-2.5">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-gold-border bg-gold-soft text-gold">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span className="text-xs font-medium uppercase tracking-[0.16em] text-text-mute">
-                        {u.domain}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5" title="claude · codex · antigravity · ollama">
-                      {COUNCIL_DOTS.map((d) => (
-                        <span
-                          key={d.n}
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: d.c }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* question */}
-                  <div className="px-6 pt-5">
-                    <p className="font-mono text-[15px] leading-snug text-text">
-                      <span className="text-gold">›</span> {u.q}
-                    </p>
-                  </div>
-
-                  {/* panel — the four engines disagree, in their own colors */}
-                  <div className="px-6 pt-5">
-                    <div className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-text-mute">
-                      The panel
-                    </div>
-                    <ul className="space-y-2.5">
-                      {u.panel.map((p) => {
-                        const c = MODEL_COLOR[p.m];
-                        return (
-                          <li key={p.m} className="flex items-start gap-2.5">
-                            <span
-                              className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full"
-                              style={{ background: c }}
-                            />
-                            <span
-                              className="w-[74px] shrink-0 font-mono text-[10px] uppercase tracking-wide"
-                              style={{ color: c }}
-                            >
-                              {p.m}
-                            </span>
-                            <span className="flex-1 text-[12.5px] leading-snug text-text-soft">
-                              {p.s}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-
-                  {/* split + verdict, pinned to the bottom so they line up
-                      across the row regardless of panel height */}
-                  <div className="mt-auto px-6 pb-5 pt-5">
-                    <div className="mb-3 flex items-start gap-2 text-xs leading-relaxed text-text-mute">
-                      <span className="text-ai">▸</span>
-                      <span>{u.split}</span>
-                    </div>
-                    <div className="rounded-xl border border-gold-border bg-gold-soft p-4">
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
-                        <Scale className="h-3.5 w-3.5" />
-                        Verdict
-                      </div>
-                      <p className="mt-2 text-sm leading-relaxed text-text">
-                        {u.verdict}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </FadeIn>
-            );
-          })}
-        </div>
-
-        <FadeIn delay={0.2}>
-          <p className="mx-auto mt-12 max-w-xl text-center text-sm text-text-mute">
-            Every verdict lands in dated markdown you own: searchable forever,
-            synced however you like.
-          </p>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Root
 
@@ -3106,270 +1562,293 @@ function DemoVideo() {
 
 // Minimal Odysseus mark — no official logo, so a clean monochrome sail-on-wave
 // glyph (currentColor) for the "external alternative" card. Geometric only.
-function OdysseusMark({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-label="Odysseus">
-      {/* mast */}
-      <line x1="12" y1="3" x2="12" y2="17" />
-      {/* sail */}
-      <path d="M12 4 L19 14 L12 14 Z" fill="currentColor" stroke="none" />
-      {/* hull */}
-      <path d="M5 17 L19 17 L17 20 L7 20 Z" />
-      {/* wave */}
-      <path d="M3 22 Q6 20.5 9 22 T15 22 T21 22" strokeWidth="1.3" />
-    </svg>
-  );
-}
-
 // Each product is a COLUMN. `blurb` is the short 1–2 sentence description that
 // sits under the logo in the header. `hero` lights Prevail's column gold.
-const COMPARE_COLS: Array<{
-  key: string;
-  name: ReactNode;
-  tint: string;
-  blurb: string;
-  surface: string;
-  hero?: boolean;
-  external?: boolean;
-  render: (cls: string) => ReactNode;
-}> = [
-  {
-    key: "prevail",
-    name: <Brand />,
-    tint: "#C4A35A",
-    hero: true,
-    blurb: "The council cockpit. One question, every model, one verdict: with the disagreement laid bare.",
-    surface: "Terminal · desktop",
-    render: () => <Logo size={26} />,
-  },
-  {
-    key: "openclaw",
-    name: "OpenClaw",
-    tint: "#ff4d4d",
-    blurb: "The phone gateway. Reach the same vault from anywhere over Telegram.",
-    surface: "Telegram",
-    render: (cls) => <OpenClawBrand className={cls} />,
-  },
-  {
-    key: "paperclip",
-    name: "Paperclip",
-    tint: "#0092b7",
-    blurb: "The background crew. Autonomous agents that work your domains between decisions.",
-    surface: "Always-on",
-    render: (cls) => <PaperclipBrandReal className={cls} />,
-  },
-  {
-    key: "hermes",
-    name: "Hermes",
-    tint: "#c4a8ff",
-    blurb: "An AI agent on the shared ~/.ai layer.",
-    surface: "Agent",
-    render: (cls) => <HermesBrand className={cls} />,
-  },
-  {
-    key: "multica",
-    name: "Multica",
-    tint: "#f5f3ed",
-    blurb: "An AI agent on the shared ~/.ai layer.",
-    surface: "Agent",
-    render: (cls) => <MulticaBrandReal className={cls} />,
-  },
-  {
-    key: "odysseus",
-    name: "Odysseus",
-    tint: "#5fbfff",
-    external: true,
-    blurb: "The all-in-one alternative. A self-hosted workspace you stand up with Docker and a GPU.",
-    surface: "Browser · self-hosted",
-    render: (cls) => <OdysseusMark className={cls} />,
-  },
-];
-
 // Cell value: true = full, "part" = partial/indirect, false = absent.
-type Cell = boolean | "part";
-const COMPARE_FEATURES: Array<{ label: string; vals: Record<string, Cell> }> = [
+// #RRGGBB → rgba(), for the per-brand color bands and glows applied inline.
+// ─────────────────────────────────────────────────────────────────────────────
+// THESIS PAGE — why Prevail exists. A quiet manifesto, one belief per block.
+
+// Aspirational social-proof figures. NOT real yet — surfaced with an explicit
+// "illustrative" label (here and in the footer disclaimer). Edit to the real
+// numbers once they exist; the live GitHub-star count beside them is always true.
+const ILLUSTRATIVE = { users: "5,000+", rating: "4.9" };
+
+const THESES = [
   {
-    label: "Multi-model council + synthesized verdict",
-    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+    title: "AI for your life will matter more than AI for your work.",
+    body: "Everyone is racing to build AI for code, email, and the office. The bigger prize is the AI that helps with the decisions that actually shape a life: money, health, family, career. The hard calls you only get to make once.",
   },
   {
-    label: "Surfaces where the models disagree",
-    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+    title: "Context compounds.",
+    body: "An AI that knows your whole life gets more useful the longer you use it. Most assistants start from zero every session. Prevail keeps a durable record of who you are and what you've decided, and feeds it forward, so every answer is sharper than the last.",
   },
   {
-    label: "Benchmarks new models on your real decisions",
-    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+    title: "Everyone deserves a council of advisors.",
+    body: "The wealthy keep lawyers, accountants, doctors, and wealth managers on call. AI can give everyone that same caliber of counsel, in private, for the cost of the electricity. A panel of the best models, not a single guess.",
   },
   {
-    label: "Frameworks & lenses, per domain",
-    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: false },
+    title: "Your context is the most valuable thing you own, so it should never leave your machine.",
+    body: "The industry default is \"send us everything.\" We think that's backwards: the intelligence should come to your data, not your data to the intelligence. Local-first isn't a feature, it's the moral position. Your vault stays on your Mac, in plain files you can read and delete.",
   },
   {
-    label: "Your vault: plain markdown you own",
-    vals: { prevail: true, openclaw: true, paperclip: true, hermes: true, multica: true, odysseus: false },
-  },
-  {
-    label: "Shares the ~/.ai knowledge layer",
-    vals: { prevail: true, openclaw: true, paperclip: true, hermes: true, multica: true, odysseus: false },
-  },
-  {
-    label: "Ask from your phone",
-    vals: { prevail: true, openclaw: true, paperclip: false, hermes: false, multica: false, odysseus: "part" },
-  },
-  {
-    label: "Autonomous background agents",
-    vals: { prevail: false, openclaw: false, paperclip: true, hermes: true, multica: "part", odysseus: true },
-  },
-  {
-    label: "Local-first: no server, no Docker",
-    vals: { prevail: true, openclaw: true, paperclip: "part", hermes: "part", multica: "part", odysseus: false },
-  },
-  {
-    label: "All-in-one email · calendar · image tools",
-    vals: { prevail: false, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: true },
-  },
-  {
-    label: "Open source (GPL-3.0)",
-    vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: "part" },
+    title: "Your life deserves the same rigor as your code.",
+    body: "We version, test, and peer-review our software. Our biggest personal decisions get a gut feeling at 11pm. That asymmetry is absurd. Prevail brings structure, a second opinion, and a durable record to the choices that matter most.",
   },
 ];
 
-// #RRGGBB → rgba(), for the per-brand color bands and glows applied inline.
-function rgba(hex: string, a: number) {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
-
-function CompareCell({ value, tint }: { value: Cell; tint: string }) {
-  if (value === true) {
-    return (
-      <span
-        className="text-lg font-bold"
-        style={{ color: tint, textShadow: `0 0 16px ${rgba(tint, 0.5)}` }}
-        aria-label="yes"
-      >
-        ✓
-      </span>
-    );
-  }
-  if (value === "part") {
-    return (
-      <span className="text-sm font-medium" style={{ color: rgba(tint, 0.6) }} aria-label="partial">
-        ○
-      </span>
-    );
-  }
+function SocialProof({ center = true, showMeta = true }: { center?: boolean; showMeta?: boolean }) {
+  // Illustrative avatars: generated illustrated portraits (DiceBear), not stock
+  // photos of real people who aren't users. Honest placeholder, and the count /
+  // ratings beside them are explicitly labelled illustrative below.
+  const avatars = ["Aria", "Marcus", "Sofia", "Devin", "Priya"].map(
+    (seed) => `https://api.dicebear.com/9.x/micah/svg?seed=${seed}&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`,
+  );
   return (
-    <span className="text-text-mute/30" aria-label="no">
-      –
-    </span>
+    <FadeIn>
+      <div className={`flex max-w-xl flex-col gap-3 ${center ? "mx-auto items-center" : "items-start"}`}>
+        <div className="flex items-center gap-4">
+          <div className="flex -space-x-2.5">
+            {avatars.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                loading="lazy"
+                className="h-9 w-9 rounded-full bg-surface-2 ring-2 ring-bg"
+              />
+            ))}
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />
+              ))}
+              <span className="ml-1 text-sm font-semibold">{ILLUSTRATIVE.rating}</span>
+            </div>
+            <div className="text-sm text-text-soft">
+              Loved by {ILLUSTRATIVE.users} early users
+            </div>
+          </div>
+        </div>
+        {showMeta && (
+          <div className="flex items-center gap-3">
+            <GitHubStarButton size="sm" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">
+              ratings &amp; count illustrative
+            </span>
+          </div>
+        )}
+      </div>
+    </FadeIn>
   );
 }
 
-function ComparisonSection() {
+function ThesisPage() {
+  const dmg = useDmgDownload();
   return (
-    <section id="compare" className="border-t border-border-soft py-24 md:py-32">
+    <main className="pt-14">
+      <section className="relative overflow-hidden py-24 md:py-32 grain">
+        <div className="glow-gold absolute inset-0 -z-10 opacity-30" />
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <FadeIn>
+            <p className="text-xs uppercase tracking-[0.2em] text-gold">Why <Brand /> exists</p>
+            <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-semibold leading-[1.1] tracking-[-0.02em] md:text-6xl">
+              A private intelligence for every person,{" "}
+              <span className="font-serif italic text-text-soft">that compounds for a lifetime.</span>
+            </h1>
+            <p className="mx-auto mt-7 max-w-xl text-lg text-text-soft">
+              Prevail is a bet on a simple idea: the most important AI you ever use
+              won't be the one at work. It'll be the one that knows your life, and
+              keeps it yours.
+            </p>
+          </FadeIn>
+          <div className="mt-10">
+            <SocialProof />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border-soft py-8 md:py-12">
+        <div className="mx-auto max-w-3xl px-6">
+          {THESES.map((t, i) => (
+            <FadeIn key={t.title} delay={i * 0.04}>
+              <div className="flex gap-6 border-b border-border-soft py-12 last:border-b-0 md:gap-10">
+                <div className="font-serif text-4xl italic text-gold md:text-5xl">{String(i + 1).padStart(2, "0")}</div>
+                <div>
+                  <h2 className="text-2xl font-semibold leading-snug tracking-[-0.01em] md:text-3xl">{t.title}</h2>
+                  <p className="mt-4 text-lg leading-relaxed text-text-soft">{t.body}</p>
+                </div>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-border-soft py-20 md:py-28 grain">
+        <div className="mx-auto max-w-2xl px-6 text-center">
+          <FadeIn>
+            <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-4xl">
+              Start your vault. <span className="font-serif italic text-text-soft">It only compounds from here.</span>
+            </h2>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <a
+                href={dmg.url}
+                className="inline-flex items-center gap-2 rounded-md bg-gold px-6 py-3 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                style={{ boxShadow: "0 4px 24px rgba(196, 163, 90, 0.25)" }}
+              >
+                <Download className="h-4 w-4" /> Download for macOS
+              </a>
+              <a href="/" className="inline-flex items-center gap-1.5 rounded-md border border-border-soft px-6 py-3 text-sm text-text-soft hover:text-text">
+                Back to home <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIFE DOMAINS — radial constellation of the life areas Prevail covers.
+
+const LIFE_DOMAINS: { label: string; Icon: typeof Heart }[] = [
+  { label: "Health", Icon: Heart },
+  { label: "Wealth", Icon: TrendingUp },
+  { label: "Tax", Icon: Receipt },
+  { label: "Career", Icon: Briefcase },
+  { label: "Benefits", Icon: Gift },
+  { label: "Home", Icon: Home },
+  { label: "Insure", Icon: ShieldCheck },
+  { label: "Calendar", Icon: Calendar },
+  { label: "Records", Icon: FileText },
+  { label: "Family", Icon: Users },
+  { label: "Learning", Icon: GraduationCap },
+  { label: "Chief", Icon: Crown },
+];
+
+const VAULT_QUESTIONS = [
+  { q: "Which of my documents are about to expire?", tag: "Records" },
+  { q: "Can I afford to take three months off?", tag: "Wealth" },
+  { q: "What should I ask at my next review?", tag: "Career" },
+  { q: "Is this insurance policy still worth keeping?", tag: "Insure" },
+];
+
+function LifeDomains() {
+  const [qi, setQi] = useState(0);
+  const [active, setActive] = useState(0);
+  const reduce = useReducedMotion();
+  const N = LIFE_DOMAINS.length;
+  useEffect(() => {
+    if (reduce) return;
+    const tq = setInterval(() => setQi((n) => (n + 1) % VAULT_QUESTIONS.length), 3200);
+    const ta = setInterval(() => setActive((a) => (a + 1) % N), 1500);
+    return () => { clearInterval(tq); clearInterval(ta); };
+  }, [reduce, N]);
+  const R = 40;
+  const nodes = LIFE_DOMAINS.map((d, i) => {
+    const ang = ((-90 + i * (360 / N)) * Math.PI) / 180;
+    return { ...d, x: 50 + R * Math.cos(ang), y: 50 + R * Math.sin(ang) };
+  });
+  return (
+    <section className="border-t border-border-soft py-24 md:py-28">
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
-          <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
-              Where it fits
-            </p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-              The whole board,{" "}
-              <span className="font-serif italic text-text-soft">side by side.</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-text-soft">
-              <Brand /> is the seat you sit in. The others are the crew around it -
-              and the one heavyweight you'd self-host instead. Here's what each one
-              actually brings.
-            </p>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">One place for all of it</p>
+          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            Your whole life, <span className="font-serif italic text-text-soft">one domain at a time.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-center text-text-soft">
+            Prevail organizes your life into domains, each a folder the council can reason over. Start with one, or all of them.
+          </p>
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <div className="relative mx-auto mt-14 aspect-square w-full max-w-[560px]">
+            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
+              {nodes.map((n, i) => (
+                <line
+                  key={n.label}
+                  x1="50"
+                  y1="50"
+                  x2={n.x}
+                  y2={n.y}
+                  stroke="currentColor"
+                  strokeWidth={active === i ? 0.35 : 0.2}
+                  strokeDasharray="0.9 0.9"
+                  className={`transition-all duration-500 ${active === i ? "text-gold/60" : "text-border"}`}
+                />
+              ))}
+              {/* pulses flowing from each domain into "You" */}
+              {!reduce && nodes.map((n, i) => (
+                <motion.circle
+                  key={`pulse-${n.label}`}
+                  r="0.75"
+                  className="fill-gold"
+                  initial={{ cx: n.x, cy: n.y, opacity: 0 }}
+                  animate={{ cx: 50, cy: 50, opacity: [0, 0.9, 0] }}
+                  transition={{ duration: 2.1, repeat: Infinity, ease: "easeIn", delay: (i / N) * 2.1 }}
+                />
+              ))}
+            </svg>
+
+            {/* breathing glow behind center */}
+            {!reduce && (
+              <motion.span
+                className="absolute left-1/2 top-1/2 -z-0 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{ width: "34%", height: "34%", background: "radial-gradient(circle, rgba(196,163,90,0.28), transparent 70%)" }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.25, 0.6] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                aria-hidden
+              />
+            )}
+
+            <div className="absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-gold-border bg-surface-1 shadow-lg md:h-24 md:w-24">
+              <Logo size={26} />
+              <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">You</span>
+            </div>
+
+            {nodes.map((n, i) => {
+              const Icon = n.Icon;
+              const on = active === i;
+              return (
+                <div
+                  key={n.label}
+                  className="group absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
+                  style={{ left: `${n.x}%`, top: `${n.y}%` }}
+                >
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0, scale: 0.4 }}
+                    whileInView={reduce ? undefined : { opacity: 1, scale: 1 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ delay: 0.25 + i * 0.05, type: "spring", stiffness: 220, damping: 18 }}
+                    className={`flex h-11 w-11 items-center justify-center rounded-full border bg-surface-0 transition-all duration-500 md:h-12 md:w-12 group-hover:border-gold-border group-hover:text-gold ${
+                      on ? "border-gold-border text-gold shadow-[0_0_18px_rgba(196,163,90,0.35)]" : "border-border-soft text-text-soft"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </motion.div>
+                  <span className={`font-mono text-[9px] uppercase tracking-[0.14em] transition-colors duration-500 md:text-[10px] ${on ? "text-gold" : "text-text-mute"}`}>
+                    {n.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </FadeIn>
-
         <FadeIn delay={0.15}>
-          <div className="mt-14 overflow-x-auto rounded-2xl border border-border-soft">
-            <table className="w-full min-w-[920px] border-collapse text-left">
-              <thead>
-                <tr>
-                  <th className="w-[26%] border-b border-border-soft p-4 align-bottom" />
-                  {COMPARE_COLS.map((col) => (
-                    <th
-                      key={col.key}
-                      className="border-b border-l border-border-soft p-4 align-top"
-                      style={{
-                        background: `linear-gradient(to bottom, ${rgba(col.tint, col.hero ? 0.22 : 0.12)}, ${rgba(col.tint, 0.02)})`,
-                        borderTop: `3px solid ${col.tint}`,
-                      }}
-                    >
-                      <div className="flex flex-col items-center text-center">
-                        <div
-                          className="flex h-11 w-11 items-center justify-center rounded-xl border"
-                          style={{
-                            color: col.tint,
-                            borderColor: rgba(col.tint, 0.5),
-                            background: rgba(col.tint, 0.12),
-                            boxShadow: `0 0 22px ${rgba(col.tint, 0.25)}`,
-                          }}
-                        >
-                          {col.render("h-6 w-6")}
-                        </div>
-                        <span
-                          className="mt-3 text-sm font-semibold tracking-[-0.01em]"
-                          style={{ color: col.tint }}
-                        >
-                          {col.name}
-                        </span>
-                        <span className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-text-mute">
-                          {col.surface}
-                        </span>
-                        <span className="mt-2 text-[11px] leading-snug text-text-soft">
-                          {col.blurb}
-                        </span>
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARE_FEATURES.map((feat) => (
-                  <tr key={feat.label} className="group">
-                    <th
-                      scope="row"
-                      className="border-b border-border-soft p-4 text-sm font-medium text-text-soft transition-colors group-hover:text-text"
-                    >
-                      {feat.label}
-                    </th>
-                    {COMPARE_COLS.map((col) => (
-                      <td
-                        key={col.key}
-                        className="border-b border-l border-border-soft p-4 text-center"
-                        style={{ background: rgba(col.tint, col.hero ? 0.1 : 0.05) }}
-                      >
-                        <CompareCell value={feat.vals[col.key]} tint={col.tint} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={0.2}>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-text-mute">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="font-bold text-gold">✓</span> full
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="text-text-soft">○</span> partial / indirect
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="text-text-mute/60">–</span> not built for it
-            </span>
+          <div className="mx-auto mt-12 max-w-md text-center">
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-mute">Ask your vault</div>
+            <motion.p
+              key={qi}
+              initial={reduce ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="mt-3 text-lg italic text-text-soft md:text-xl"
+            >
+              "{VAULT_QUESTIONS[qi].q}"
+            </motion.p>
+            <span className="mt-3 inline-block rounded-full border border-border-soft px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold">{VAULT_QUESTIONS[qi].tag}</span>
           </div>
         </FadeIn>
       </div>
@@ -3377,8 +1856,93 @@ function ComparisonSection() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// DIFFERENTIATORS — the genuinely unique stuff: a council you assemble,
+// self-learning memory, proactive loops, and Bunker/Cloud control.
+
+const DIFFERENTIATORS = [
+  {
+    Icon: Users,
+    color: "#c4a35a",
+    title: "A council you assemble",
+    body: "Pick which models sit on the council. They answer in parallel, a chair you choose writes one verdict, and the panel shows exactly where they disagreed.",
+  },
+  {
+    Icon: Sparkles,
+    color: "#5fbfff",
+    title: "It learns you, not just your question",
+    body: "Every decision is captured the moment you make it and distilled into living memory. The next answer already knows what you decided last time.",
+  },
+  {
+    Icon: Target,
+    color: "#6ee787",
+    title: "It works toward your goals",
+    body: "Proactive loops, reminders, and generated tasks pursue what matters in the background. It doesn't just respond, it follows up.",
+  },
+  {
+    Icon: ShieldCheck,
+    color: "#c4a8ff",
+    title: "Bunker or Cloud, your call",
+    body: "Bunker Mode runs entirely on local models, nothing leaves your Mac. Cloud Mode brings in Claude, GPT, and Gemini for the frontier. Switch per question.",
+  },
+];
+
+function Differentiators() {
+  return (
+    <section className="relative border-t border-border-soft py-24 md:py-28">
+      <div className="glow-ai absolute inset-0 -z-10 opacity-20" />
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-ai">More than a chatbot</p>
+          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            It doesn't just answer. <span className="font-serif italic text-text-soft">It works for you.</span>
+          </h2>
+        </FadeIn>
+        <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
+          {DIFFERENTIATORS.map((it, i) => {
+            const Icon = it.Icon;
+            return (
+              <FadeIn key={it.title} delay={i * 0.06}>
+                <div className="flex h-full gap-5 rounded-2xl border border-border-soft bg-surface-0 p-7 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${it.color}18`, color: it.color }}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold leading-snug">{it.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-text-soft">{it.body}</p>
+                  </div>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LandingMain() {
+  return (
+    <main className="pt-14">
+      <Hero />
+      <LifeDomains />
+      <DemoVideo />
+      <HardQuestionsSection />
+      <Pillars />
+      <Differentiators />
+      <DownloadSection />
+      <FAQSection />
+    </main>
+  );
+}
+
 export default function App() {
   const [theme, toggleTheme] = useTheme();
+  const path = typeof window !== "undefined" ? window.location.pathname.replace(/\/+$/, "") : "";
+  const isThesis = path === "/thesis";
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -3398,83 +1962,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg">
       <Nav theme={theme} onToggleTheme={toggleTheme} />
-      <main className="pt-14">
-        <Hero />
-        <DemoVideo />
-        <ComparisonSection />
-        <CouncilPitch />
-        <DownloadSection />
-        <DesktopShowcase />
-        <LogoBar />
-        <HardQuestionsSection />
-        <UseCasesSection />
-
-        <FeatureSection
-          id="council"
-          eyebrow="The Council"
-          title={
-            <>
-              Stop asking one model.{" "}
-              <span className="text-text-soft">Ask all of them.</span>
-            </>
-          }
-          description="Every hard question fans out to every CLI you have installed. They answer in parallel. A chair model reads all the replies and writes one verdict: with a dedicated panel showing where the panelists disagreed. That's usually where the real decision lives."
-          bullets={[
-            "Claude, Codex, Antigravity, and Ollama in parallel",
-            "Automatic synthesis by the chair model you pick",
-            "Disagreement panel surfaces the load-bearing edges",
-            "Every verdict logs to dated markdown: searchable forever",
-          ]}
-          mockup={<CouncilMock />}
-        />
-
-        <BenchmarkBoard />
-
-        <FeatureSection
-          id="benchmark"
-          eyebrow="The Benchmark"
-          title={
-            <>
-              Your real decisions.{" "}
-              <span className="text-text-soft">Your real benchmark.</span>
-            </>
-          }
-          description="21 canonical questions ship with the app, covering 8 capability dimensions: binary decisions, document analysis, recency, cultural nuance, bias, brevity, complex tax traps, and refusal-to-recommend scenarios. Add your own from real decisions you've already made. New models get graded against your life."
-          bullets={[
-            "A leaderboard per domain: the model that wins your wealth calls isn't the one that wins your health calls",
-            "21 starter questions across 8 capability dimensions",
-            "Scored two ways: keyword match + LLM-as-judge",
-            "Import from your decision log with one command",
-          ]}
-          mockup={<BenchmarkMock />}
-          reverse
-          glow="ai"
-        />
-
-        <FeatureSection
-          eyebrow="The Vault"
-          title={
-            <>
-              No database.{" "}
-              <span className="text-text-soft">Just folders.</span>
-            </>
-          }
-          description="Honestly, that's most of it. No database, no lock-in, nothing clever. Prevail is folders, one per life domain, plus the discipline of organizing them so an AI can reason over your life. Get AI-ready and the council does the rest. Every verdict lands as a dated markdown file; sync with git, iCloud, Tailscale, or nothing."
-          bullets={[
-            "Folders + the discipline of organizing: that's the whole trick",
-            "Plain markdown: read it without the app",
-            "20 starter domains, or bring your own",
-            "Works with any sync tool, or none",
-          ]}
-          mockup={<VaultMock />}
-        />
-
-        <FrameworksSection />
-        <LensesSection />
-        <EcosystemSection />
-        <Pillars />
-        <FAQSection />
-      </main>
+      {isThesis ? <ThesisPage /> : <LandingMain />}
       <Footer />
     </div>
   );
