@@ -30,6 +30,7 @@ import {
   siApple,
   siClaude,
   siGooglegemini,
+  siOllama,
 } from "simple-icons";
 import { APP_VERSION, useLatestVersion, useLiveVersion } from "./version";
 
@@ -1034,8 +1035,21 @@ function Pillars() {
               visual: (
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex -space-x-2">
-                    {["#cc785c", "#4285F4", "#6ee787", "#ededed"].map((c) => (
-                      <span key={c} className="h-7 w-7 rounded-full ring-2 ring-surface-0" style={{ background: c }} aria-hidden />
+                    {[
+                      { name: "Claude", bg: "#cc785c", fg: "#ffffff", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
+                      { name: "Gemini", bg: "#4285F4", fg: "#ffffff", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
+                      { name: "OpenAI", bg: "#0d0d0d", fg: "#ffffff", render: (c: string) => <OpenAIMark className={c} /> },
+                      { name: "Llama", bg: "#ededed", fg: "#181818", render: (c: string) => <SimpleIcon icon={siOllama} className={c} /> },
+                    ].map((m) => (
+                      <span
+                        key={m.name}
+                        title={m.name}
+                        aria-label={m.name}
+                        className="flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-surface-0"
+                        style={{ background: m.bg, color: m.fg }}
+                      >
+                        {m.render("h-3.5 w-3.5")}
+                      </span>
                     ))}
                   </div>
                   <ArrowRight className="h-4 w-4 shrink-0 text-text-mute" />
