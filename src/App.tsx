@@ -710,7 +710,7 @@ function Hero() {
             </FadeIn>
 
             <div className="mt-8">
-              <SocialProof center={false} />
+              <SocialProof center={false} showMeta={false} />
             </div>
 
             {/* small trust row */}
@@ -1533,26 +1533,25 @@ const THESES = [
   },
 ];
 
-function SocialProof({ center = true }: { center?: boolean }) {
-  // Illustrative avatars are abstract gradients, never stock photos of people
-  // who aren't users. Honest placeholder + an explicit label.
-  const grads = [
-    "from-[#c4a35a] to-[#6ee787]",
-    "from-[#5fbfff] to-[#c4a35a]",
-    "from-[#6ee787] to-[#5fbfff]",
-    "from-[#c4a35a] to-[#5fbfff]",
-    "from-[#5fbfff] to-[#6ee787]",
-  ];
+function SocialProof({ center = true, showMeta = true }: { center?: boolean; showMeta?: boolean }) {
+  // Illustrative avatars: generated illustrated portraits (DiceBear), not stock
+  // photos of real people who aren't users. Honest placeholder, and the count /
+  // ratings beside them are explicitly labelled illustrative below.
+  const avatars = ["Aria", "Marcus", "Sofia", "Devin", "Priya"].map(
+    (seed) => `https://api.dicebear.com/9.x/micah/svg?seed=${seed}&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`,
+  );
   return (
     <FadeIn>
       <div className={`flex max-w-xl flex-col gap-3 ${center ? "mx-auto items-center" : "items-start"}`}>
         <div className="flex items-center gap-4">
           <div className="flex -space-x-2.5">
-            {grads.map((g, i) => (
-              <span
+            {avatars.map((src, i) => (
+              <img
                 key={i}
-                className={`h-9 w-9 rounded-full bg-gradient-to-br ${g} ring-2 ring-bg`}
-                aria-hidden
+                src={src}
+                alt=""
+                loading="lazy"
+                className="h-9 w-9 rounded-full bg-surface-2 ring-2 ring-bg"
               />
             ))}
           </div>
@@ -1568,12 +1567,14 @@ function SocialProof({ center = true }: { center?: boolean }) {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <GitHubStarButton size="sm" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">
-            ratings &amp; count illustrative
-          </span>
-        </div>
+        {showMeta && (
+          <div className="flex items-center gap-3">
+            <GitHubStarButton size="sm" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">
+              ratings &amp; count illustrative
+            </span>
+          </div>
+        )}
       </div>
     </FadeIn>
   );
