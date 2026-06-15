@@ -1673,13 +1673,15 @@ const VAULT_QUESTIONS = [
 
 function LifeDomains() {
   const [qi, setQi] = useState(0);
+  const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
+  const N = LIFE_DOMAINS.length;
   useEffect(() => {
     if (reduce) return;
-    const t = setInterval(() => setQi((n) => (n + 1) % VAULT_QUESTIONS.length), 3200);
-    return () => clearInterval(t);
-  }, [reduce]);
-  const N = LIFE_DOMAINS.length;
+    const tq = setInterval(() => setQi((n) => (n + 1) % VAULT_QUESTIONS.length), 3200);
+    const ta = setInterval(() => setActive((a) => (a + 1) % N), 1500);
+    return () => { clearInterval(tq); clearInterval(ta); };
+  }, [reduce, N]);
   const R = 40;
   const nodes = LIFE_DOMAINS.map((d, i) => {
     const ang = ((-90 + i * (360 / N)) * Math.PI) / 180;
@@ -1699,27 +1701,72 @@ function LifeDomains() {
         </FadeIn>
         <FadeIn delay={0.1}>
           <div className="relative mx-auto mt-14 aspect-square w-full max-w-[560px]">
-            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full text-border" aria-hidden>
-              {nodes.map((n) => (
-                <line key={n.label} x1="50" y1="50" x2={n.x} y2={n.y} stroke="currentColor" strokeWidth="0.2" strokeDasharray="0.9 0.9" />
+            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
+              {nodes.map((n, i) => (
+                <line
+                  key={n.label}
+                  x1="50"
+                  y1="50"
+                  x2={n.x}
+                  y2={n.y}
+                  stroke="currentColor"
+                  strokeWidth={active === i ? 0.35 : 0.2}
+                  strokeDasharray="0.9 0.9"
+                  className={`transition-all duration-500 ${active === i ? "text-gold/60" : "text-border"}`}
+                />
+              ))}
+              {/* pulses flowing from each domain into "You" */}
+              {!reduce && nodes.map((n, i) => (
+                <motion.circle
+                  key={`pulse-${n.label}`}
+                  r="0.75"
+                  className="fill-gold"
+                  initial={{ cx: n.x, cy: n.y, opacity: 0 }}
+                  animate={{ cx: 50, cy: 50, opacity: [0, 0.9, 0] }}
+                  transition={{ duration: 2.1, repeat: Infinity, ease: "easeIn", delay: (i / N) * 2.1 }}
+                />
               ))}
             </svg>
+
+            {/* breathing glow behind center */}
+            {!reduce && (
+              <motion.span
+                className="absolute left-1/2 top-1/2 -z-0 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{ width: "34%", height: "34%", background: "radial-gradient(circle, rgba(196,163,90,0.28), transparent 70%)" }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.25, 0.6] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                aria-hidden
+              />
+            )}
+
             <div className="absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-gold-border bg-surface-1 shadow-lg md:h-24 md:w-24">
               <Logo size={26} />
               <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">You</span>
             </div>
-            {nodes.map((n) => {
+
+            {nodes.map((n, i) => {
               const Icon = n.Icon;
+              const on = active === i;
               return (
                 <div
                   key={n.label}
                   className="group absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
                   style={{ left: `${n.x}%`, top: `${n.y}%` }}
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full border border-border-soft bg-surface-0 text-text-soft transition-colors group-hover:border-gold-border group-hover:text-gold md:h-12 md:w-12">
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0, scale: 0.4 }}
+                    whileInView={reduce ? undefined : { opacity: 1, scale: 1 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ delay: 0.25 + i * 0.05, type: "spring", stiffness: 220, damping: 18 }}
+                    className={`flex h-11 w-11 items-center justify-center rounded-full border bg-surface-0 transition-all duration-500 md:h-12 md:w-12 group-hover:border-gold-border group-hover:text-gold ${
+                      on ? "border-gold-border text-gold shadow-[0_0_18px_rgba(196,163,90,0.35)]" : "border-border-soft text-text-soft"
+                    }`}
+                  >
                     <Icon className="h-5 w-5" />
-                  </div>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-text-mute md:text-[10px]">{n.label}</span>
+                  </motion.div>
+                  <span className={`font-mono text-[9px] uppercase tracking-[0.14em] transition-colors duration-500 md:text-[10px] ${on ? "text-gold" : "text-text-mute"}`}>
+                    {n.label}
+                  </span>
                 </div>
               );
             })}
@@ -1728,7 +1775,15 @@ function LifeDomains() {
         <FadeIn delay={0.15}>
           <div className="mx-auto mt-12 max-w-md text-center">
             <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-mute">Ask your vault</div>
-            <p key={qi} className="mt-3 text-lg italic text-text-soft md:text-xl">"{VAULT_QUESTIONS[qi].q}"</p>
+            <motion.p
+              key={qi}
+              initial={reduce ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="mt-3 text-lg italic text-text-soft md:text-xl"
+            >
+              "{VAULT_QUESTIONS[qi].q}"
+            </motion.p>
             <span className="mt-3 inline-block rounded-full border border-border-soft px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold">{VAULT_QUESTIONS[qi].tag}</span>
           </div>
         </FadeIn>
