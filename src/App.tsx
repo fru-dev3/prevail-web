@@ -1215,8 +1215,7 @@ function DownloadSection() {
               </h3>
               <p className="mt-3 mb-8 text-text-soft">
                 Same app, same vault. v{version}. NSIS installer, no terminal
-                required. (Unsigned for now: Windows SmartScreen may warn on first
-                run; click More info : Run anyway.)
+                required. Unsigned for now; SmartScreen may warn at first.
               </p>
 
               <a
