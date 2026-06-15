@@ -21,6 +21,7 @@ import {
   Sparkles,
   Star,
   Sun,
+  Target,
   TrendingUp,
   Users,
   X,
@@ -1162,7 +1163,7 @@ function DownloadSection() {
           <FadeIn delay={0.05}>
             <div
               id="desktop"
-              className="group relative h-full overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8"
+              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8"
             >
               <div className="shimmer absolute inset-x-0 top-0 h-px" />
               <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
@@ -1172,7 +1173,7 @@ function DownloadSection() {
               <h3 className="mt-5 text-3xl font-bold tracking-tight">
                 Prevail.app
               </h3>
-              <p className="mt-3 text-text-soft">
+              <p className="mt-3 mb-8 text-text-soft">
                 Native Mac app. v{version}. Self-contained, no terminal required.
                 Signed &amp; notarized by Apple: opens like any Mac app.
               </p>
@@ -1180,7 +1181,7 @@ function DownloadSection() {
               <a
                 href={dmg.url}
                 download={dmg.name}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
                 Download .dmg
@@ -1212,7 +1213,7 @@ function DownloadSection() {
               <h3 className="mt-5 text-3xl font-bold tracking-tight">
                 Prevail for Windows
               </h3>
-              <p className="mt-3 text-text-soft">
+              <p className="mt-3 mb-8 text-text-soft">
                 Same app, same vault. v{version}. NSIS installer, no terminal
                 required. (Unsigned for now: Windows SmartScreen may warn on first
                 run; click More info : Run anyway.)
@@ -1221,7 +1222,7 @@ function DownloadSection() {
               <a
                 href={exe.url}
                 download={exe.name}
-                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
                 Download installer
@@ -1257,11 +1258,15 @@ const FAQ = [
   },
   {
     q: "Does my data leave my Mac?",
-    a: "Your vault stays on your machine. Prevail spawns whichever AI CLIs you've already logged into. Want zero network? Set the council to Ollama-only.",
+    a: "Your vault always stays on your Mac, in plain files you own. Whether anything leaves is your call: Bunker Mode keeps everything on-device with local models; Cloud Mode sends your prompts to the frontier models you pick. You choose, per question.",
   },
   {
-    q: "Which CLIs work?",
-    a: "Claude Code, Codex, Antigravity (Google's agy), and Ollama. Auto-detected at startup. Add or remove from any council with one click.",
+    q: "Bunker Mode or Cloud Mode?",
+    a: "Bunker Mode runs entirely on local models (via Ollama): nothing leaves your machine. Cloud Mode brings in the frontier, Claude, GPT, Gemini, when you want their horsepower. Same vault, same council, you decide how private versus how powerful.",
+  },
+  {
+    q: "Which models can sit on the council?",
+    a: "Claude, Codex, Gemini, and local Ollama models, auto-detected at startup. You pick who's on the council for any given question, and a chair model you choose writes the verdict.",
   },
   {
     q: "Do I have to use the desktop app?",
@@ -1481,9 +1486,11 @@ function Footer() {
               Feedback and bug reports are very welcome and directly shape what comes next.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-text-soft">
-              Prevail is free, open-source software released under the GNU General Public License v3.0. Your vault,
-              chats, and decisions stay on your Mac; the app collects no telemetry unless you opt in. This marketing
-              site uses Google Analytics. Ratings and the user count shown elsewhere on this site are illustrative.
+              Prevail is free, open-source software released under the GNU General Public License v3.0. Your vault
+              lives on your Mac in plain files you own. In Bunker Mode nothing leaves your machine; in Cloud Mode
+              your prompts go to the model providers you choose. The app collects no telemetry unless you opt in.
+              This marketing site uses Google Analytics. Ratings and the user count shown elsewhere on this site
+              are illustrative.
             </p>
           </div>
         </div>
@@ -1850,6 +1857,74 @@ function LifeDomains() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// DIFFERENTIATORS — the genuinely unique stuff: a council you assemble,
+// self-learning memory, proactive loops, and Bunker/Cloud control.
+
+const DIFFERENTIATORS = [
+  {
+    Icon: Users,
+    color: "#c4a35a",
+    title: "A council you assemble",
+    body: "Pick which models sit on the council. They answer in parallel, a chair you choose writes one verdict, and the panel shows exactly where they disagreed.",
+  },
+  {
+    Icon: Sparkles,
+    color: "#5fbfff",
+    title: "It learns you, not just your question",
+    body: "Every decision is captured the moment you make it and distilled into living memory. The next answer already knows what you decided last time.",
+  },
+  {
+    Icon: Target,
+    color: "#6ee787",
+    title: "It works toward your goals",
+    body: "Proactive loops, reminders, and generated tasks pursue what matters in the background. It doesn't just respond, it follows up.",
+  },
+  {
+    Icon: ShieldCheck,
+    color: "#c4a8ff",
+    title: "Bunker or Cloud, your call",
+    body: "Bunker Mode runs entirely on local models, nothing leaves your Mac. Cloud Mode brings in Claude, GPT, and Gemini for the frontier. Switch per question.",
+  },
+];
+
+function Differentiators() {
+  return (
+    <section className="relative border-t border-border-soft py-24 md:py-28">
+      <div className="glow-ai absolute inset-0 -z-10 opacity-20" />
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-ai">More than a chatbot</p>
+          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+            It doesn't just answer. <span className="font-serif italic text-text-soft">It works for you.</span>
+          </h2>
+        </FadeIn>
+        <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
+          {DIFFERENTIATORS.map((it, i) => {
+            const Icon = it.Icon;
+            return (
+              <FadeIn key={it.title} delay={i * 0.06}>
+                <div className="flex h-full gap-5 rounded-2xl border border-border-soft bg-surface-0 p-7 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${it.color}18`, color: it.color }}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold leading-snug">{it.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-text-soft">{it.body}</p>
+                  </div>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function LandingMain() {
   return (
     <main className="pt-14">
@@ -1858,6 +1933,7 @@ function LandingMain() {
       <DemoVideo />
       <HardQuestionsSection />
       <Pillars />
+      <Differentiators />
       <DownloadSection />
       <FAQSection />
     </main>
