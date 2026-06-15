@@ -1264,6 +1264,10 @@ const FAQ = [
     a: "Bunker Mode runs entirely on local models (via Ollama): nothing leaves your machine. Cloud Mode brings in the frontier, Claude, GPT, Gemini, when you want their horsepower. Same vault, same council, you decide how private versus how powerful.",
   },
   {
+    q: "Do you collect any analytics or telemetry?",
+    a: "Off by default. Prevail sends nothing unless you explicitly turn it on in Settings. If you opt in, it's anonymous (a random local ID, never your name, email, files, or chats), limited to a small fixed list of events, and you can see exactly what's sent and switch it off anytime.",
+  },
+  {
     q: "Which models can sit on the council?",
     a: "Claude, Codex, Gemini, and local Ollama models, auto-detected at startup. You pick who's on the council for any given question, and a chair model you choose writes the verdict.",
   },
