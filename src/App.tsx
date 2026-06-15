@@ -924,48 +924,12 @@ function DesktopAppMock() {
 // One agent isn't enough. Generic benchmarks don't grade your life.
 
 const HARD_QUESTIONS = [
-  {
-    domain: "Wealth",
-    glyph: "¤",
-    color: "#c4a35a",
-    q: "Should I prepay the mortgage or invest the delta?",
-    edge: "Tax-bracket sensitivity. Horizon math. The wrong default kills six figures.",
-  },
-  {
-    domain: "Career",
-    glyph: "▲",
-    color: "#5fbfff",
-    q: "Take the Series B offer or stay where I am?",
-    edge: "Equity dilution model + comp ladder + 5-year founder bet, weighed against vested RSUs.",
-  },
-  {
-    domain: "Health",
-    glyph: "♥",
-    color: "#6ee787",
-    q: "Lab panel just landed. What do I act on first?",
-    edge: "Signal vs noise across 47 markers. Most important: which yellow flags are downstream of one upstream cause.",
-  },
-  {
-    domain: "Tax",
-    glyph: "§",
-    color: "#f0c674",
-    q: "Roth conversion this year: does the IRMAA cliff bite?",
-    edge: "Sub-clause traps most general advice misses. The math says yes, the policy edge says wait.",
-  },
-  {
-    domain: "Family",
-    glyph: "♥",
-    color: "#ffb38a",
-    q: "Sister's wedding back home: contribute $40k?",
-    edge: "Western individualist advice flattens this. Real answer respects obligation and protects you.",
-  },
-  {
-    domain: "Estate",
-    glyph: "⌂",
-    color: "#c4a8ff",
-    q: "Term life vs whole life for my situation?",
-    edge: "The product pitch is wrong 80% of the time. The right answer depends on your dependents and runway.",
-  },
+  { domain: "Wealth", Icon: TrendingUp, color: "#c4a35a", q: "Prepay the mortgage, or invest the delta?" },
+  { domain: "Career", Icon: Briefcase, color: "#5fbfff", q: "Take the Series B offer, or stay where I am?" },
+  { domain: "Health", Icon: Heart, color: "#6ee787", q: "Lab panel just landed: what do I act on first?" },
+  { domain: "Tax", Icon: Receipt, color: "#f0c674", q: "Roth conversion this year: does the IRMAA cliff bite?" },
+  { domain: "Family", Icon: Users, color: "#ffb38a", q: "Sister's wedding back home: contribute $40k?" },
+  { domain: "Estate", Icon: ShieldCheck, color: "#c4a8ff", q: "Term life or whole life, for my situation?" },
 ];
 
 function HardQuestionsSection() {
@@ -974,7 +938,7 @@ function HardQuestionsSection() {
       <div className="glow-ai absolute inset-0 -z-10 opacity-30" />
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
               Why one model isn't enough
             </p>
@@ -982,78 +946,36 @@ function HardQuestionsSection() {
               Your life doesn't fit{" "}
               <span className="font-serif italic text-text-soft">a benchmark.</span>
             </h2>
-            <p className="mt-6 text-lg text-text-soft">
-              MMLU. HumanEval. GSM8K. Useful: for someone else. None of them
-              grade the questions you actually wrestle with. Real decisions are
-              tax-coded, family-coded, body-coded, time-coded. One model gives
-              you one frame. You need four: and a chair to call it.
+            <p className="mt-5 text-lg text-text-soft">
+              The benchmarks that rank models never grade the questions you
+              actually wrestle with. These are the ones <Brand /> is for.
             </p>
           </div>
         </FadeIn>
 
-        {/* Three-column reasoning */}
-        <FadeIn delay={0.1}>
-          <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-3">
-            {[
-              {
-                n: "01",
-                t: "One model is one frame",
-                d: "Even the best frontier model has blind spots. You only see them when a second model disagrees.",
-              },
-              {
-                n: "02",
-                t: "Generic benchmarks miss you",
-                d: "MMLU doesn't know your tax bracket. HumanEval doesn't know your dependents. Your benchmark must be yours.",
-              },
-              {
-                n: "03",
-                t: "Decisions compound",
-                d: "Get the mortgage call right, the tax call right, the career call right: and 20 years compound.",
-              },
-            ].map((c) => (
-              <div key={c.n} className="rounded-xl border border-border-soft bg-surface-0 p-6">
-                <div className="font-mono text-xs text-gold">{c.n}</div>
-                <div className="mt-3 font-semibold">{c.t}</div>
-                <p className="mt-2 text-sm text-text-soft">{c.d}</p>
-              </div>
-            ))}
-          </div>
-        </FadeIn>
-
-        {/* Hard question list */}
-        <FadeIn delay={0.2}>
-          <div className="mx-auto mt-16 max-w-5xl">
-            <div className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-text-mute">
-              <span className="text-gold">◇</span> Questions <Brand /> was built for
-            </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              {HARD_QUESTIONS.map((q, i) => (
-                <FadeIn key={q.q} delay={0.05 * i}>
-                  <div className="group relative h-full overflow-hidden rounded-xl border border-border-soft bg-surface-0 p-5 transition-all hover:border-border hover:bg-surface-1">
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base"
-                        style={{ backgroundColor: `${q.color}18`, color: q.color }}
-                      >
-                        {q.glyph}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-mute">
-                          {q.domain}
-                        </div>
-                        <div className="mt-1.5 font-medium text-text">{q.q}</div>
-                        <div className="mt-2 text-xs text-text-soft">
-                          <span className="text-gold">▸</span> {q.edge}
-                        </div>
-                      </div>
-                    </div>
+        <div className="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {HARD_QUESTIONS.map((q, i) => {
+            const Icon = q.Icon;
+            return (
+              <FadeIn key={q.q} delay={0.05 * i}>
+                <div className="group flex h-full flex-col gap-3 rounded-2xl border border-border-soft bg-surface-0 p-6 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${q.color}18`, color: q.color }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-mute">
+                      {q.domain}
+                    </span>
                   </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
-
+                  <div className="text-lg font-medium leading-snug text-text">{q.q}</div>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
