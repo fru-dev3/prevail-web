@@ -764,7 +764,7 @@ function Hero() {
             {/* small trust row */}
             <FadeIn delay={0.24}>
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-mute">
-                <span><span className="text-gold">✓</span> Free, MIT</span>
+                <span><span className="text-gold">✓</span> Free, GPL-3.0</span>
                 <span><span className="text-gold">✓</span> Local-first</span>
                 <span><span className="text-gold">✓</span> Works with Claude, Codex, Antigravity, Ollama</span>
               </div>
@@ -2574,7 +2574,7 @@ const FAQ = [
   },
   {
     q: "Is it open source?",
-    a: "Yes. MIT. Read every line on GitHub.",
+    a: "Yes. GPL-3.0. Read every line on GitHub.",
   },
 ];
 
@@ -2639,7 +2639,7 @@ function Footer() {
             </div>
             <p className="mt-4 max-w-xs text-sm text-text-soft">
               A native Mac app for AI council deliberation.
-              Local. Open source. MIT.
+              Local. Open source. GPL-3.0.
             </p>
           </div>
           {[
@@ -2661,7 +2661,7 @@ function Footer() {
             {
               title: "Legal",
               links: [
-                ["MIT License", `${GITHUB_DESKTOP}/blob/main/LICENSE`],
+                ["GPL-3.0 License", `${GITHUB_DESKTOP}/blob/main/LICENSE`],
                 ["Security", `${GITHUB_DESKTOP}/blob/main/SECURITY.md`],
               ],
             },
@@ -3229,7 +3229,7 @@ const COMPARE_FEATURES: Array<{ label: string; vals: Record<string, Cell> }> = [
     vals: { prevail: false, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: true },
   },
   {
-    label: "Open source (MIT)",
+    label: "Open source (GPL-3.0)",
     vals: { prevail: true, openclaw: false, paperclip: false, hermes: false, multica: false, odysseus: "part" },
   },
 ];
