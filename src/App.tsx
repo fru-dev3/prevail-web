@@ -4,6 +4,8 @@ import {
   ArrowRight,
   Briefcase,
   Calendar,
+  Check,
+  Copy,
   Crown,
   Download,
   FileText,
@@ -715,15 +717,6 @@ function Hero() {
               <SocialProof center={false} showMeta={false} />
             </div>
 
-            {/* small trust row */}
-            <FadeIn delay={0.24}>
-              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-mute">
-                <span><span className="text-gold">✓</span> Free, GPL-3.0</span>
-                <span><span className="text-gold">✓</span> Local-first</span>
-                <span><span className="text-gold">✓</span> Works with Claude, Codex, Antigravity, Ollama</span>
-              </div>
-            </FadeIn>
-
             {/* Works-with ecosystem icons */}
             <FadeIn delay={0.28}>
               <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-text-mute">
@@ -1149,6 +1142,99 @@ function Pillars() {
 // Ecosystem section — icons only, no titles, no descriptions.
 // Just a clean strip of brand marks showing 'plays with these tools'.
 // ─────────────────────────────────────────────────────────────────────────────
+// INSTALL CARD — terminal-style card with two tabs. `curl` is the one-line
+// installer for the CLI engine; `claude` is a prompt you paste into Claude (or
+// any coding agent) that points it at llms.txt so the agent installs Prevail for
+// you. Mirrors the install widget on our sibling site paperclip.ing — adapted to
+// Prevail, which ships a curl installer rather than an npm package.
+
+const INSTALL_TABS = [
+  {
+    key: "curl",
+    label: "curl",
+    prompt: false,
+    command: "curl -fsSL prevail.sh/install | bash",
+  },
+  {
+    key: "claude",
+    label: "claude",
+    prompt: true,
+    command: "Please install prevail\nhttps://prevail.sh/llms.txt",
+  },
+] as const;
+
+function InstallCard() {
+  const [tab, setTab] = useState<(typeof INSTALL_TABS)[number]["key"]>("curl");
+  const [copied, setCopied] = useState(false);
+  const active = INSTALL_TABS.find((t) => t.key === tab)!;
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(active.command);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      /* clipboard unavailable — no-op */
+    }
+  };
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-[#0c0c0e] shadow-2xl">
+      {/* title bar: traffic lights + tab toggle */}
+      <div className="flex items-center justify-between border-b border-border-soft px-4 py-3">
+        <div className="flex gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
+          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
+          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
+        </div>
+        <div className="flex items-center gap-0.5 rounded-lg bg-surface-0 p-0.5">
+          {INSTALL_TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => {
+                setTab(t.key);
+                setCopied(false);
+              }}
+              className={`rounded-md px-3 py-1 font-mono text-xs transition-colors ${
+                tab === t.key
+                  ? "bg-surface-1 text-text"
+                  : "text-text-mute hover:text-text-soft"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* body: command + copy button */}
+      <div className="flex items-start justify-between gap-4 px-5 py-6">
+        <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap font-mono text-sm leading-relaxed text-text">
+          {active.prompt ? (
+            active.command
+          ) : (
+            <>
+              <span className="text-gold">$ </span>
+              {active.command}
+            </>
+          )}
+        </pre>
+        <button
+          onClick={copy}
+          aria-label={copied ? "Copied" : "Copy to clipboard"}
+          className="shrink-0 rounded-md p-1.5 text-text-mute transition-colors hover:bg-surface-1 hover:text-text"
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-gold" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // DOWNLOAD / INSTALL section — native Mac app
 
 function DownloadSection() {
@@ -1256,6 +1342,25 @@ function DownloadSection() {
             </div>
           </FadeIn>
         </div>
+
+        {/* CLI / agent install — terminal card under the desktop downloads */}
+        <FadeIn delay={0.15}>
+          <div className="mx-auto mt-12 max-w-2xl">
+            <p className="text-center text-sm text-text-soft">
+              Prefer the terminal? Install the{" "}
+              <span className="text-text">CLI engine</span> with one line — or hand
+              the job to your agent.
+            </p>
+            <div className="mt-6">
+              <InstallCard />
+            </div>
+            <p className="mt-4 text-center text-xs text-text-mute">
+              macOS, Linux &amp; Windows (WSL). The desktop app already bundles
+              this engine — install it standalone only for headless or terminal
+              use.
+            </p>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
@@ -1379,6 +1484,8 @@ function Footer() {
             {
               title: "Legal",
               links: [
+                ["Terms of Service", "/tos"],
+                ["Privacy Policy", "/privacy"],
                 ["GPL-3.0 License", `${GITHUB_DESKTOP}/blob/main/LICENSE`],
                 ["Security", `${GITHUB_DESKTOP}/blob/main/SECURITY.md`],
               ],
@@ -1389,18 +1496,22 @@ function Footer() {
                 {col.title}
               </div>
               <ul className="mt-4 space-y-2 text-sm">
-                {col.links.map(([label, href]) => (
-                  <li key={label}>
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-text-soft hover:text-text"
-                    >
-                      {label}
-                    </a>
-                  </li>
-                ))}
+                {col.links.map(([label, href]) => {
+                  const internal = href.startsWith("/");
+                  return (
+                    <li key={label}>
+                      <a
+                        href={href}
+                        {...(internal
+                          ? {}
+                          : { target: "_blank", rel: "noreferrer" })}
+                        className="text-text-soft hover:text-text"
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -1942,6 +2053,346 @@ function Differentiators() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// LEGAL — combined Terms of Service & Privacy Policy, served at /tos (aliases
+// /terms, /privacy, /legal). Structure mirrors our sibling site paperclip.ing,
+// rewritten for Prevail's reality: GPL-3.0, local-first, no accounts, no hosted
+// backend, telemetry off by default. A `body` entry that is a string renders as
+// a paragraph; an array renders as a bullet list; `caps` marks all-caps
+// disclaimer blocks; `part`/`anchor` mark the two top-level dividers.
+
+const LEGAL_EFFECTIVE = "June 17, 2026";
+
+type LegalBlock = string | string[];
+type LegalSection = {
+  title: string;
+  part?: boolean;
+  anchor?: string;
+  caps?: boolean;
+  body?: LegalBlock[];
+};
+
+const LEGAL_SECTIONS: LegalSection[] = [
+  {
+    title: "Part I — Terms of Service",
+    part: true,
+  },
+  {
+    title: "1. Definitions",
+    body: [
+      [
+        '"Prevail" refers to the open-source software available under the GNU General Public License v3.0 at github.com/fru-dev3/prevail-desktop and github.com/fru-dev3/prevail-cli.',
+        '"fru.dev" (also "we," "us," or "our") refers to fru.dev (@fru), the maker that develops Prevail and operates the prevail.sh website.',
+        '"Services" refers to the prevail.sh website, the install script served from it, the documentation, and any optional telemetry endpoint operated by fru.dev. Prevail itself runs entirely on your own machine and is not a hosted service.',
+        '"User," "you," or "your" refers to any individual or entity using Prevail or the Services.',
+        '"Content" refers to your vault and any data, files, prompts, or output you create with Prevail. Your Content lives on your machine; we do not receive it.',
+      ],
+    ],
+  },
+  {
+    title: "2. Acceptance of Terms",
+    body: [
+      "By downloading, installing, or using Prevail, or by accessing the Services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you are using Prevail on behalf of an organization, you represent that you have the authority to bind that organization to these terms.",
+      "If you do not agree to these terms, you must discontinue use of Prevail and the Services. Your continued use constitutes ongoing acceptance of these terms as they may be amended from time to time.",
+    ],
+  },
+  {
+    title: "3. Open-Source Software",
+    body: [
+      "Prevail is licensed under the GNU General Public License v3.0 (GPL-3.0). Nothing in these Terms of Service restricts, modifies, or supersedes the rights granted to you under that license with respect to the source code itself — including the rights to use, study, modify, and redistribute the software under the terms of the GPL-3.0.",
+      "These Terms of Service govern the Services (the website, install script, and any optional telemetry endpoint) and your use of the Prevail name and branding, which are separate from the rights granted under the GPL-3.0.",
+    ],
+  },
+  {
+    title: "4. Acceptable Use",
+    body: [
+      "You agree to use Prevail and the Services only for lawful purposes and in compliance with all applicable laws and regulations. You shall not:",
+      [
+        "Use Prevail or the Services to engage in any activity that is illegal, harmful, or fraudulent;",
+        "Attempt to gain unauthorized access to the prevail.sh website, its infrastructure, or any system operated by fru.dev;",
+        "Interfere with or disrupt the integrity, security, or performance of the Services;",
+        "Use the Services to transmit viruses, malware, or other harmful code;",
+        "Misrepresent the Prevail name or branding, or distribute modified builds in a way that implies official endorsement by fru.dev;",
+        "Resell or sublicense access to the Services without prior written authorization (this does not affect your rights to the source code under the GPL-3.0).",
+      ],
+    ],
+  },
+  {
+    title: "5. No Accounts",
+    body: [
+      "Prevail requires no account, sign-up, or login. There are no credentials for us to store and no profile for us to maintain. You are responsible for the security of your own machine and the vault stored on it.",
+    ],
+  },
+  {
+    title: "6. Your Content and Intellectual Property",
+    body: [
+      "You own your vault and everything in it. Prevail is local-first: your Content stays in plain files on your machine and never leaves it except where you explicitly direct it — for example, when you use Cloud Mode, which sends your prompts and the context you select to the AI providers you choose.",
+      "We claim no license to, and no ownership of, your Content. Because we do not receive it, we cannot use, reproduce, or distribute it.",
+      "fru.dev retains all rights, title, and interest in the Prevail name, logo, and branding, and in the prevail.sh website. The source code remains available to you under the GPL-3.0.",
+    ],
+  },
+  {
+    title: "7. Third-Party AI Providers and Tools",
+    body: [
+      "Prevail orchestrates third-party AI command-line tools and models that you have installed or are logged into — for example Claude, Codex, Gemini, and local models via Ollama. Prevail does not provide these models; it convenes the ones already available on your machine.",
+      "When you use Cloud Mode, your prompts and the context you select are sent to the third-party providers you choose, under their own terms of service and privacy policies. In Bunker Mode, processing stays on-device with local models. You are responsible for reviewing and complying with the terms of each provider you enable.",
+    ],
+  },
+  {
+    title: "8. Telemetry and Analytics",
+    body: [
+      "Prevail collects no telemetry by default. It sends nothing unless you explicitly opt in within Settings. If you opt in, telemetry is anonymous — a random local identifier, never your name, email, files, or chats — limited to a small fixed list of events, and you can see exactly what is sent and turn it off at any time.",
+      "The prevail.sh marketing website uses Google Analytics to understand aggregate traffic. Ratings, user counts, and similar figures shown on the website are illustrative.",
+    ],
+  },
+  {
+    title: "9. Disclaimers",
+    caps: true,
+    body: [
+      'PREVAIL AND THE SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. FRU.DEV SPECIFICALLY DISCLAIMS ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.',
+      "PREVAIL IS EARLY, EXPERIMENTAL SOFTWARE. IT ORCHESTRATES THIRD-PARTY AI TOOLS THAT CAN PRODUCE INACCURATE OR INCOMPLETE OUTPUT. NOTHING PRODUCED BY PREVAIL IS LEGAL, FINANCIAL, TAX, MEDICAL, OR OTHER PROFESSIONAL ADVICE. ALWAYS REVIEW ANYTHING IMPORTANT YOURSELF AND CONSULT A QUALIFIED PROFESSIONAL.",
+      "FRU.DEV DOES NOT WARRANT THAT PREVAIL OR THE SERVICES WILL BE UNINTERRUPTED, SECURE, OR ERROR-FREE. YOU USE THEM AT YOUR OWN RISK.",
+    ],
+  },
+  {
+    title: "10. Limitation of Liability",
+    caps: true,
+    body: [
+      "TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL FRU.DEV BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATING TO YOUR USE OF OR INABILITY TO USE PREVAIL OR THE SERVICES.",
+      "TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, FRU.DEV'S TOTAL AGGREGATE LIABILITY ARISING OUT OF OR RELATING TO THESE TERMS, PREVAIL, OR THE SERVICES SHALL NOT EXCEED ONE HUNDRED U.S. DOLLARS ($100). PREVAIL IS FREE AND OPEN-SOURCE SOFTWARE.",
+    ],
+  },
+  {
+    title: "11. Indemnification",
+    body: [
+      "You agree to indemnify, defend, and hold harmless fru.dev from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to: (a) your use of Prevail or the Services; (b) your violation of these terms; (c) your violation of any third-party right, including any intellectual property or privacy right, or the terms of any third-party AI provider; or (d) any Content you process using Prevail.",
+    ],
+  },
+  {
+    title: "12. Modifications to These Terms",
+    body: [
+      "fru.dev may modify these terms at any time. Changes are effective upon posting to this page with an updated effective date. Your continued use of Prevail or the Services after a change constitutes acceptance of the revised terms. It is your responsibility to review these terms periodically.",
+    ],
+  },
+  {
+    title: "13. Termination",
+    body: [
+      "You may stop using Prevail and the Services at any time. Because Prevail runs locally and requires no account, fru.dev does not control your local use and cannot revoke a copy you already have, subject to the GPL-3.0. fru.dev may suspend or discontinue the Services (such as the website or install script) at any time, with or without notice.",
+      "Sections that by their nature should survive termination — including Sections 6, 8, 9, 10, and 11 — shall survive.",
+    ],
+  },
+  {
+    title: "14. Governing Law",
+    body: [
+      "These terms are governed by and construed in accordance with the laws of the State of California, United States, without regard to its conflict-of-laws principles. Any dispute arising out of or relating to these terms, Prevail, or the Services shall be subject to the exclusive jurisdiction of the state and federal courts located in California.",
+    ],
+  },
+  {
+    title: "15. General Provisions",
+    body: [
+      [
+        "Entire Agreement: These terms constitute the entire agreement between you and fru.dev regarding the Services and supersede all prior agreements and understandings.",
+        "Severability: If any provision is found unenforceable, the remaining provisions continue in full force and effect.",
+        "Waiver: A failure to enforce any right or provision is not a waiver of that right or provision.",
+        "Assignment: You may not assign these terms without our prior written consent; fru.dev may assign them without restriction.",
+        "Force Majeure: fru.dev is not liable for any failure or delay in performance resulting from causes beyond its reasonable control.",
+      ],
+    ],
+  },
+  {
+    title: "Part II — Privacy Policy",
+    part: true,
+    anchor: "privacy",
+  },
+  {
+    title: "1. Our Approach to Privacy",
+    body: [
+      "Prevail is built local-first. The software runs on your machine, stores your vault in plain files you own, and sends us nothing by default. This Privacy Policy describes the limited data collected through the Services (the prevail.sh website and any optional, opt-in telemetry) — not data from Prevail itself, which we do not receive.",
+      "This policy does not apply to third-party services or AI providers you use alongside Prevail. We encourage you to review their privacy policies.",
+    ],
+  },
+  {
+    title: "2. Data We Collect",
+    body: [
+      "We collect very little, and nothing about your vault:",
+      [
+        "From Prevail: nothing, by default. We do not operate accounts and do not receive your vault, files, prompts, or AI output.",
+        "Website analytics: when you visit prevail.sh, Google Analytics records standard web data such as pages viewed, browser and device type, approximate location derived from IP address, and referral source.",
+        "Optional telemetry (opt-in only): if you enable it in Settings, Prevail sends a random local identifier and a small fixed set of anonymous usage events. It never includes your name, email, files, or chats.",
+        "Communications: if you email us or open a GitHub issue, we receive the content of that message.",
+      ],
+    ],
+  },
+  {
+    title: "3. How We Use Data",
+    body: [
+      "We use the limited data we collect to:",
+      [
+        "Operate, maintain, and improve Prevail and the website;",
+        "Understand aggregate usage and performance;",
+        "Respond to support requests, feedback, and bug reports;",
+        "Detect, prevent, and address security or technical issues;",
+        "Comply with legal obligations.",
+      ],
+      "We do not sell your data. We do not use your vault or Content to train machine-learning models — we do not have it.",
+    ],
+  },
+  {
+    title: "4. Data Sharing and Disclosure",
+    body: [
+      "We do not sell personal data. We may share the limited data we hold in these circumstances:",
+      [
+        "Service providers: with the vendors that run our infrastructure — for example Netlify (website hosting), Google Analytics, and GitHub (source, releases, and issues) — subject to their own terms.",
+        "Legal requirements: when required by law, regulation, legal process, or governmental request.",
+        "Protection of rights: to protect the rights, property, or safety of fru.dev, our users, or the public.",
+      ],
+      "Separately, when you choose Cloud Mode, Prevail sends your prompts directly to the third-party AI providers you select. That exchange is governed by each provider's own privacy policy; the data does not pass through fru.dev.",
+    ],
+  },
+  {
+    title: "5. Data Retention",
+    body: [
+      "We retain the limited data we collect only as long as reasonably necessary for the purposes described in this policy or as required by law. Aggregated or anonymized analytics that cannot identify you may be retained indefinitely. Your vault is retained by you, on your machine, for as long as you keep it.",
+    ],
+  },
+  {
+    title: "6. Data Security",
+    body: [
+      "We apply commercially reasonable measures to protect the data we hold. Because Prevail is local-first, the security of your vault is largely in your hands: it lives on your machine, and you choose how to back it up or sync it (for example git, iCloud, or Tailscale). No method of transmission or storage is completely secure, and we cannot guarantee absolute security.",
+    ],
+  },
+  {
+    title: "7. Your Rights",
+    body: [
+      "Depending on your jurisdiction, you may have rights to access, correct, delete, port, or restrict the processing of personal data we hold, and to withdraw consent where processing is based on consent. Because we hold little or no personal data about you, there is often little for us to return or delete. To exercise any of these rights, contact us using the details below.",
+    ],
+  },
+  {
+    title: "8. International Data Transfers",
+    body: [
+      "The Services are operated from, and the limited data they collect may be processed in, the United States and other countries. By using the Services, you consent to the transfer of that data to jurisdictions that may have different data-protection laws than your own.",
+    ],
+  },
+  {
+    title: "9. Children's Privacy",
+    body: [
+      "The Services are not directed to children under the age of 13 (or the applicable age of digital consent in your jurisdiction), and we do not knowingly collect personal data from children. If you believe a child has provided us data, please contact us and we will delete it promptly.",
+    ],
+  },
+  {
+    title: "10. Changes to This Policy",
+    body: [
+      "We may update this Privacy Policy from time to time. Changes are posted to this page with a revised effective date. Your continued use of the Services after changes are posted constitutes acceptance of the revised policy.",
+    ],
+  },
+  {
+    title: "Contact",
+    body: [
+      "If you have questions about these Terms of Service or this Privacy Policy, please reach out:",
+      [
+        "Maker: fru.dev (@fru)",
+        "GitHub: github.com/fru-dev3/prevail-desktop/issues",
+      ],
+    ],
+  },
+];
+
+function LegalPage() {
+  useEffect(() => {
+    const path =
+      typeof window !== "undefined"
+        ? window.location.pathname.replace(/\/+$/, "")
+        : "";
+    if (path === "/privacy") {
+      const el = document.getElementById("privacy");
+      if (el) el.scrollIntoView();
+    }
+  }, []);
+
+  return (
+    <main className="pt-14">
+      <section className="relative overflow-hidden py-20 md:py-28 grain">
+        <div className="glow-gold absolute inset-0 -z-10 opacity-25" />
+        <div className="mx-auto max-w-3xl px-6">
+          <FadeIn>
+            <p className="text-xs uppercase tracking-[0.2em] text-gold">Legal</p>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+              Terms of Service{" "}
+              <span className="font-serif italic text-text-soft">&amp;</span>{" "}
+              Privacy Policy
+            </h1>
+            <p className="mt-5 text-sm text-text-mute">
+              Effective date: {LEGAL_EFFECTIVE}
+            </p>
+            <p className="mt-6 text-lg leading-relaxed text-text-soft">
+              This document sets out the Terms of Service and Privacy Policy
+              governing your use of Prevail (the open-source software) and the
+              prevail.sh website and related services operated by fru.dev
+              (&ldquo;Prevail,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or
+              &ldquo;our&rdquo;). By using Prevail or these services, you agree to
+              be bound by these terms.
+            </p>
+          </FadeIn>
+        </div>
+      </section>
+
+      <section className="border-t border-border-soft py-12 md:py-16">
+        <div className="mx-auto max-w-3xl px-6">
+          {LEGAL_SECTIONS.map((s) =>
+            s.part ? (
+              <h2
+                key={s.title}
+                id={s.anchor}
+                className="mt-14 scroll-mt-24 border-b border-border-soft pb-4 text-xs font-medium uppercase tracking-[0.2em] text-gold first:mt-0"
+              >
+                {s.title}
+              </h2>
+            ) : (
+              <div key={s.title} className="mt-10">
+                <h3 className="text-lg font-semibold tracking-[-0.01em] md:text-xl">
+                  {s.title}
+                </h3>
+                {s.body?.map((block, bi) =>
+                  Array.isArray(block) ? (
+                    <ul
+                      key={bi}
+                      className="mt-3 space-y-2 pl-5 text-text-soft [list-style:disc]"
+                    >
+                      {block.map((li, li2) => (
+                        <li key={li2} className="leading-relaxed">
+                          {li}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p
+                      key={bi}
+                      className={`mt-3 leading-relaxed text-text-soft ${
+                        s.caps ? "text-xs uppercase tracking-wide text-text-mute" : ""
+                      }`}
+                    >
+                      {block}
+                    </p>
+                  )
+                )}
+              </div>
+            )
+          )}
+
+          <div className="mt-16 border-t border-border-soft pt-8">
+            <a
+              href="/"
+              className="inline-flex items-center gap-1.5 text-sm text-text-soft hover:text-text"
+            >
+              <ArrowRight className="h-3.5 w-3.5 rotate-180" /> Back to home
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function LandingMain() {
   return (
     <main className="pt-14">
@@ -1961,6 +2412,11 @@ export default function App() {
   const [theme, toggleTheme] = useTheme();
   const path = typeof window !== "undefined" ? window.location.pathname.replace(/\/+$/, "") : "";
   const isThesis = path === "/thesis";
+  const isLegal =
+    path === "/tos" ||
+    path === "/terms" ||
+    path === "/privacy" ||
+    path === "/legal";
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -1980,7 +2436,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg">
       <Nav theme={theme} onToggleTheme={toggleTheme} />
-      {isThesis ? <ThesisPage /> : <LandingMain />}
+      {isThesis ? <ThesisPage /> : isLegal ? <LegalPage /> : <LandingMain />}
       <Footer />
     </div>
   );

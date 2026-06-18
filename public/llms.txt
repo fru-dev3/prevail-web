@@ -12,8 +12,8 @@ Prevail is not a chatbot and not a coding harness — it is a "life harness." Th
 
 ## Install
 
-- [Download the Mac app](https://github.com/fru-dev3/prevail-desktop/releases/latest): Native desktop app — self-contained, no terminal required (right-click → Open on first launch). The recommended way to run Prevail. Current desktop version 0.7.6.
-- [Advanced: the CLI engine](https://prevail.sh/#install): `curl -fsSL prevail.sh/install | bash` (macOS, Linux, Windows via WSL). The desktop app bundles this engine; install it standalone only for headless/terminal use. Current CLI version 1.7.0.
+- [Download the Mac app](https://github.com/fru-dev3/prevail-desktop/releases/latest): Native desktop app — self-contained, no terminal required (right-click → Open on first launch). The recommended way to run Prevail. Current desktop version 0.8.14.
+- [Advanced: the CLI engine](https://prevail.sh/#install): `curl -fsSL prevail.sh/install | bash` (macOS, Linux, Windows via WSL). The desktop app bundles this engine; install it standalone only for headless/terminal use. Current CLI version 1.7.3.
 
 ## Source & docs
 
