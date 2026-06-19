@@ -4,6 +4,8 @@ import {
   ArrowRight,
   Briefcase,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Crown,
   Download,
@@ -14,6 +16,7 @@ import {
   Layers,
   Moon,
   Paperclip,
+  Play,
   Receipt,
   Scale,
   ShieldCheck,
@@ -308,6 +311,10 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           </span>
         </a>
         <div className="hidden items-center gap-6 text-sm text-text-soft md:flex">
+          <a href="/#demo" className="inline-flex items-center gap-1.5 hover:text-text">
+            <Play className="h-4 w-4" /> Demo
+            <span className="rounded-full bg-gold/15 px-1.5 py-0.5 text-[10px] font-semibold text-gold">{DEMO_SLIDES.length}</span>
+          </a>
           <a href="/#how" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> How it works</a>
           <a href="/thesis" className="inline-flex items-center gap-1.5 hover:text-text"><Sparkles className="h-4 w-4" /> Thesis</a>
           <a href="/#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
@@ -1453,7 +1460,35 @@ function Footer() {
 // Demo video — a compact, self-hosted MP4 (1.3 MB, poster + preload=metadata
 // so it only fully downloads on play). Hosting the binary DMG here is what blew
 // the bandwidth budget; a tiny lazy video is fine.
+// Demo carousel — widescreen product videos. The active clip autoplays muted
+// and, when it ends, advances to the next (looping the set). Users can also jump
+// with the arrows or dots. Caption updates per slide.
+const DEMO_SLIDES = [
+  {
+    src: "/prevail-demo2.mp4",
+    poster: "/prevail-demo2-poster.jpg",
+    title: "Convene a council",
+    blurb: "One question, every model deliberating, and a single verdict saved as markdown you own.",
+  },
+  {
+    src: "/prevail-benchmark.mp4",
+    poster: "/prevail-benchmark-poster.jpg",
+    title: "Benchmark against your life",
+    blurb: "Grade every model per domain on your real questions, not generic tests.",
+  },
+  {
+    src: "/prevail-connectivity.mp4",
+    poster: "/prevail-connectivity-poster.jpg",
+    title: "Connect every model you have",
+    blurb: "Prevail auto-detects the AI CLIs you're already logged into and convenes them.",
+  },
+];
+
 function DemoVideo() {
+  const [idx, setIdx] = useState(0);
+  const n = DEMO_SLIDES.length;
+  const go = (d: number) => setIdx((i) => (i + d + n) % n);
+  const slide = DEMO_SLIDES[idx];
   return (
     <section id="demo" className="border-t border-border-soft py-20 md:py-28 grain">
       <div className="relative mx-auto max-w-[1700px] px-4 sm:px-6">
@@ -1466,26 +1501,64 @@ function DemoVideo() {
             <h2 className="mx-auto mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
               Watch it <span className="font-serif italic text-text-soft">work.</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-3xl text-text-soft">
-              One question, the whole council deliberating, and a single verdict saved as markdown you own.
+            <p className="mx-auto mt-4 max-w-full overflow-x-auto whitespace-nowrap text-sm text-text-soft md:text-base">
+              <span className="font-medium text-text">{slide.title}.</span> {slide.blurb}
             </p>
           </div>
         </FadeIn>
         <FadeIn delay={0.15}>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-gold-border bg-surface-0 shadow-2xl">
-            <video
-              src="/prevail-demo2.mp4"
-              poster="/prevail-demo2-poster.jpg"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              controls
-              className="block aspect-video w-full"
-            />
+          <div className="group relative mt-8">
+            <div className="overflow-hidden rounded-2xl border border-gold-border bg-black shadow-2xl">
+              <video
+                key={slide.src}
+                src={slide.src}
+                poster={slide.poster}
+                autoPlay
+                muted
+                playsInline
+                preload="metadata"
+                controls
+                onEnded={() => go(1)}
+                className="block aspect-video w-full bg-black"
+              />
+            </div>
+
+            {/* Prev / next arrows */}
+            <button
+              onClick={() => go(-1)}
+              aria-label="Previous demo"
+              className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-border-soft bg-bg/70 p-2 text-text-soft opacity-0 backdrop-blur transition hover:bg-bg hover:text-text focus:opacity-100 group-hover:opacity-100"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => go(1)}
+              aria-label="Next demo"
+              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-border-soft bg-bg/70 p-2 text-text-soft opacity-0 backdrop-blur transition hover:bg-bg hover:text-text focus:opacity-100 group-hover:opacity-100"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
         </FadeIn>
+
+        {/* Numbered indicators */}
+        <div className="mt-6 flex items-center justify-center gap-2.5">
+          {DEMO_SLIDES.map((s, i) => (
+            <button
+              key={s.src}
+              onClick={() => setIdx(i)}
+              aria-label={`Show demo ${i + 1}: ${s.title}`}
+              aria-current={i === idx}
+              className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-all ${
+                i === idx
+                  ? "border-gold-border bg-gold text-bg"
+                  : "border-border-soft text-text-mute hover:border-border-strong hover:text-text"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );
