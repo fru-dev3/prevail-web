@@ -1,20 +1,17 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useReducedMotion, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
   Briefcase,
-  Calendar,
   Check,
   Copy,
   Crown,
   Download,
   FileText,
-  Gift,
   GraduationCap,
   Heart,
   Home,
   Layers,
-  MessageSquare,
   Moon,
   Paperclip,
   Receipt,
@@ -24,9 +21,9 @@ import {
   Star,
   Sun,
   Target,
+  Terminal,
   TrendingUp,
   Users,
-  X,
 } from "lucide-react";
 import {
   siApple,
@@ -297,36 +294,6 @@ function formatStars(n: number): string {
   return n.toString();
 }
 
-// Reusable mock window chrome — used in every product mockup.
-// fillParent=true makes the chrome stretch to its container's height so
-// the slider mockups (Desktop ↔ CLI) stay the same size regardless of
-// which one is active.
-function WindowChrome({
-  title,
-  children,
-  fillParent = false,
-}: {
-  title: string;
-  children: ReactNode;
-  fillParent?: boolean;
-}) {
-  return (
-    <div
-      className={`overflow-hidden rounded-xl border border-border bg-surface-0 shadow-2xl ${
-        fillParent ? "flex h-full flex-col" : ""
-      }`}
-    >
-      <div className="frost flex shrink-0 items-center gap-2 border-b border-border-soft px-4 py-2.5">
-        <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
-        <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-        <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
-        <span className="ml-3 font-mono text-xs text-text-mute">{title}</span>
-      </div>
-      <div className={fillParent ? "flex-1 overflow-hidden" : ""}>{children}</div>
-    </div>
-  );
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Nav — frosted, minimal
 
@@ -344,6 +311,8 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           <a href="/#how" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> How it works</a>
           <a href="/thesis" className="inline-flex items-center gap-1.5 hover:text-text"><Sparkles className="h-4 w-4" /> Thesis</a>
           <a href="/#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
+          <a href="https://docs.prevail.sh" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-text"><FileText className="h-4 w-4" /> Docs</a>
+          <a href="https://prevail.sh/llms.txt" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-text"><Terminal className="h-4 w-4" /> llms.txt</a>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -442,7 +411,56 @@ function Logo({ size = 24, animated = false }: { size?: number; animated?: boole
 // say it the way an editor would — strike the word "coding", write "life" over
 // it. The frozen / reduced-motion / SSR state already reads "A c̶o̶d̶i̶n̶g̶ life
 // harness." so the wordplay never depends on JS running.
-function HarnessLine() {
+// Types `word` out character by character, holds, deletes it back slowly, then
+// calls onCycle so the parent advances to the next domain. The word stays in
+// sync with the highlighted domain in the hero radial (parent owns the index).
+// A faint full-word ghost sits behind so the word has a "background feel".
+function DomainTyper({ word, onCycle }: { word: string; onCycle: () => void }) {
+  const reduce = useReducedMotion();
+  const [text, setText] = useState("");
+  useEffect(() => {
+    if (reduce) {
+      setText(word);
+      return;
+    }
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const type = (i: number) => {
+      if (cancelled) return;
+      setText(word.slice(0, i));
+      timer = i < word.length
+        ? setTimeout(() => type(i + 1), 130)
+        : setTimeout(() => del(word.length), 2600);
+    };
+    const del = (i: number) => {
+      if (cancelled) return;
+      setText(word.slice(0, i));
+      timer = i > 0
+        ? setTimeout(() => del(i - 1), 160)
+        : setTimeout(() => { if (!cancelled) onCycle(); }, 600);
+    };
+    setText("");
+    timer = setTimeout(() => type(1), 250);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [word, reduce, onCycle]);
+
+  return (
+    // The untyped remainder is rendered invisibly so the box always reserves the
+    // full word's width — the centered headline never jitters as it types.
+    <span className="font-serif italic">
+      <span className="text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]">{text}</span>
+      {!reduce && (
+        <span
+          aria-hidden
+          className="mx-[2px] inline-block h-[0.78em] w-[3px] animate-pulse rounded-full bg-gold align-baseline"
+        />
+      )}
+      <span aria-hidden className="invisible">{word.slice(text.length)}</span>
+    </span>
+  );
+}
+
+function HarnessLine({ word, onCycle }: { word: string; onCycle: () => void }) {
   const reduce = useReducedMotion();
   // Dim "coding" only after the strike has been drawn. Reduced motion lands on
   // the finished correction immediately.
@@ -456,18 +474,14 @@ function HarnessLine() {
   const strikeT = reduce
     ? { duration: 0 }
     : { duration: 0.45, delay: 0.55, ease: EASE };
-  const lifeT = reduce
-    ? { duration: 0 }
-    : { duration: 0.5, delay: 0.95, ease: EASE };
 
   return (
-    <h1 className="text-4xl font-semibold tracking-[-0.02em] md:text-5xl lg:text-6xl xl:text-[68px] xl:leading-[1.05]">
-      <span className="font-serif italic">
-        <span className="text-ai">AI</span>{" "}
-        <span className="text-gold">harness</span>
-      </span>
-      <br />
-      <span className="inline-flex flex-wrap items-baseline gap-x-3">
+    <h1 className="text-center font-semibold tracking-[-0.02em] leading-[1.08] text-[clamp(1.6rem,6.2vw,5rem)]">
+      <span className="flex flex-nowrap items-baseline justify-center gap-x-3 whitespace-nowrap sm:gap-x-4">
+        <span className="font-serif italic">
+          <span className="text-ai">AI</span>{" "}
+          <span className="text-gold">harness</span>
+        </span>
         <span className="text-text">for</span>
         <span className="relative inline-block text-[0.5em]">
           <span
@@ -486,14 +500,7 @@ function HarnessLine() {
             transition={strikeT}
           />
         </span>
-        <motion.span
-          className="font-serif italic text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]"
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={lifeT}
-        >
-          Life
-        </motion.span>
+        <DomainTyper word={word} onCycle={onCycle} />
       </span>
     </h1>
   );
@@ -653,328 +660,195 @@ function Hero() {
   const dmg = useDmgDownload();
   const exe = useExeDownload();
   const isWindows = useIsWindows();
-  const primary = isWindows ? { url: exe.url, name: exe.name, label: "Download for Windows" } : { url: dmg.url, name: dmg.name, label: "Download for Mac" };
-  const other = isWindows ? { url: dmg.url, name: dmg.name, label: "Mac" } : { url: exe.url, name: exe.name, label: "Windows" };
+  // Shared highlighted domain — the headline typewriter and the radial both read
+  // it, so the word being typed always matches the lit-up node on the right. The
+  // typewriter drives the advance (after it finishes deleting a word).
+  const [activeDomain, setActiveDomain] = useState(0);
+  const cycleDomain = useCallback(() => {
+    setActiveDomain((cur) => {
+      let n = cur;
+      while (n === cur) n = Math.floor(Math.random() * LIFE_DOMAINS.length);
+      return n;
+    });
+  }, []);
+  // Primary download follows the detected OS; the other platforms + CLI are
+  // quiet text links under the button. CLI copies the one-line installer.
+  const [copied, setCopied] = useState(false);
+  const copyCli = async () => {
+    try {
+      await navigator.clipboard.writeText("curl -fsSL prevail.sh/install | bash");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      /* clipboard unavailable — no-op */
+    }
+  };
   return (
-    <section className="relative isolate overflow-hidden pt-24 pb-16 grain lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:pt-12 lg:pb-28">
+    <section className="relative isolate overflow-hidden pt-8 pb-10 grain lg:flex lg:min-h-screen lg:flex-col lg:justify-start lg:pt-[3vh] lg:pb-8">
       <div className="glow-gold absolute inset-0 -z-10" />
       <HeroAuroras />
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Centered animated logo crown (à la OpenClaw). The inner translate
-            nudges the mark down without reserving extra layout space, so the
-            content below doesn't shift. */}
-        <FadeIn delay={0.02}>
-          <div className="mb-2 flex justify-center md:mb-3">
-            <div className="translate-y-1 md:translate-y-2">
-              <Logo animated size={84} />
+      {/* You at the center — the life-domains radial is the centerpiece, with
+          the message as a halo of text above and the CTA below. */}
+      <div className="mx-auto flex max-w-7xl flex-col items-center px-6 text-center">
+        <FadeIn delay={0.05}>
+          <HarnessLine word={LIFE_DOMAINS[activeDomain].label} onCycle={cycleDomain} />
+        </FadeIn>
+
+        <FadeIn delay={0.1}>
+          <p className="mt-4 text-base leading-relaxed text-text-soft md:text-lg">
+            Everyone's racing to automate their <span className="font-bold text-gold">job</span>.{" "}
+            <span className="text-text">We built the AI for everything else in{" "}
+            <span className="font-bold text-ai">life</span>.</span>
+          </p>
+        </FadeIn>
+
+        <FadeIn delay={0.15} y={20}>
+          <div className="mt-5 w-[clamp(342px,46.5vh,475px)] max-w-[74vw]">
+            <HeroSlider active={activeDomain} />
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.2}>
+          {/* Download CTA and social proof, side by side */}
+          <div className="mt-5 flex flex-col items-center justify-center gap-x-10 gap-y-5 sm:flex-row sm:items-center">
+            <div className="flex flex-col items-center">
+              <a
+                href={isWindows ? exe.url : dmg.url}
+                download={isWindows ? exe.name : dmg.name}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-8 py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
+                style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+              >
+                <Download className="h-4 w-4" />
+                Download for {isWindows ? "Windows" : "macOS"}
+              </a>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-text-soft">
+                <a
+                  href={isWindows ? dmg.url : exe.url}
+                  download={isWindows ? dmg.name : exe.name}
+                  className="underline-offset-2 transition-colors hover:text-text hover:underline"
+                >
+                  {isWindows ? "macOS" : "Windows"}
+                </a>
+                <span aria-hidden className="text-text-mute">·</span>
+                <button onClick={copyCli} className="underline-offset-2 transition-colors hover:text-text hover:underline">
+                  {copied ? "Copied ✓" : "CLI"}
+                </button>
+                <span aria-hidden className="text-text-mute">·</span>
+                <a href="#install" className="underline-offset-2 transition-colors hover:text-text hover:underline">all builds</a>
+              </div>
+            </div>
+            <div aria-hidden className="hidden h-12 w-px bg-border-soft sm:block" />
+            <SocialProof showMeta={false} />
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.26}>
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <div className="flex max-w-full flex-nowrap items-center gap-x-4 overflow-hidden whitespace-nowrap text-text-mute">
+              <span className="shrink-0 text-[11px] uppercase tracking-[0.18em]">Works with</span>
+              {WORKS_WITH.map((w) => (
+                <div
+                  key={w.name}
+                  title={w.name}
+                  className="group flex shrink-0 items-center gap-1.5 text-text-soft transition-colors hover:text-text"
+                >
+                  <span style={{ color: w.color }} className="inline-flex">
+                    {w.render("h-[1.65rem] w-[1.65rem]")}
+                  </span>
+                  <span className="text-xs">{w.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </FadeIn>
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12 xl:gap-16">
-          {/* LEFT — text */}
-          <div className="min-w-0">
-            <FadeIn delay={0.05}>
-              <HarnessLine />
-            </FadeIn>
-
-            <FadeIn delay={0.12}>
-              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-text-soft md:text-xl">
-                The most important AI you'll ever use won't be the one at work.{" "}
-                <span className="text-text">It'll be the one that knows your life, and keeps it yours.</span>
-              </p>
-            </FadeIn>
-
-            <FadeIn delay={0.18}>
-              <div className="mt-8 flex w-full max-w-2xl items-center gap-3">
-                <a
-                  href={primary.url}
-                  download={primary.name}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-                  style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-                >
-                  {isWindows ? <WindowsMark className="h-4 w-4" /> : <SimpleIcon icon={siApple} className="h-4 w-4" />}
-                  {primary.label}
-                </a>
-                <a
-                  href="#council"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-border-strong bg-surface-1 px-5 py-2.5 text-sm font-medium hover:bg-surface-2"
-                >
-                  <Users className="h-4 w-4" />
-                  How it works
-                </a>
-              </div>
-              {/* Both platforms are available: always show a link to the other OS
-                  so Windows visitors (and Mac visitors on Windows) see their build. */}
-              <p className="mt-3 text-sm text-text-soft">
-                Also for{" "}
-                <a href={other.url} download={other.name} className="font-medium text-gold underline-offset-2 hover:underline">{other.label}</a>
-                {" · "}
-                <a href="#install" className="text-text-soft underline-offset-2 hover:text-text hover:underline">all downloads</a>
-              </p>
-            </FadeIn>
-
-            <div className="mt-8">
-              <SocialProof center={false} showMeta={false} />
-            </div>
-
-            {/* Works-with ecosystem icons */}
-            <FadeIn delay={0.28}>
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-text-mute">
-                <span className="uppercase tracking-[0.18em]">Works with</span>
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-                  {WORKS_WITH.map((w) => (
-                    <div
-                      key={w.name}
-                      title={w.name}
-                      className="group flex items-center gap-1.5 text-text-soft transition-colors hover:text-text"
-                    >
-                      <span style={{ color: w.color }} className="inline-flex">
-                        {w.render("h-5 w-5")}
-                      </span>
-                      <span className="text-[11px]">{w.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FadeIn>
-          </div>
-
-          {/* RIGHT — slider */}
-          <FadeIn delay={0.28} y={20} className="min-w-0">
-            <HeroSlider />
-          </FadeIn>
-        </div>
       </div>
     </section>
   );
 }
 
-// Hero product shot — the native desktop app.
-function HeroSlider() {
+// Hero visual — the life-domains radial. Every domain orbits "You" and feeds
+// the center; a highlighted domain cycles. (Moved here from its own section.)
+function HeroSlider({ active }: { active: number }) {
+  const reduce = useReducedMotion();
+  const N = LIFE_DOMAINS.length;
+  const R = 40;
+  const nodes = LIFE_DOMAINS.map((d, i) => {
+    const ang = ((-90 + i * (360 / N)) * Math.PI) / 180;
+    return { ...d, x: 50 + R * Math.cos(ang), y: 50 + R * Math.sin(ang) };
+  });
   return (
-    <div>
-      <div className="relative h-[410px] sm:h-[440px] md:h-[460px]">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: EASE }}
-          className="absolute inset-0"
-        >
-          <DesktopAppMock />
-        </motion.div>
+    <div className="relative mx-auto aspect-square w-full max-w-[680px]">
+      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
+        {nodes.map((n, i) => (
+          <line
+            key={n.label}
+            x1="50"
+            y1="50"
+            x2={n.x}
+            y2={n.y}
+            stroke="currentColor"
+            strokeWidth={active === i ? 0.35 : 0.2}
+            strokeDasharray="0.9 0.9"
+            className={`transition-all duration-500 ${active === i ? "text-gold/60" : "text-border"}`}
+          />
+        ))}
+        {!reduce &&
+          nodes.map((n, i) => (
+            <motion.circle
+              key={`pulse-${n.label}`}
+              r="0.75"
+              className="fill-gold"
+              initial={{ cx: n.x, cy: n.y, opacity: 0 }}
+              animate={{ cx: 50, cy: 50, opacity: [0, 0.9, 0] }}
+              transition={{ duration: 2.1, repeat: Infinity, ease: "easeIn", delay: (i / N) * 2.1 }}
+            />
+          ))}
+      </svg>
+
+      {!reduce && (
+        <motion.span
+          className="absolute left-1/2 top-1/2 -z-0 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ width: "34%", height: "34%", background: "radial-gradient(circle, rgba(196,163,90,0.28), transparent 70%)" }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.25, 0.6] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+          aria-hidden
+        />
+      )}
+
+      <div className="absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-gold-border bg-surface-1 shadow-lg md:h-24 md:w-24">
+        <Logo size={26} />
+        <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">You</span>
       </div>
+
+      {nodes.map((n, i) => {
+        const Icon = n.Icon;
+        const on = active === i;
+        return (
+          <div
+            key={n.label}
+            className={`absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 ${
+              n.y < 50 ? "flex-col-reverse" : "flex-col"
+            }`}
+            style={{ left: `${n.x}%`, top: `${n.y}%` }}
+          >
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-full border bg-surface-0 transition-all duration-500 md:h-11 md:w-11 ${
+                on ? "border-gold-border text-gold shadow-[0_0_18px_rgba(196,163,90,0.35)]" : "border-border-soft text-text-soft"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+            </div>
+            <span className={`font-mono text-[9px] uppercase tracking-[0.14em] transition-colors duration-500 md:text-[10px] ${on ? "text-gold" : "text-text-mute"}`}>
+              {n.label}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Polished CSS/SVG mockup of the desktop app — appears in hero. Looks like
-// a real screenshot but stays sharp at any density.
-
-function DesktopAppMock() {
-  return (
-    <WindowChrome title="Prevail" fillParent>
-      <div className="grid h-full grid-cols-[180px_1fr] bg-surface-0">
-        {/* sidebar */}
-        <div className="border-r border-border-soft bg-surface-0 p-3">
-          <div className="mb-3 px-2 font-mono text-[9px] uppercase tracking-[0.18em] text-text-mute">
-            <span className="text-gold">◆</span> Domains · 20
-          </div>
-          <ul className="space-y-0.5 font-mono text-[11px]">
-            {[
-              ["chief", true],
-              ["vision", false],
-              ["wealth", false],
-              ["health", false],
-              ["tax", false],
-              ["career", false],
-              ["business", false],
-              ["estate", false],
-              ["insurance", false],
-            ].map(([d, active]) => (
-              <li
-                key={d as string}
-                className={`flex items-center justify-between rounded px-2 py-1 ${
-                  active
-                    ? "bg-gold-soft text-gold"
-                    : "text-text-soft"
-                }`}
-              >
-                <span>
-                  <span className="mr-2 text-text-mute">
-                    {active ? "▸" : "·"}
-                  </span>
-                  {d}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 border-t border-border-soft pt-3 font-mono text-[9px]">
-            <div className="mb-1.5 uppercase tracking-[0.18em] text-text-mute">
-              CLIs
-            </div>
-            <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px]">
-              <span className="text-ok">✓ claude</span>
-              <span className="text-ok">✓ codex</span>
-              <span className="text-ok">✓ agy</span>
-              <span className="text-text-mute">· ollama</span>
-            </div>
-          </div>
-        </div>
-
-        {/* main pane — COUNCIL TAB active, fan-out + verdict */}
-        <div className="flex min-h-0 flex-col bg-bg">
-          {/* tab bar — Council is active */}
-          <div className="flex shrink-0 items-center gap-1 border-b border-border-soft px-4">
-            <button className="flex items-center gap-2 px-3 py-2.5 text-xs text-text-mute">
-              <MessageSquare className="h-3 w-3" /> Chat
-            </button>
-            <button className="relative -mb-px flex items-center gap-2 px-3 py-2.5 text-xs text-gold">
-              <Scale className="h-3 w-3" /> Council
-              <span className="absolute bottom-0 left-0 right-0 h-px bg-gold" />
-            </button>
-            <button className="flex items-center gap-2 px-3 py-2.5 text-xs text-text-mute">
-              <Sparkles className="h-3 w-3" /> Benchmark
-            </button>
-          </div>
-
-          {/* council body */}
-          <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-hidden px-4 py-3 text-[11px]">
-            {/* Question echo */}
-            <div className="shrink-0 rounded-md border border-border bg-surface-1 px-3 py-2 font-mono text-[10px] text-text-soft">
-              <span className="text-gold">$</span> Should I prepay the mortgage
-              or invest the delta?
-            </div>
-
-            {/* 4 panelist replies in a 2x2 grid */}
-            <div className="grid shrink-0 grid-cols-2 gap-2">
-              {[
-                { name: "claude", color: "#c4a35a", text: "Invest. 22-yr horizon dominates.", done: true },
-                { name: "codex", color: "#5fbfff", text: "Invest. Tax wrapper > prepay.", done: true },
-                { name: "agy", color: "#6ee787", text: "Split. 60/40 toward investing.", done: true },
-                { name: "ollama", color: "#c4a8ff", text: "Prepay. Guaranteed 6.2%.", done: false },
-              ].map((p) => (
-                <div
-                  key={p.name}
-                  className="overflow-hidden rounded-md border border-border bg-surface-1"
-                >
-                  <div className="flex items-center justify-between border-b border-border-soft bg-surface-2 px-2.5 py-1 font-mono text-[9px]">
-                    <span style={{ color: p.color }}>◇ {p.name}</span>
-                    {p.done ? (
-                      <span className="text-ok">✓</span>
-                    ) : (
-                      <span className="pulse-soft text-gold">stream</span>
-                    )}
-                  </div>
-                  <div className="px-2.5 py-1.5 text-[10px] text-text-soft">
-                    {p.text}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Disagreement panel */}
-            <div className="shrink-0 rounded-md border-l-2 border-gold bg-surface-1 px-3 py-1.5">
-              <div className="font-mono text-[9px] uppercase tracking-wider text-gold">
-                ▸ Where panelists disagreed
-              </div>
-              <div className="mt-0.5 text-[10px] text-text-soft">
-                3/4 favor investment; Ollama anchors on guaranteed return.
-              </div>
-            </div>
-
-            {/* Verdict block */}
-            <div className="shrink-0 rounded-md border border-gold-border bg-gold-soft p-3">
-              <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-gold">
-                <span>◆</span>
-                <span>Verdict · synthesized by claude</span>
-              </div>
-              <div className="mt-1 text-[11px] leading-relaxed text-text">
-                Invest 60% in tax-advantaged index funds. Prepay 40% quarterly.
-                Revisit annually.
-                <span className="blink text-gold">▌</span>
-              </div>
-            </div>
-          </div>
-
-          {/* composer */}
-          <div className="shrink-0 border-t border-border-soft p-3">
-            <div className="flex items-center gap-2 rounded-md border border-border bg-surface-0 p-2 text-[11px] text-text-mute">
-              <Scale className="h-3 w-3 text-gold" />
-              <span>ask the council · cmd+enter to convene</span>
-              <div className="ml-auto flex items-center gap-1.5 rounded bg-gold px-2 py-0.5 text-bg">
-                <span>convene</span>
-                <ArrowRight className="h-3 w-3" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </WindowChrome>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HARD QUESTIONS — the "why this matters" section
-// One agent isn't enough. Generic benchmarks don't grade your life.
-
-const HARD_QUESTIONS = [
-  { domain: "Wealth", Icon: TrendingUp, color: "#c4a35a", q: "Prepay the mortgage, or invest the delta?" },
-  { domain: "Career", Icon: Briefcase, color: "#5fbfff", q: "Take the Series B offer, or stay where I am?" },
-  { domain: "Health", Icon: Heart, color: "#6ee787", q: "Lab panel just landed: what do I act on first?" },
-  { domain: "Tax", Icon: Receipt, color: "#f0c674", q: "Roth conversion this year: does the IRMAA cliff bite?" },
-  { domain: "Family", Icon: Users, color: "#ffb38a", q: "Sister's wedding back home: contribute $40k?" },
-  { domain: "Estate", Icon: ShieldCheck, color: "#c4a8ff", q: "Term life or whole life, for my situation?" },
-];
-
-function HardQuestionsSection() {
-  return (
-    <section className="relative border-t border-border-soft py-24 md:py-32 grain">
-      <div className="glow-ai absolute inset-0 -z-10 opacity-30" />
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-ai">
-              Why one model isn't enough
-            </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-              Your life doesn't fit{" "}
-              <span className="font-serif italic text-text-soft">a benchmark.</span>
-            </h2>
-            <p className="mt-5 text-lg text-text-soft">
-              The benchmarks that rank models never grade the questions you
-              actually wrestle with. These are the ones <Brand /> is for.
-            </p>
-          </div>
-        </FadeIn>
-
-        <div className="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {HARD_QUESTIONS.map((q, i) => {
-            const Icon = q.Icon;
-            return (
-              <FadeIn key={q.q} delay={0.05 * i}>
-                <div className="group flex h-full flex-col gap-3 rounded-2xl border border-border-soft bg-surface-0 p-6 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="flex h-11 w-11 items-center justify-center rounded-xl"
-                      style={{ backgroundColor: `${q.color}18`, color: q.color }}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-mute">
-                      {q.domain}
-                    </span>
-                  </div>
-                  <div className="text-lg font-medium leading-snug text-text">{q.q}</div>
-                </div>
-              </FadeIn>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // COUNCIL PITCH — model logos + "around one table" + Convene CTA + GitHub
@@ -1014,71 +888,125 @@ function Pillars() {
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
             How <Brand /> works
           </p>
-          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+          <h2 className="mx-auto mt-4 text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
             Three ideas. <span className="font-serif italic text-text-soft">That's the whole app.</span>
           </h2>
         </FadeIn>
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           {[
             {
-              icon: Scale,
-              title: "A council, not a chatbot",
-              text: "Ask every model at once. A chair reads all the answers and writes one verdict, and flags where they disagree.",
-              color: "#c4a35a",
+              icon: Layers,
+              title: "For life's biggest decisions",
+              text: "Wealth, health, career, tax, estate, and more. Prevail is built for the high-stakes parts of your life, each a plain folder you own. No database, no cloud.",
+              color: "#6ee787",
               visual: (
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex -space-x-2">
-                    {[
-                      { name: "Claude", bg: "#cc785c", fg: "#ffffff", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
-                      { name: "Gemini", bg: "#4285F4", fg: "#ffffff", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
-                      { name: "OpenAI", bg: "#0d0d0d", fg: "#ffffff", render: (c: string) => <OpenAIMark className={c} /> },
-                      { name: "Llama", bg: "#ededed", fg: "#181818", render: (c: string) => <SimpleIcon icon={siOllama} className={c} /> },
-                    ].map((m) => (
-                      <span
-                        key={m.name}
-                        title={m.name}
-                        aria-label={m.name}
-                        className="flex h-7 w-7 items-center justify-center rounded-full ring-2 ring-surface-0"
-                        style={{ background: m.bg, color: m.fg }}
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Wealth", Icon: TrendingUp },
+                    { label: "Health", Icon: Heart },
+                    { label: "Career", Icon: Briefcase },
+                    { label: "Tax", Icon: Receipt },
+                    { label: "Family", Icon: Users },
+                    { label: "Home", Icon: Home },
+                  ].map((d) => {
+                    const DIcon = d.Icon;
+                    return (
+                      <div
+                        key={d.label}
+                        className="flex flex-col items-center gap-1.5 rounded-lg border border-border-soft bg-bg/50 py-3 text-text-soft"
                       >
-                        {m.render("h-3.5 w-3.5")}
-                      </span>
-                    ))}
-                  </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-text-mute" />
-                  <span className="rounded-md border border-gold-border bg-gold/10 px-2.5 py-1 text-xs font-medium text-gold">one verdict</span>
+                        <DIcon className="h-4 w-4 text-[#6ee787]" />
+                        <span className="text-[10px] font-medium uppercase tracking-wider text-text-mute">{d.label}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               ),
             },
             {
-              icon: Layers,
-              title: "Just folders you own",
-              text: "Your life in plain markdown, one folder per domain. No database, no cloud. Read it without the app.",
-              color: "#6ee787",
+              icon: Scale,
+              title: "A council, not just one model",
+              text: "Ask every AI model at once, not just one. A chair reads all the answers, writes a single verdict, and flags where they disagree.",
+              color: "#c4a35a",
               visual: (
-                <div className="rounded-lg border border-border-soft bg-bg/60 p-3 font-mono text-[11px] leading-relaxed">
-                  <div className="text-text-mute">~/prevail-vault/</div>
-                  {["wealth", "health", "career"].map((d) => (
-                    <div key={d} className="pl-3 text-text-soft">
-                      <span className="text-[#6ee787]">{d}/</span> state.md
+                <div className="flex flex-col items-center">
+                  {/* Round table: named models seated around Prevail; one is the chair */}
+                  <div className="relative mx-auto h-52 w-52">
+                    {/* table ring */}
+                    <div className="absolute inset-7 rounded-full border border-dashed border-border-soft" aria-hidden />
+                    {/* center — Prevail */}
+                    <div
+                      className="absolute left-1/2 top-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl border border-border bg-surface-0"
+                      title="Prevail"
+                      style={{ boxShadow: "0 0 30px rgba(196, 163, 90, 0.25)" }}
+                    >
+                      <Logo size={26} />
                     </div>
-                  ))}
+                    {/* seats — model + name, one marked as chair */}
+                    {[
+                      { name: "Claude", chair: true, pos: "left-1/2 top-0 -translate-x-1/2", bg: "#cc785c", fg: "#ffffff", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
+                      { name: "Gemini", pos: "right-0 top-1/2 -translate-y-1/2", bg: "#4285F4", fg: "#ffffff", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
+                      { name: "Codex", pos: "left-1/2 bottom-0 -translate-x-1/2", bg: "#0d0d0d", fg: "#ffffff", render: (c: string) => <OpenAIMark className={c} /> },
+                      { name: "Ollama", pos: "left-0 top-1/2 -translate-y-1/2", bg: "#ededed", fg: "#181818", render: (c: string) => <SimpleIcon icon={siOllama} className={c} /> },
+                    ].map((m) => (
+                      <div key={m.name} className={`absolute ${m.pos} z-10 flex flex-col items-center gap-1`}>
+                        <span
+                          title={m.name}
+                          aria-label={m.chair ? `${m.name} (chair)` : m.name}
+                          className={`relative flex h-10 w-10 items-center justify-center rounded-full ${
+                            m.chair ? "ring-2 ring-gold" : "ring-2 ring-surface-0"
+                          }`}
+                          style={{ background: m.bg, color: m.fg }}
+                        >
+                          {m.render("h-4 w-4")}
+                          {m.chair && (
+                            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-bg">
+                              <Crown className="h-2.5 w-2.5" />
+                            </span>
+                          )}
+                        </span>
+                        <span className={`text-[10px] font-medium ${m.chair ? "text-gold" : "text-text-mute"}`}>
+                          {m.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">
+                    any model can chair · one verdict
+                  </div>
                 </div>
               ),
             },
             {
               icon: Sparkles,
-              title: "It compounds",
-              text: "Every chat and decision feeds the next answer. It gets sharper the longer you use it, and never starts from zero.",
+              title: "It learns and adapts",
+              text: "Every question and verdict stays in your vault, so Prevail learns your life and adapts as things change, working for you, not just answering.",
               color: "#5fbfff",
               visual: (
-                <div>
-                  <div className="flex h-16 items-end gap-1.5">
-                    {[18, 30, 40, 55, 72, 92].map((h, j) => (
-                      <span key={j} className="flex-1 rounded-sm bg-gradient-to-t from-[#5fbfff]/25 to-[#5fbfff]" style={{ height: `${h}%` }} aria-hidden />
-                    ))}
+                <div className="flex flex-col items-center">
+                  {/* A mind that keeps thinking: ripples radiate out, memories accrete */}
+                  <div className="relative mx-auto flex h-28 w-full items-center justify-center">
+                    <span className="absolute h-24 w-24 rounded-full border border-[#5fbfff]/15" aria-hidden />
+                    <span className="absolute h-16 w-16 rounded-full border border-[#5fbfff]/30" aria-hidden />
+                    <motion.span
+                      className="absolute h-12 w-12 rounded-full border border-[#5fbfff]/50"
+                      animate={{ scale: [1, 2.1], opacity: [0.5, 0] }}
+                      transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
+                      aria-hidden
+                    />
+                    <span
+                      className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[#5fbfff]/50 bg-surface-0 text-[#5fbfff]"
+                      style={{ boxShadow: "0 0 26px rgba(95,191,255,0.4)" }}
+                    >
+                      <Sparkles className="h-5 w-5" />
+                    </span>
+                    {/* memories accumulating around the mind */}
+                    <span className="absolute h-2 w-2 rounded-full bg-[#5fbfff]" style={{ left: "78%", top: "24%" }} aria-hidden />
+                    <span className="absolute h-1.5 w-1.5 rounded-full bg-[#5fbfff]/70" style={{ left: "20%", top: "64%" }} aria-hidden />
+                    <span className="absolute h-1.5 w-1.5 rounded-full bg-[#5fbfff]/60" style={{ left: "70%", top: "76%" }} aria-hidden />
+                    <span className="absolute h-1 w-1 rounded-full bg-[#5fbfff]/50" style={{ left: "28%", top: "26%" }} aria-hidden />
                   </div>
-                  <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">sharper over time</div>
+                  <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">learns a little more each time</div>
                 </div>
               ),
             },
@@ -1142,79 +1070,113 @@ function Pillars() {
 // Ecosystem section — icons only, no titles, no descriptions.
 // Just a clean strip of brand marks showing 'plays with these tools'.
 // ─────────────────────────────────────────────────────────────────────────────
-// INSTALL CARD — terminal-style card with two tabs. `curl` is the one-line
-// installer for the CLI engine; `claude` is a prompt you paste into Claude (or
-// any coding agent) that points it at llms.txt so the agent installs Prevail for
-// you. Mirrors the install widget on our sibling site paperclip.ing — adapted to
-// Prevail, which ships a curl installer rather than an npm package.
+// INSTALL STUDIO — one terminal-style card with icon-forward tabs that covers
+// every way to get Prevail: the native macOS and Windows apps, the curl one-line
+// CLI installer, and a paste-into-Claude prompt that points an agent at
+// llms.txt. App tabs show a download CTA; command tabs show a copyable line.
 
 const INSTALL_TABS = [
   {
+    key: "mac",
+    label: "macOS",
+    kind: "app",
+    icon: (c: string) => <SimpleIcon icon={siApple} className={c} />,
+  },
+  {
+    key: "win",
+    label: "Windows",
+    kind: "app",
+    icon: (c: string) => <WindowsMark className={c} />,
+  },
+  {
     key: "curl",
     label: "curl",
+    kind: "cmd",
     prompt: false,
     command: "curl -fsSL prevail.sh/install | bash",
+    caption: "macOS, Linux & Windows (WSL). The desktop app already bundles this engine.",
+    icon: (c: string) => <Terminal className={c} />,
   },
   {
     key: "claude",
-    label: "claude",
+    label: "Claude",
+    kind: "cmd",
     prompt: true,
     command: "Please install prevail\nhttps://prevail.sh/llms.txt",
+    caption: "Paste into Claude or any coding agent — it reads llms.txt and installs Prevail.",
+    icon: (c: string) => <SimpleIcon icon={siClaude} className={c} />,
   },
 ] as const;
 
-function InstallCard() {
-  const [tab, setTab] = useState<(typeof INSTALL_TABS)[number]["key"]>("curl");
-  const [copied, setCopied] = useState(false);
-  const active = INSTALL_TABS.find((t) => t.key === tab)!;
+function AppPane({ platform }: { platform: "mac" | "win" }) {
+  const version = useLatestVersion();
+  const dmg = useDmgDownload();
+  const exe = useExeDownload();
+  const isMac = platform === "mac";
+  const build = isMac ? dmg : exe;
+  return (
+    <div className="flex flex-col items-center text-center sm:flex-row sm:gap-7 sm:text-left">
+      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-gold-border bg-surface-1 text-gold">
+        {isMac ? (
+          <SimpleIcon icon={siApple} className="h-9 w-9" />
+        ) : (
+          <WindowsMark className="h-9 w-9" />
+        )}
+      </div>
+      <div className="mt-5 min-w-0 flex-1 sm:mt-0">
+        <div className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
+          {isMac ? "Desktop · macOS arm64" : "Desktop · Windows x64"}
+        </div>
+        <h3 className="mt-2 text-2xl font-bold tracking-tight">
+          {isMac ? "Prevail.app" : "Prevail for Windows"}
+        </h3>
+        <p className="mt-1.5 text-sm text-text-mute">
+          v{version} · {isMac ? "Apple Silicon · macOS 13+" : "Windows 10/11 · x64"} ·
+          self-contained, no terminal
+        </p>
+        <a
+          href={build.url}
+          download={build.name}
+          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:w-auto sm:px-9"
+          style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
+        >
+          <Download className="h-4 w-4" />
+          {isMac ? "Download .dmg" : "Download installer"}
+        </a>
+      </div>
+    </div>
+  );
+}
 
+function CmdPane({
+  command,
+  prompt,
+  caption,
+}: {
+  command: string;
+  prompt: boolean;
+  caption: string;
+}) {
+  const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(active.command);
+      await navigator.clipboard.writeText(command);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
       /* clipboard unavailable — no-op */
     }
   };
-
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-[#0c0c0e] shadow-2xl">
-      {/* title bar: traffic lights + tab toggle */}
-      <div className="flex items-center justify-between border-b border-border-soft px-4 py-3">
-        <div className="flex gap-1.5">
-          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
-          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
-          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
-        </div>
-        <div className="flex items-center gap-0.5 rounded-lg bg-surface-0 p-0.5">
-          {INSTALL_TABS.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => {
-                setTab(t.key);
-                setCopied(false);
-              }}
-              className={`rounded-md px-3 py-1 font-mono text-xs transition-colors ${
-                tab === t.key
-                  ? "bg-surface-1 text-text"
-                  : "text-text-mute hover:text-text-soft"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      {/* body: command + copy button */}
-      <div className="flex items-start justify-between gap-4 px-5 py-6">
+    <div>
+      <div className="flex items-start justify-between gap-4 rounded-lg border border-border-soft bg-surface-0 px-5 py-5">
         <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap font-mono text-sm leading-relaxed text-text">
-          {active.prompt ? (
-            active.command
+          {prompt ? (
+            command
           ) : (
             <>
               <span className="text-gold">$ </span>
-              {active.command}
+              {command}
             </>
           )}
         </pre>
@@ -1223,24 +1185,64 @@ function InstallCard() {
           aria-label={copied ? "Copied" : "Copy to clipboard"}
           className="shrink-0 rounded-md p-1.5 text-text-mute transition-colors hover:bg-surface-1 hover:text-text"
         >
-          {copied ? (
-            <Check className="h-4 w-4 text-gold" />
-          ) : (
-            <Copy className="h-4 w-4" />
-          )}
+          {copied ? <Check className="h-4 w-4 text-gold" /> : <Copy className="h-4 w-4" />}
         </button>
+      </div>
+      <p className="mt-4 text-center text-xs text-text-mute">{caption}</p>
+    </div>
+  );
+}
+
+function InstallStudio() {
+  const isWindows = useIsWindows();
+  const [tab, setTab] = useState<(typeof INSTALL_TABS)[number]["key"]>(
+    isWindows ? "win" : "mac",
+  );
+  const active = INSTALL_TABS.find((t) => t.key === tab)!;
+  return (
+    <div className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border bg-[#0c0c0e] shadow-2xl">
+      {/* title bar: traffic lights + icon-forward tab strip */}
+      <div className="flex items-center justify-between gap-3 border-b border-border-soft px-4 py-3">
+        <div className="hidden gap-1.5 sm:flex">
+          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
+          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
+          <span className="h-3 w-3 rounded-full bg-[#3a3a3e]" />
+        </div>
+        <div className="flex w-full items-center justify-between gap-1 rounded-lg bg-surface-0 p-1 sm:w-auto sm:justify-end">
+          {INSTALL_TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              aria-pressed={tab === t.key}
+              title={t.label}
+              className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors sm:flex-none ${
+                tab === t.key
+                  ? "bg-surface-1 text-text ring-1 ring-border-strong"
+                  : "text-text-mute hover:text-text-soft"
+              }`}
+            >
+              {t.icon("h-4 w-4")}
+              <span>{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* body */}
+      <div className="p-6 sm:p-8">
+        {active.kind === "app" ? (
+          <AppPane platform={active.key as "mac" | "win"} />
+        ) : (
+          <CmdPane command={active.command} prompt={active.prompt} caption={active.caption} />
+        )}
       </div>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DOWNLOAD / INSTALL section — native Mac app
+// DOWNLOAD / INSTALL section — one tabbed card for every platform & method
 
 function DownloadSection() {
-  const version = useLatestVersion();
-  const dmg = useDmgDownload();
-  const exe = useExeDownload();
   return (
     <section id="install" className="border-t border-border-soft py-24 md:py-32 grain">
       <div className="glow-gold absolute inset-0 -z-10 opacity-50" />
@@ -1249,116 +1251,17 @@ function DownloadSection() {
           <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">
             Ask a council. Prevail.
           </p>
-          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+          <h2 className="mx-auto mt-4 text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
             Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Native desktop app for Mac and Windows: self-contained, no terminal,
-            no setup. Download and open.
+            Mac, Windows, terminal, or your agent — pick a tab and go.
           </p>
         </FadeIn>
 
-        <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-2">
-          {/* Desktop card — macOS */}
-          <FadeIn delay={0.05}>
-            <div
-              id="desktop"
-              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8"
-            >
-              <div className="shimmer absolute inset-x-0 top-0 h-px" />
-              <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                <SimpleIcon icon={siApple} className="h-4 w-4" />
-                Desktop · macOS arm64
-              </div>
-              <h3 className="mt-5 text-3xl font-bold tracking-tight">
-                Prevail.app
-              </h3>
-              <p className="mt-3 mb-8 text-text-soft">
-                Native Mac app. v{version}. Self-contained, no terminal required.
-                Signed &amp; notarized by Apple: opens like any Mac app.
-              </p>
-
-              <a
-                href={dmg.url}
-                download={dmg.name}
-                className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-                style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-              >
-                Download .dmg
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
-
-              <div className="mt-6 flex items-center justify-between text-xs text-text-mute">
-                <span>Apple Silicon · macOS 13+</span>
-                <a
-                  href={`${GITHUB_DESKTOP}/releases`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-gold"
-                >
-                  All releases →
-                </a>
-              </div>
-            </div>
-          </FadeIn>
-
-          {/* Desktop card — Windows */}
-          <FadeIn delay={0.1}>
-            <div className="group relative h-full overflow-hidden rounded-2xl border border-gold-border bg-gradient-to-br from-surface-1 to-surface-0 p-8">
-              <div className="shimmer absolute inset-x-0 top-0 h-px" />
-              <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-gold">
-                <WindowsMark className="h-4 w-4" />
-                Desktop · Windows x64
-              </div>
-              <h3 className="mt-5 text-3xl font-bold tracking-tight">
-                Prevail for Windows
-              </h3>
-              <p className="mt-3 mb-8 text-text-soft">
-                Same app, same vault. v{version}. NSIS installer, no terminal
-                required. Unsigned for now; SmartScreen may warn at first.
-              </p>
-
-              <a
-                href={exe.url}
-                download={exe.name}
-                className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
-                style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
-              >
-                Download installer
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
-
-              <div className="mt-6 flex items-center justify-between text-xs text-text-mute">
-                <span>Windows 10/11 · x64</span>
-                <a
-                  href={`${GITHUB_DESKTOP}/releases`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-gold"
-                >
-                  All releases →
-                </a>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-
-        {/* CLI / agent install — terminal card under the desktop downloads */}
-        <FadeIn delay={0.15}>
-          <div className="mx-auto mt-12 max-w-2xl">
-            <p className="text-center text-sm text-text-soft">
-              Prefer the terminal? Install the{" "}
-              <span className="text-text">CLI engine</span> with one line — or hand
-              the job to your agent.
-            </p>
-            <div className="mt-6">
-              <InstallCard />
-            </div>
-            <p className="mt-4 text-center text-xs text-text-mute">
-              macOS, Linux &amp; Windows (WSL). The desktop app already bundles
-              this engine — install it standalone only for headless or terminal
-              use.
-            </p>
+        <FadeIn delay={0.08}>
+          <div id="desktop" className="mt-14 scroll-mt-24">
+            <InstallStudio />
           </div>
         </FadeIn>
       </div>
@@ -1449,74 +1352,10 @@ function FAQSection() {
 // Footer
 
 function Footer() {
-  const dmg = useDmgDownload();
-  const [showLegal, setShowLegal] = useState(false);
   return (
     <footer className="border-t border-border-soft bg-surface-0">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
-          <div>
-            <div className="flex items-center gap-2">
-              <Logo size={20} />
-              <Brand className="text-lg font-semibold" />
-            </div>
-            <p className="mt-4 max-w-xs text-sm text-text-soft">
-              A native Mac app for AI council deliberation.
-              Local. Open source. GPL-3.0.
-            </p>
-          </div>
-          {[
-            {
-              title: "Product",
-              links: [
-                ["Download (DMG)", dmg.url],
-                ["All releases", `${GITHUB_DESKTOP}/releases`],
-                ["Source", GITHUB_DESKTOP],
-              ],
-            },
-            {
-              title: "Source",
-              links: [
-                ["Prevail desktop", GITHUB_DESKTOP],
-                ["Demo vault", `${GITHUB_DESKTOP}/tree/main/src-tauri/resources/sample-vault`],
-              ],
-            },
-            {
-              title: "Legal",
-              links: [
-                ["Terms of Service", "/tos"],
-                ["Privacy Policy", "/privacy"],
-                ["GPL-3.0 License", `${GITHUB_DESKTOP}/blob/main/LICENSE`],
-                ["Security", `${GITHUB_DESKTOP}/blob/main/SECURITY.md`],
-              ],
-            },
-          ].map((col) => (
-            <div key={col.title}>
-              <div className="text-xs font-medium uppercase tracking-wider text-text-mute">
-                {col.title}
-              </div>
-              <ul className="mt-4 space-y-2 text-sm">
-                {col.links.map(([label, href]) => {
-                  const internal = href.startsWith("/");
-                  return (
-                    <li key={label}>
-                      <a
-                        href={href}
-                        {...(internal
-                          ? {}
-                          : { target: "_blank", rel: "noreferrer" })}
-                        className="text-text-soft hover:text-text"
-                      >
-                        {label}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="mt-14 border-t border-border-soft pt-12">
+        <div>
           <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-text-mute">
             Part of a family of private, local-first tools
           </p>
@@ -1526,8 +1365,8 @@ function Footer() {
                 name: "Memosa",
                 tagline: "Private meeting memory for Mac",
                 href: "https://memosa.dev/",
-                tile: <span className="font-serif text-xl font-semibold text-[#5fd0a8]">M</span>,
-                tileClass: "bg-[#0c0c0e]",
+                tile: <img src="/memosa-logo.png" alt="Memosa" className="h-full w-full object-cover" />,
+                tileClass: "overflow-hidden bg-[#0c0c0e]",
               },
               {
                 name: "Prevail",
@@ -1540,8 +1379,8 @@ function Footer() {
                 name: "AI Ready U",
                 tagline: "Score and grow your AI readiness",
                 href: "https://aireadyu.dev/",
-                tile: <span className="text-xl font-bold text-white">U</span>,
-                tileClass: "bg-[#2f9e6f]",
+                tile: <img src="/aireadyu-logo.svg" alt="AI Ready U" className="h-full w-full" />,
+                tileClass: "overflow-hidden",
               },
             ].map((f) => {
               const inner = (
@@ -1574,55 +1413,25 @@ function Footer() {
             })}
           </div>
         </div>
-        <div className="mt-14 border-t border-border-soft pt-12 text-center">
-          <p className="font-serif text-2xl italic text-text-soft md:text-3xl">
-            Ask a council. <span className="not-italic text-gold">Prevail.</span>
+        {/* One minimal closing section — brand, tagline, the two links that
+            matter, copyright. Everything else lives in the downloads above. */}
+        <div className="mt-16 flex flex-col items-center gap-6 border-t border-border-soft pt-12 text-center">
+          <div className="flex items-center gap-2">
+            <Logo size={22} />
+            <Brand className="text-lg font-semibold" />
+          </div>
+          <p className="font-serif text-2xl italic text-text-soft md:text-3xl text-balance">
+            AI for your <span className="not-italic text-gold">life</span>, not your job.
           </p>
-        </div>
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => setShowLegal(true)}
-            className="text-xs text-text-mute underline-offset-2 hover:text-text-soft hover:underline"
-          >
-            Disclaimer, privacy &amp; legal
-          </button>
-        </div>
-        <div className="mt-6 flex flex-col items-start justify-between gap-3 text-xs text-text-mute md:flex-row md:items-center">
-          <span>© 2026 Prevail.sh · built local, shipped open · alpha</span>
-          <span>Built with Tauri · React · Tailwind · Rust</span>
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-text-soft">
+            <a href="/tos" className="hover:text-text">Terms of Service</a>
+            <a href="/privacy" className="hover:text-text">Privacy Policy</a>
+          </nav>
+          <GitHubStarButton size="lg" />
+          <p className="text-xs text-text-mute">© 2026 Prevail.sh · built local, shipped open</p>
+          <p className="text-[11px] text-text-mute/70">Star &amp; share on GitHub. Ratings and user counts shown on this site are illustrative.</p>
         </div>
       </div>
-
-      {showLegal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLegal(false)} />
-          <div className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface-0 p-7 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Disclaimer, privacy &amp; legal</h3>
-              <button
-                onClick={() => setShowLegal(false)}
-                aria-label="Close"
-                className="rounded-md p-1 text-text-mute hover:bg-surface-1 hover:text-text"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="mt-5 text-sm leading-relaxed text-text-soft">
-              Prevail is an early, experimental alpha released for demonstration and testing. It is provided "as is",
-              without warranty of any kind, and you use it at your own risk. It runs third-party AI tools and, unless
-              Bunker Mode is on, may send data to cloud providers, so always review anything important yourself.
-              Feedback and bug reports are very welcome and directly shape what comes next.
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-text-soft">
-              Prevail is free, open-source software released under the GNU General Public License v3.0. Your vault
-              lives on your Mac in plain files you own. In Bunker Mode nothing leaves your machine; in Cloud Mode
-              your prompts go to the model providers you choose. The app collects no telemetry unless you opt in.
-              This marketing site uses Google Analytics. Ratings and the user count shown elsewhere on this site
-              are illustrative.
-            </p>
-          </div>
-        </div>
-      )}
     </footer>
   );
 }
@@ -1647,30 +1456,32 @@ function Footer() {
 function DemoVideo() {
   return (
     <section id="demo" className="border-t border-border-soft py-20 md:py-28 grain">
-      <div className="mx-auto max-w-5xl px-6">
+      <div className="relative mx-auto max-w-[1700px] px-4 sm:px-6">
+        <div className="glow-gold absolute inset-0 -z-10 opacity-40" />
         <FadeIn>
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-gold">
               See it in action
             </p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-              The whole thing,{" "}
-              <span className="font-serif italic text-text-soft">in two minutes.</span>
+            <h2 className="mx-auto mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
+              Watch it <span className="font-serif italic text-text-soft">work.</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-text-soft">
-              A real walkthrough: convene a council, watch it self-learn, and see
-              your life become markdown you own.
+            <p className="mx-auto mt-4 max-w-3xl text-text-soft">
+              One question, the whole council deliberating, and a single verdict saved as markdown you own.
             </p>
           </div>
         </FadeIn>
         <FadeIn delay={0.15}>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-2xl">
+          <div className="mt-10 overflow-hidden rounded-2xl border border-gold-border bg-surface-0 shadow-2xl">
             <video
-              src="/prevail-demo.mp4"
-              poster="/prevail-demo-poster.jpg"
-              controls
+              src="/prevail-demo2.mp4"
+              poster="/prevail-demo2-poster.jpg"
+              autoPlay
+              muted
+              loop
               playsInline
               preload="metadata"
+              controls
               className="block aspect-video w-full"
             />
           </div>
@@ -1726,39 +1537,41 @@ const THESES = [
   },
 ];
 
+// Illustrated avatars (DiceBear "personas") — modern, friendly, younger-looking
+// flat portraits. Broad skin-tone + hair-color palettes and reduced glasses make
+// the set visibly diverse. Illustrative — labelled as such.
+const PROOF_FACES = ["Maya", "Leo", "Zara", "Theo", "Iris", "Kai", "Nora", "Eli"].map(
+  (seed) =>
+    `https://api.dicebear.com/9.x/personas/svg?seed=${seed}` +
+    `&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf,c1f4d1` +
+    `&skinColor=623d36,92594b,a47c63,b16a5b,cb9e6e,e5a07e,eeb4a4` +
+    `&hairColor=1b1b1b,3a2a1d,6c4a32,a55728,b9a05f,cb6820,e0ddff,ffffff` +
+    `&glassesProbability=35`,
+);
+
 function SocialProof({ center = true, showMeta = true }: { center?: boolean; showMeta?: boolean }) {
-  // Illustrative avatars: generated illustrated portraits (DiceBear), not stock
-  // photos of real people who aren't users. Honest placeholder, and the count /
-  // ratings beside them are explicitly labelled illustrative below.
-  const avatars = ["Aria", "Marcus", "Sofia", "Devin", "Priya"].map(
-    (seed) => `https://api.dicebear.com/9.x/micah/svg?seed=${seed}&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`,
-  );
   return (
     <FadeIn>
-      <div className={`flex max-w-xl flex-col gap-3 ${center ? "mx-auto items-center" : "items-start"}`}>
-        <div className="flex items-center gap-4">
-          <div className="flex -space-x-2.5">
-            {avatars.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt=""
-                loading="lazy"
-                className="h-9 w-9 rounded-full bg-surface-2 ring-2 ring-bg"
-              />
+      <div className={`flex max-w-xl flex-col gap-2.5 ${center ? "mx-auto items-center" : "items-start"}`}>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="h-4 w-4 fill-gold text-gold" />
             ))}
           </div>
-          <div className="text-left">
-            <div className="flex items-center gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />
-              ))}
-              <span className="ml-1 text-sm font-semibold">{ILLUSTRATIVE.rating}</span>
-            </div>
-            <div className="text-sm text-text-soft">
-              Loved by {ILLUSTRATIVE.users} early users
-            </div>
-          </div>
+          <span className="text-sm font-semibold">{ILLUSTRATIVE.rating}</span>
+          <span className="text-sm text-text-soft">· Loved by {ILLUSTRATIVE.users} early users</span>
+        </div>
+        <div className="flex -space-x-2.5">
+          {PROOF_FACES.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt=""
+              loading="lazy"
+              className="h-9 w-9 rounded-full bg-surface-2 object-cover ring-2 ring-bg"
+            />
+          ))}
         </div>
         {showMeta && (
           <div className="flex items-center gap-3">
@@ -1847,143 +1660,9 @@ const LIFE_DOMAINS: { label: string; Icon: typeof Heart }[] = [
   { label: "Wealth", Icon: TrendingUp },
   { label: "Tax", Icon: Receipt },
   { label: "Career", Icon: Briefcase },
-  { label: "Benefits", Icon: Gift },
-  { label: "Home", Icon: Home },
-  { label: "Insure", Icon: ShieldCheck },
-  { label: "Calendar", Icon: Calendar },
-  { label: "Records", Icon: FileText },
   { label: "Family", Icon: Users },
   { label: "Learning", Icon: GraduationCap },
-  { label: "Chief", Icon: Crown },
 ];
-
-const VAULT_QUESTIONS = [
-  { q: "Which of my documents are about to expire?", tag: "Records" },
-  { q: "Can I afford to take three months off?", tag: "Wealth" },
-  { q: "What should I ask at my next review?", tag: "Career" },
-  { q: "Is this insurance policy still worth keeping?", tag: "Insure" },
-];
-
-function LifeDomains() {
-  const [qi, setQi] = useState(0);
-  const [active, setActive] = useState(0);
-  const reduce = useReducedMotion();
-  const N = LIFE_DOMAINS.length;
-  useEffect(() => {
-    if (reduce) return;
-    const tq = setInterval(() => setQi((n) => (n + 1) % VAULT_QUESTIONS.length), 3200);
-    const ta = setInterval(() => setActive((a) => (a + 1) % N), 1500);
-    return () => { clearInterval(tq); clearInterval(ta); };
-  }, [reduce, N]);
-  const R = 40;
-  const nodes = LIFE_DOMAINS.map((d, i) => {
-    const ang = ((-90 + i * (360 / N)) * Math.PI) / 180;
-    return { ...d, x: 50 + R * Math.cos(ang), y: 50 + R * Math.sin(ang) };
-  });
-  return (
-    <section className="border-t border-border-soft py-24 md:py-28">
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">One place for all of it</p>
-          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-            Your whole life, <span className="font-serif italic text-text-soft">one domain at a time.</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-center text-text-soft">
-            Prevail organizes your life into domains, each a folder the council can reason over. Start with one, or all of them.
-          </p>
-        </FadeIn>
-        <FadeIn delay={0.1}>
-          <div className="relative mx-auto mt-14 aspect-square w-full max-w-[560px]">
-            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
-              {nodes.map((n, i) => (
-                <line
-                  key={n.label}
-                  x1="50"
-                  y1="50"
-                  x2={n.x}
-                  y2={n.y}
-                  stroke="currentColor"
-                  strokeWidth={active === i ? 0.35 : 0.2}
-                  strokeDasharray="0.9 0.9"
-                  className={`transition-all duration-500 ${active === i ? "text-gold/60" : "text-border"}`}
-                />
-              ))}
-              {/* pulses flowing from each domain into "You" */}
-              {!reduce && nodes.map((n, i) => (
-                <motion.circle
-                  key={`pulse-${n.label}`}
-                  r="0.75"
-                  className="fill-gold"
-                  initial={{ cx: n.x, cy: n.y, opacity: 0 }}
-                  animate={{ cx: 50, cy: 50, opacity: [0, 0.9, 0] }}
-                  transition={{ duration: 2.1, repeat: Infinity, ease: "easeIn", delay: (i / N) * 2.1 }}
-                />
-              ))}
-            </svg>
-
-            {/* breathing glow behind center */}
-            {!reduce && (
-              <motion.span
-                className="absolute left-1/2 top-1/2 -z-0 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{ width: "34%", height: "34%", background: "radial-gradient(circle, rgba(196,163,90,0.28), transparent 70%)" }}
-                animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.25, 0.6] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-                aria-hidden
-              />
-            )}
-
-            <div className="absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-gold-border bg-surface-1 shadow-lg md:h-24 md:w-24">
-              <Logo size={26} />
-              <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold">You</span>
-            </div>
-
-            {nodes.map((n, i) => {
-              const Icon = n.Icon;
-              const on = active === i;
-              return (
-                <div
-                  key={n.label}
-                  className="group absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
-                  style={{ left: `${n.x}%`, top: `${n.y}%` }}
-                >
-                  <motion.div
-                    initial={reduce ? false : { opacity: 0, scale: 0.4 }}
-                    whileInView={reduce ? undefined : { opacity: 1, scale: 1 }}
-                    viewport={{ once: true, amount: 0.4 }}
-                    transition={{ delay: 0.25 + i * 0.05, type: "spring", stiffness: 220, damping: 18 }}
-                    className={`flex h-11 w-11 items-center justify-center rounded-full border bg-surface-0 transition-all duration-500 md:h-12 md:w-12 group-hover:border-gold-border group-hover:text-gold ${
-                      on ? "border-gold-border text-gold shadow-[0_0_18px_rgba(196,163,90,0.35)]" : "border-border-soft text-text-soft"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </motion.div>
-                  <span className={`font-mono text-[9px] uppercase tracking-[0.14em] transition-colors duration-500 md:text-[10px] ${on ? "text-gold" : "text-text-mute"}`}>
-                    {n.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </FadeIn>
-        <FadeIn delay={0.15}>
-          <div className="mx-auto mt-12 max-w-md text-center">
-            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-mute">Ask your vault</div>
-            <motion.p
-              key={qi}
-              initial={reduce ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="mt-3 text-lg italic text-text-soft md:text-xl"
-            >
-              "{VAULT_QUESTIONS[qi].q}"
-            </motion.p>
-            <span className="mt-3 inline-block rounded-full border border-border-soft px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-gold">{VAULT_QUESTIONS[qi].tag}</span>
-          </div>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DIFFERENTIATORS — the genuinely unique stuff: a council you assemble,
@@ -2023,7 +1702,7 @@ function Differentiators() {
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn>
           <p className="text-center text-xs uppercase tracking-[0.2em] text-ai">More than a chatbot</p>
-          <h2 className="mx-auto mt-4 max-w-2xl text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+          <h2 className="mx-auto mt-4 text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
             It doesn't just answer. <span className="font-serif italic text-text-soft">It works for you.</span>
           </h2>
         </FadeIn>
@@ -2397,9 +2076,7 @@ function LandingMain() {
   return (
     <main className="pt-14">
       <Hero />
-      <LifeDomains />
       <DemoVideo />
-      <HardQuestionsSection />
       <Pillars />
       <Differentiators />
       <DownloadSection />
