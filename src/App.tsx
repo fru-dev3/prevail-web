@@ -2,6 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { motion, useInView, useReducedMotion, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
+  Activity,
+  BarChart3,
+  Boxes,
+  EyeOff,
+  Landmark,
+  LayoutGrid,
+  Monitor,
+  Plug,
+  RefreshCw,
+  Send,
+  Wallet,
   Briefcase,
   Check,
   ChevronLeft,
@@ -18,6 +29,7 @@ import {
   Paperclip,
   Play,
   Receipt,
+  Rocket,
   Scale,
   ShieldCheck,
   Sparkles,
@@ -318,8 +330,8 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           <a href="/#how" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> How it works</a>
           <a href="/thesis" className="inline-flex items-center gap-1.5 hover:text-text"><Sparkles className="h-4 w-4" /> Thesis</a>
           <a href="/#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
+          <a href="/changelog" className="inline-flex items-center gap-1.5 hover:text-text"><Rocket className="h-4 w-4" /> Releases</a>
           <a href="https://docs.prevail.sh" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-text"><FileText className="h-4 w-4" /> Docs</a>
-          <a href="https://prevail.sh/llms.txt" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-text"><Terminal className="h-4 w-4" /> llms.txt</a>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -1431,6 +1443,7 @@ function Footer() {
             AI for your <span className="not-italic text-gold">life</span>, not your job.
           </p>
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-text-soft">
+            <a href="/changelog" className="hover:text-text">Changelog &amp; roadmap</a>
             <a href="/tos" className="hover:text-text">Terms of Service</a>
             <a href="/privacy" className="hover:text-text">Privacy Policy</a>
           </nav>
@@ -2145,6 +2158,223 @@ function LegalPage() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CHANGELOG + ROADMAP — minimalist. Shipped = real major milestones distilled
+// from the desktop/CLI CHANGELOG.md; Roadmap = directional, not commitments.
+
+const RELEASES_URL = `${GITHUB_DESKTOP}/releases`;
+const RELEASES_LATEST = `${GITHUB_DESKTOP}/releases/latest`;
+
+const SHIPPED = [
+  {
+    date: "Jun 2026",
+    tag: "Windows",
+    Icon: Monitor,
+    title: "Prevail for Windows",
+    body: "A native Windows app (NSIS installer) now ships alongside macOS. Same app, same vault.",
+    href: RELEASES_LATEST,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Loops",
+    Icon: RefreshCw,
+    title: "Self-driving Domain Loops",
+    body: "Each domain runs on persistent loops that learn from their history, create tracked tasks, ask permission for anything irreversible, and act through your connectors.",
+    href: RELEASES_LATEST,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Board",
+    Icon: LayoutGrid,
+    title: "A board for your work",
+    body: "A Kanban board to plan and track the tasks Prevail surfaces across every domain, in one view.",
+    href: RELEASES_LATEST,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Incognito",
+    Icon: EyeOff,
+    title: "Incognito mode",
+    body: "Convene a council that leaves no trace. An ephemeral session with nothing written to your vault.",
+    href: RELEASES_LATEST,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Benchmark",
+    Icon: BarChart3,
+    title: "Benchmark against your life",
+    body: "Per-domain leaderboards graded two ways, scheduled runs, richer scenarios (recency, bias, brevity, tax traps), and drill-down into every question.",
+    href: RELEASES_URL,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Recommendations",
+    Icon: Sparkles,
+    title: "Proactive recommendations and self-connecting apps",
+    body: "A feed that watches how you work and proposes the next moves. Connect a tool just by describing the goal and an agent sets it up.",
+    href: RELEASES_URL,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Desktop",
+    Icon: ShieldCheck,
+    title: "Native app, signed and hardened",
+    body: "A native macOS app, signed and notarized by Apple, with demo-first onboarding, an embedded vault, and on-device encryption.",
+    href: RELEASES_URL,
+  },
+  {
+    date: "Jun 2026",
+    tag: "Council",
+    Icon: Scale,
+    title: "The council",
+    body: "One question fans out to every model you have. A chair you choose writes a single verdict with a panel showing where they disagreed.",
+    href: RELEASES_URL,
+  },
+  {
+    date: "May 2026",
+    tag: "Engine",
+    Icon: Terminal,
+    title: "The first release",
+    body: "The Prevail engine: your life as plain markdown folders an AI can reason over. Local-first from line one.",
+    href: RELEASES_URL,
+  },
+];
+
+const ROADMAP = [
+  {
+    Icon: Landmark,
+    title: "Life connectors and ecosystem",
+    body: "First-class connectors for the parts of life that matter most: banking, finance, wealth, insurance, and health, all flowing into your vault.",
+  },
+  {
+    Icon: Send,
+    title: "More surfaces",
+    body: "Reach the council where you already are: Telegram, WhatsApp, and more.",
+  },
+  {
+    Icon: Boxes,
+    title: "Open-source models",
+    body: "Broader, first-class support for local and open models, not just the frontier.",
+  },
+  {
+    Icon: Plug,
+    title: "MCP and the agent ecosystem",
+    body: "Robust MCP interop with tools like OpenClaw, Paperclip, and the Hermes agent.",
+  },
+  {
+    Icon: Wallet,
+    title: "Budgets and cost control",
+    body: "Better management of AI spend and telemetry, by model and by domain.",
+  },
+  {
+    Icon: Activity,
+    title: "Telemetry and insights",
+    body: "Opt-in, in-app collection that surfaces how your council performs over time.",
+  },
+];
+
+function ChangelogPage() {
+  return (
+    <main className="pt-14">
+      <section className="relative overflow-hidden py-20 md:py-24 grain">
+        <div className="glow-gold absolute inset-0 -z-10 opacity-25" />
+        <div className="mx-auto max-w-3xl px-6">
+          <FadeIn>
+            <p className="text-xs uppercase tracking-[0.2em] text-gold">Changelog &amp; roadmap</p>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
+              What's shipped,{" "}
+              <span className="font-serif italic text-text-soft">what's next.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-text-soft">
+              Prevail moves fast. The major milestones so far, and a look at where
+              it's heading.
+            </p>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* On the horizon — roadmap as a timeline (cyan), above the shipped line */}
+      <section className="border-t border-border-soft py-14 md:py-16 grain">
+        <div className="mx-auto max-w-3xl px-6">
+          <FadeIn>
+            <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-ai">On the horizon</h2>
+            <p className="mt-2 text-sm text-text-mute">Directional, not a commitment. It shifts as we learn.</p>
+          </FadeIn>
+          <div className="mt-8 border-l border-dashed border-ai/40 pl-6">
+            {ROADMAP.map((r, i) => {
+              const Icon = r.Icon;
+              return (
+                <FadeIn key={r.title} delay={i * 0.04}>
+                  <div className="relative pb-9 last:pb-0">
+                    <span className="absolute -left-[31px] top-0.5 flex h-6 w-6 items-center justify-center rounded-full border border-ai/40 bg-bg text-ai ring-4 ring-bg">
+                      <Icon className="h-3.5 w-3.5" />
+                    </span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="rounded-full border border-ai/40 bg-ai/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-ai">Planned</span>
+                    </div>
+                    <h3 className="mt-2 text-lg font-semibold tracking-[-0.01em]">{r.title}</h3>
+                    <p className="mt-1.5 leading-relaxed text-text-soft">{r.body}</p>
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Shipped — deployed timeline (gold), below the line */}
+      <section className="border-t border-border-soft py-14 md:py-16">
+        <div className="mx-auto max-w-3xl px-6">
+          <FadeIn>
+            <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-gold">Shipped</h2>
+          </FadeIn>
+          <div className="mt-8 border-l border-border-soft pl-6">
+            {SHIPPED.map((r, i) => {
+              const Icon = r.Icon;
+              return (
+                <FadeIn key={r.title} delay={i * 0.04}>
+                  <div className="relative pb-9 last:pb-0">
+                    <span className="absolute -left-[31px] top-0.5 flex h-6 w-6 items-center justify-center rounded-full border border-gold-border bg-surface-0 text-gold ring-4 ring-bg">
+                      <Icon className="h-3.5 w-3.5" />
+                    </span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="font-mono text-xs uppercase tracking-wider text-text-mute">{r.date}</span>
+                      <a
+                        href={r.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="View on GitHub Releases"
+                        className="rounded-full border border-gold-border/60 bg-gold/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gold transition-colors hover:bg-gold/20"
+                      >
+                        {r.tag} ↗
+                      </a>
+                    </div>
+                    <h3 className="mt-2 text-lg font-semibold tracking-[-0.01em]">{r.title}</h3>
+                    <p className="mt-1.5 leading-relaxed text-text-soft">{r.body}</p>
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
+          <FadeIn>
+            <p className="mt-2 text-sm text-text-mute">
+              Full per-version notes live on{" "}
+              <a href={`${GITHUB_DESKTOP}/releases`} target="_blank" rel="noreferrer" className="text-text-soft underline-offset-2 hover:text-text hover:underline">GitHub Releases</a>.
+            </p>
+          </FadeIn>
+          <FadeIn>
+            <div className="mt-10">
+              <a href="/" className="inline-flex items-center gap-1.5 text-sm text-text-soft hover:text-text">
+                <ArrowRight className="h-3.5 w-3.5 rotate-180" /> Back to home
+              </a>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function LandingMain() {
   return (
     <main className="pt-14">
@@ -2162,6 +2392,7 @@ export default function App() {
   const [theme, toggleTheme] = useTheme();
   const path = typeof window !== "undefined" ? window.location.pathname.replace(/\/+$/, "") : "";
   const isThesis = path === "/thesis";
+  const isChangelog = path === "/changelog" || path === "/roadmap";
   const isLegal =
     path === "/tos" ||
     path === "/terms" ||
@@ -2186,7 +2417,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg">
       <Nav theme={theme} onToggleTheme={toggleTheme} />
-      {isThesis ? <ThesisPage /> : isLegal ? <LegalPage /> : <LandingMain />}
+      {isThesis ? <ThesisPage /> : isChangelog ? <ChangelogPage /> : isLegal ? <LegalPage /> : <LandingMain />}
       <Footer />
     </div>
   );
