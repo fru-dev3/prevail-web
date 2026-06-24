@@ -18,6 +18,20 @@
     Cache-Control = "public, max-age=300"
     X-Content-Type-Options = "nosniff"
 
+# Desktop app installer — same pattern as /install, but installs the macOS .app.
+[[redirects]]
+  from = "/install-mac"
+  to = "/install-mac"
+  status = 200
+  force = false
+
+[[headers]]
+  for = "/install-mac"
+  [headers.values]
+    Content-Type = "text/x-shellscript; charset=utf-8"
+    Cache-Control = "public, max-age=300"
+    X-Content-Type-Options = "nosniff"
+
 # SPA fallback — serve index.html for all routes
 [[redirects]]
   from = "/*"
