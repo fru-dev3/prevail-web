@@ -945,7 +945,7 @@ function Pillars() {
             {
               icon: Scale,
               title: "A council, not just one model",
-              text: "Ask every AI model at once, not just one. A chair reads all the answers, writes a single verdict, and flags where they disagree.",
+              text: "Ask every AI model at once, not just one. A chair reads all the answers, writes a single verdict, and flags where they disagree. New: hand a task to an agent — Hermes, Pi, OpenCode — and it runs it end-to-end, not just answers.",
               color: "#c4a35a",
               visual: (
                 <div className="flex flex-col items-center">
