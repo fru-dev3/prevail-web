@@ -24,7 +24,9 @@
   /* Text */
   --color-text: #f5f3ed;
   --color-text-soft: #b6b1a3;
-  --color-text-mute: #6e6a5e;
+  /* Lifted from #6e6a5e — the old value was ~3.3:1 on the page ground and
+     failed WCAG AA for the many small captions set in it. */
+  --color-text-mute: #8b8677;
 
   /* Brand accents */
   --color-gold: #c4a35a;

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { motion, useInView, useReducedMotion, useMotionValue, useSpring, useTransform, MotionConfig } from "framer-motion";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { motion, useInView, useReducedMotion, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
   Activity,
@@ -23,8 +23,8 @@ import {
   FileText,
   GraduationCap,
   Heart,
-  Home,
   Layers,
+  Menu,
   Moon,
   Paperclip,
   Play,
@@ -39,6 +39,7 @@ import {
   Terminal,
   TrendingUp,
   Users,
+  X,
 } from "lucide-react";
 import {
   siApple,
@@ -98,6 +99,22 @@ function useIsWindows(): boolean {
   }, []);
 }
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+// GA4 event helper. gtag is loaded in index.html; every conversion-relevant
+// action on the page reports through here so we can actually measure what
+// converts (downloads, CLI copies, demo plays) instead of guessing.
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+function track(name: string, params?: Record<string, unknown>) {
+  try {
+    window.gtag?.("event", name, params);
+  } catch {
+    /* analytics must never break the page */
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Primitives
@@ -233,18 +250,24 @@ function OpenClawMark({ className = "" }: { className?: string }) {
   );
 }
 
-// "Works with" ecosystem strip — Fru's own systems (OpenClaw, Paperclip,
-// Hermes) alongside the model CLIs they bridge to.
-// Each mark carries its brand color so the strip reads at a glance. The icons
-// render in `currentColor`, so the wrapper sets the color per brand. OpenAI's
-// mark is monochrome by design, so it stays light on the dark strip.
-const WORKS_WITH = [
-  { name: "OpenClaw", color: "#ff4d4d", render: (c: string) => <OpenClawMark className={c} /> },
-  { name: "Paperclip", color: "#0092b7", render: (c: string) => <Paperclip className={c} /> },
-  { name: "Gemini", color: "#4285F4", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
-  { name: "Codex", color: "#ededed", render: (c: string) => <OpenAIMark className={c} /> },
+// Hero model strip — recognizable model brands ONLY, in their official
+// colors, so a cold visitor borrows credibility from names they already
+// trust. Our own ecosystem tools (OpenClaw, Paperclip, Hermes) live in the
+// dedicated Ecosystem section instead — mixing unknown marks in here dilutes
+// the effect.
+const MODEL_STRIP = [
   { name: "Claude", color: "#cc785c", render: (c: string) => <SimpleIcon icon={siClaude} className={c} /> },
-  { name: "Hermes", color: "#c4a8ff", render: (c: string) => <HermesBrand className={c} /> },
+  { name: "OpenAI", color: "#ededed", render: (c: string) => <OpenAIMark className={c} /> },
+  { name: "Gemini", color: "#4285F4", render: (c: string) => <SimpleIcon icon={siGooglegemini} className={c} /> },
+  { name: "Ollama", color: "#ededed", render: (c: string) => <SimpleIcon icon={siOllama} className={c} /> },
+];
+
+// Ecosystem strip — the agent stack Prevail shares a knowledge layer with.
+const ECOSYSTEM = [
+  { name: "OpenClaw", color: "#ff4d4d", blurb: "Chat gateway on Telegram & WhatsApp", render: (c: string) => <OpenClawMark className={c} /> },
+  { name: "Paperclip", color: "#0092b7", blurb: "A team of agents for your work", render: (c: string) => <Paperclip className={c} /> },
+  { name: "Hermes", color: "#c4a8ff", blurb: "An agent harness for autonomous tasks", render: (c: string) => <HermesBrand className={c} /> },
+  { name: "MCP", color: "#6ee787", blurb: "Your vault, readable by any MCP client", render: (c: string) => <Plug className={c} /> },
 ];
 
 // Reusable model-logo row — actual brand logos in their official colors.
@@ -291,6 +314,7 @@ function GitHubStarButton({
       target="_blank"
       rel="noreferrer"
       title="Star on GitHub"
+      onClick={() => track("github_star_click", { size })}
       className={`group inline-flex items-center gap-2 rounded-full bg-text text-bg transition-all hover:opacity-90 hover:-translate-y-0.5 ${
         isLg ? "px-5 py-2.5 text-sm" : "px-3.5 py-1.5 text-xs"
       } ${className}`}
@@ -312,7 +336,17 @@ function formatStars(n: number): string {
 // ─────────────────────────────────────────────────────────────────────────────
 // Nav — frosted, minimal
 
+const NAV_LINKS = [
+  { href: "/#demo", label: "Demo", Icon: Play, badge: true },
+  { href: "/#how", label: "How it works", Icon: Layers },
+  { href: "/thesis", label: "Thesis", Icon: Sparkles },
+  { href: "/#install", label: "Install", Icon: Download },
+  { href: "/changelog", label: "Releases", Icon: Rocket },
+  { href: "https://docs.prevail.sh", label: "Docs", Icon: FileText, external: true },
+] as const;
+
 function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
+  const [open, setOpen] = useState(false);
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 frost border-b border-border-soft">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
@@ -323,15 +357,19 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           </span>
         </a>
         <div className="hidden items-center gap-6 text-sm text-text-soft md:flex">
-          <a href="/#demo" className="inline-flex items-center gap-1.5 hover:text-text">
-            <Play className="h-4 w-4" /> Demo
-            <span className="rounded-full bg-gold/15 px-1.5 py-0.5 text-[10px] font-semibold text-gold">{DEMO_SLIDES.length}</span>
-          </a>
-          <a href="/#how" className="inline-flex items-center gap-1.5 hover:text-text"><Layers className="h-4 w-4" /> How it works</a>
-          <a href="/thesis" className="inline-flex items-center gap-1.5 hover:text-text"><Sparkles className="h-4 w-4" /> Thesis</a>
-          <a href="/#install" className="inline-flex items-center gap-1.5 hover:text-text"><Download className="h-4 w-4" /> Install</a>
-          <a href="/changelog" className="inline-flex items-center gap-1.5 hover:text-text"><Rocket className="h-4 w-4" /> Releases</a>
-          <a href="https://docs.prevail.sh" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-text"><FileText className="h-4 w-4" /> Docs</a>
+          {NAV_LINKS.map((l) => (
+            <a
+              key={l.label}
+              href={l.href}
+              {...("external" in l && l.external ? { target: "_blank", rel: "noreferrer" } : {})}
+              className="inline-flex items-center gap-1.5 hover:text-text"
+            >
+              <l.Icon className="h-4 w-4" /> {l.label}
+              {"badge" in l && l.badge && (
+                <span className="rounded-full bg-gold/15 px-1.5 py-0.5 text-[10px] font-semibold text-gold">{DEMO_SLIDES.length}</span>
+              )}
+            </a>
+          ))}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -346,14 +384,44 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           </span>
           <a
             href="#install"
+            onClick={() => track("download_click", { location: "nav" })}
             className="inline-flex items-center gap-1.5 rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:px-4"
             style={{ boxShadow: "0 4px 24px rgba(196, 163, 90, 0.25)" }}
           >
             Download
             <ArrowRight className="h-3.5 w-3.5" />
           </a>
+          <button
+            onClick={() => setOpen((o) => !o)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-border-soft text-text-soft hover:bg-surface-1 hover:text-text md:hidden"
+          >
+            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
       </div>
+      {/* Mobile menu sheet — links were previously unreachable below md */}
+      {open && (
+        <div className="frost border-t border-border-soft md:hidden">
+          <div className="mx-auto grid max-w-6xl gap-1 px-6 py-4">
+            {NAV_LINKS.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                {...("external" in l && l.external ? { target: "_blank", rel: "noreferrer" } : {})}
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm text-text-soft hover:bg-surface-1 hover:text-text"
+              >
+                <l.Icon className="h-4 w-4" /> {l.label}
+              </a>
+            ))}
+            <div className="mt-2 border-t border-border-soft pt-3">
+              <GitHubStarButton />
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
@@ -424,65 +492,14 @@ function Logo({ size = 24, animated = false }: { size?: number; animated?: boole
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HARNESS LINE — the category claim. Every other AI tool is a *coding* harness:
-// a wrapper that points a model (Claude, Codex, Antigravity, Ollama) at a
-// codebase. Prevail wraps the same models and points them at your *life*. We
-// say it the way an editor would — strike the word "coding", write "life" over
-// it. The frozen / reduced-motion / SSR state already reads "A c̶o̶d̶i̶n̶g̶ life
-// harness." so the wordplay never depends on JS running.
-// Types `word` out character by character, holds, deletes it back slowly, then
-// calls onCycle so the parent advances to the next domain. The word stays in
-// sync with the highlighted domain in the hero radial (parent owns the index).
-// A faint full-word ghost sits behind so the word has a "background feel".
-function DomainTyper({ word, onCycle }: { word: string; onCycle: () => void }) {
+// HEADLINE — the editor's strike, in plain language. Everyone built AI agents
+// for work; Prevail is the one for your life. One animation trick only: the
+// gold strike through "your job". No typewriter, no jargon — the headline is
+// always whole and readable, and it passes the five-second "what is this?"
+// test. The reduced-motion / SSR state lands on the finished correction.
+function StrikeHeadline() {
   const reduce = useReducedMotion();
-  const [text, setText] = useState("");
-  useEffect(() => {
-    if (reduce) {
-      setText(word);
-      return;
-    }
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const type = (i: number) => {
-      if (cancelled) return;
-      setText(word.slice(0, i));
-      timer = i < word.length
-        ? setTimeout(() => type(i + 1), 130)
-        : setTimeout(() => del(word.length), 2600);
-    };
-    const del = (i: number) => {
-      if (cancelled) return;
-      setText(word.slice(0, i));
-      timer = i > 0
-        ? setTimeout(() => del(i - 1), 160)
-        : setTimeout(() => { if (!cancelled) onCycle(); }, 600);
-    };
-    setText("");
-    timer = setTimeout(() => type(1), 250);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, [word, reduce, onCycle]);
-
-  return (
-    // The untyped remainder is rendered invisibly so the box always reserves the
-    // full word's width — the centered headline never jitters as it types.
-    <span className="font-serif italic">
-      <span className="text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]">{text}</span>
-      {!reduce && (
-        <span
-          aria-hidden
-          className="mx-[2px] inline-block h-[0.78em] w-[3px] animate-pulse rounded-full bg-gold align-baseline"
-        />
-      )}
-      <span aria-hidden className="invisible">{word.slice(text.length)}</span>
-    </span>
-  );
-}
-
-function HarnessLine({ word, onCycle }: { word: string; onCycle: () => void }) {
-  const reduce = useReducedMotion();
-  // Dim "coding" only after the strike has been drawn. Reduced motion lands on
-  // the finished correction immediately.
+  // Dim "your job" only after the strike has been drawn.
   const [struck, setStruck] = useState(!!reduce);
   useEffect(() => {
     if (reduce) return;
@@ -495,31 +512,31 @@ function HarnessLine({ word, onCycle }: { word: string; onCycle: () => void }) {
     : { duration: 0.45, delay: 0.55, ease: EASE };
 
   return (
-    <h1 className="text-center font-semibold tracking-[-0.02em] leading-[1.08] text-[clamp(1.6rem,6.2vw,5rem)]">
-      <span className="flex flex-nowrap items-baseline justify-center gap-x-3 whitespace-nowrap sm:gap-x-4">
-        <span className="font-serif italic">
-          <span className="text-ai">AI</span>{" "}
-          <span className="text-gold">harness</span>
+    <h1 className="text-center font-semibold tracking-[-0.02em] leading-[1.08] text-[clamp(2rem,6.4vw,4.6rem)]">
+      <span className="flex flex-wrap items-baseline justify-center gap-x-3 sm:gap-x-4">
+        <span className="text-text">
+          <span className="text-ai">AI</span> agents for
         </span>
-        <span className="text-text">for</span>
-        <span className="relative inline-block text-[0.5em]">
+        <span className="relative inline-block whitespace-nowrap">
           <span
             className={`transition-colors duration-500 ${
               struck ? "text-text-mute" : "text-text"
             }`}
           >
-            coding
+            your job
           </span>
           <motion.span
             aria-hidden
-            className="absolute inset-x-[-2px] top-1/2 h-[0.06em] -translate-y-1/2 rounded-full bg-gold"
+            className="absolute inset-x-[-2px] top-1/2 h-[0.05em] -translate-y-1/2 rounded-full bg-gold"
             style={{ transformOrigin: "left center" }}
             initial={{ scaleX: reduce ? 1 : 0 }}
             animate={{ scaleX: 1 }}
             transition={strikeT}
           />
         </span>
-        <DomainTyper word={word} onCycle={onCycle} />
+        <span className="whitespace-nowrap font-serif italic text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]">
+          your life.
+        </span>
       </span>
     </h1>
   );
@@ -528,150 +545,39 @@ function HarnessLine({ word, onCycle }: { word: string; onCycle: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // HERO
 
-// Deterministic dust-mote field — fixed positions so there's no hydration
-// flicker and no Math.random. Spread across the canvas, varied size/opacity.
-const DUST = Array.from({ length: 44 }, (_, i) => {
-  // cheap hash-ish spread from the index — stable across renders
-  const a = (i * 73 + 11) % 100;
-  const b = (i * 37 + 7) % 100;
-  const c = (i * 53) % 100;
-  return {
-    left: a,
-    top: b,
-    size: 1.5 + (c % 4),
-    delay: (i % 10) * 0.7,
-    dur: 9 + (c % 8),
-    drift: 14 + (c % 22),
-    opacity: 0.18 + (c % 5) * 0.06,
-  };
-});
-
-// Ambient hero background — three layers that fill the empty space with life:
-//   1. slow-drifting blurred "cloud" orbs (gold + the "AI" blue) that breathe
-//   2. a floating dust-mote field
-//   3. a gold glow that tracks the cursor
-// Layers parallax-shift with the mouse for depth. This is intentionally
-// decoration the owner wants ALWAYS on, so it does NOT gate on the OS
-// reduced-motion preference (the headline/strike animations still do).
-// aria-hidden + pointer-events-none so it never interferes with content.
-function HeroAuroras() {
-  // Normalized cursor position (-0.5 .. 0.5), spring-smoothed.
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  // Raw cursor pixels for the follow-glow.
-  const gx = useMotionValue(-1000);
-  const gy = useMotionValue(-1000);
-  const sx = useSpring(mx, { stiffness: 50, damping: 22, mass: 0.6 });
-  const sy = useSpring(my, { stiffness: 50, damping: 22, mass: 0.6 });
-  const glowX = useSpring(gx, { stiffness: 120, damping: 26, mass: 0.4 });
-  const glowY = useSpring(gy, { stiffness: 120, damping: 26, mass: 0.4 });
-
-  // Parallax offsets per depth (px). Far layers move least.
-  const farX = useTransform(sx, (v) => v * -28);
-  const farY = useTransform(sy, (v) => v * -28);
-  const midX = useTransform(sx, (v) => v * 55);
-  const midY = useTransform(sy, (v) => v * 55);
-  const nearX = useTransform(sx, (v) => v * 95);
-  const nearY = useTransform(sy, (v) => v * 95);
-
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      mx.set(e.clientX / window.innerWidth - 0.5);
-      my.set(e.clientY / window.innerHeight - 0.5);
-      gx.set(e.clientX);
-      gy.set(e.clientY);
-    };
-    window.addEventListener("pointermove", onMove);
-    return () => window.removeEventListener("pointermove", onMove);
-  }, [mx, my, gx, gy]);
-
-  // Cool-dominant palette: the "AI" blue + neutral cool-white carry the
-  // ambient motion; gold appears only as a single low-key warm accent so the
-  // brand colour stays present without taking over.
+// Ambient hero background — a single slow gold aurora plus a faint cool
+// counterweight. Deliberately quiet: the download button should be the
+// brightest thing in the viewport, and the layer respects the OS
+// reduced-motion preference like everything else on the page.
+function HeroGlow() {
+  const reduce = useReducedMotion();
   const orbs = [
     {
-      className: "left-[-10%] top-[2%] h-[46vw] w-[46vw] bg-[radial-gradient(circle,rgba(122,162,247,0.30),transparent_70%)]",
-      anim: { x: [0, 60, -20, 0], y: [0, -40, 26, 0], scale: [1, 1.12, 0.94, 1] },
-      dur: 20,
+      className: "left-[8%] top-[-12%] h-[52vw] w-[52vw] bg-[radial-gradient(circle,rgba(196,163,90,0.16),transparent_70%)]",
+      anim: { x: [0, 40, -24, 0], y: [0, -24, 18, 0], scale: [1, 1.08, 0.95, 1] },
+      dur: 26,
     },
     {
-      className: "right-[-8%] top-[-6%] h-[40vw] w-[40vw] bg-[radial-gradient(circle,rgba(180,200,255,0.16),transparent_70%)]",
-      anim: { x: [0, -48, 20, 0], y: [0, 36, -24, 0], scale: [1, 0.92, 1.1, 1] },
-      dur: 24,
-    },
-    {
-      className: "left-[34%] bottom-[-18%] h-[44vw] w-[44vw] bg-[radial-gradient(circle,rgba(196,163,90,0.14),transparent_70%)]",
-      anim: { x: [0, 40, -34, 0], y: [0, -28, 20, 0], scale: [1, 1.14, 0.88, 1] },
-      dur: 28,
+      className: "right-[-12%] top-[18%] h-[38vw] w-[38vw] bg-[radial-gradient(circle,rgba(95,191,255,0.09),transparent_70%)]",
+      anim: { x: [0, -32, 16, 0], y: [0, 24, -16, 0], scale: [1, 0.94, 1.06, 1] },
+      dur: 32,
     },
   ];
-
   return (
-    // reducedMotion="never" forces this purely-decorative layer to animate
-    // even when the OS has Reduce Motion on (framer-motion v12 otherwise
-    // freezes all animations globally when it detects that preference).
-    <MotionConfig reducedMotion="never">
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      {/* Layer 1 — drifting cloud orbs (far parallax) */}
-      <motion.div className="absolute inset-0" style={{ x: farX, y: farY }}>
-        {orbs.map((o, i) => (
+      {orbs.map((o, i) =>
+        reduce ? (
+          <div key={i} className={`absolute rounded-full blur-3xl ${o.className}`} />
+        ) : (
           <motion.div
             key={i}
             className={`absolute rounded-full blur-3xl ${o.className}`}
             animate={o.anim}
             transition={{ duration: o.dur, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
           />
-        ))}
-      </motion.div>
-
-      {/* Layer 2 — floating dust motes (mid parallax) */}
-      <motion.div className="absolute inset-0" style={{ x: midX, y: midY }}>
-        {DUST.map((d, i) => (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{
-              left: `${d.left}%`,
-              top: `${d.top}%`,
-              width: d.size + 1,
-              height: d.size + 1,
-              opacity: d.opacity * 0.8,
-              boxShadow: "0 0 6px rgba(200,212,255,0.45)",
-            }}
-            animate={{ y: [0, -d.drift, 0], opacity: [d.opacity, Math.min(d.opacity * 2.2, 0.9), d.opacity] }}
-            transition={{ duration: d.dur, delay: d.delay, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
-          />
-        ))}
-      </motion.div>
-
-      {/* Layer 3 — cursor-following glow. Cool blue-white so the reactive
-          motion reads clearly without adding more gold to the page. */}
-      <motion.div
-        className="absolute h-[55vw] w-[55vw] rounded-full blur-3xl bg-[radial-gradient(circle,rgba(150,178,255,0.34),rgba(150,178,255,0.10)_35%,transparent_65%)]"
-        style={{ left: glowX, top: glowY, x: "-50%", y: "-50%" }}
-      />
-
-      {/* Layer 4 — near sparkle layer (strongest parallax on mouse move) */}
-      <motion.div className="absolute inset-0" style={{ x: nearX, y: nearY }}>
-        {DUST.filter((_, i) => i % 3 === 0).map((d, i) => (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-ai"
-            style={{
-              left: `${(d.left + 13) % 100}%`,
-              top: `${(d.top + 29) % 100}%`,
-              width: d.size,
-              height: d.size,
-              opacity: d.opacity * 0.9,
-              boxShadow: "0 0 6px rgba(122,162,247,0.5)",
-            }}
-            animate={{ y: [0, d.drift * 0.8, 0] }}
-            transition={{ duration: d.dur + 3, delay: d.delay, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
-          />
-        ))}
-      </motion.div>
+        ),
+      )}
     </div>
-    </MotionConfig>
   );
 }
 
@@ -679,105 +585,123 @@ function Hero() {
   const dmg = useDmgDownload();
   const exe = useExeDownload();
   const isWindows = useIsWindows();
-  // Shared highlighted domain — the headline typewriter and the radial both read
-  // it, so the word being typed always matches the lit-up node on the right. The
-  // typewriter drives the advance (after it finishes deleting a word).
-  const [activeDomain, setActiveDomain] = useState(0);
-  const cycleDomain = useCallback(() => {
-    setActiveDomain((cur) => {
-      let n = cur;
-      while (n === cur) n = Math.floor(Math.random() * LIFE_DOMAINS.length);
-      return n;
-    });
-  }, []);
   // Primary download follows the detected OS; the other platforms + CLI are
   // quiet text links under the button. CLI copies the one-line installer.
   const [copied, setCopied] = useState(false);
   const copyCli = async () => {
     try {
       await navigator.clipboard.writeText("curl -fsSL prevail.sh/install | bash");
+      track("cli_copy", { location: "hero" });
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
       /* clipboard unavailable — no-op */
     }
   };
+  const heroSlide = DEMO_SLIDES[0];
   return (
-    <section className="relative isolate overflow-hidden pt-8 pb-10 grain lg:flex lg:min-h-screen lg:flex-col lg:justify-start lg:pt-[3vh] lg:pb-8">
+    <section className="relative isolate overflow-hidden pt-14 pb-16 grain md:pt-20">
       <div className="glow-gold absolute inset-0 -z-10" />
-      <HeroAuroras />
-      {/* You at the center — the life-domains radial is the centerpiece, with
-          the message as a halo of text above and the CTA below. */}
-      <div className="mx-auto flex max-w-7xl flex-col items-center px-6 text-center">
+      <HeroGlow />
+      <div className="mx-auto flex max-w-5xl flex-col items-center px-6 text-center">
         <FadeIn delay={0.05}>
-          <HarnessLine word={LIFE_DOMAINS[activeDomain].label} onCycle={cycleDomain} />
+          <StrikeHeadline />
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <p className="mt-4 text-base leading-relaxed text-text-soft md:text-lg">
-            Everyone's racing to automate their <span className="font-bold text-gold">job</span>.{" "}
-            <span className="text-text">We built the AI for everything else in{" "}
-            <span className="font-bold text-ai">life</span>.</span>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-text-soft md:text-lg">
+            Prevail puts <span className="text-text">Claude, GPT, Gemini, and your local models</span>{" "}
+            around one table for the decisions that matter: money, health, career, tax.
+            They debate. A chair writes <span className="font-medium text-gold">one verdict</span>.
+            Everything lands in plain files you own.
           </p>
         </FadeIn>
 
-        <FadeIn delay={0.15} y={20}>
-          <div className="mt-5 w-[clamp(342px,46.5vh,475px)] max-w-[74vw]">
-            <HeroSlider active={activeDomain} />
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={0.2}>
-          {/* Download CTA and social proof, side by side */}
-          <div className="mt-5 flex flex-col items-center justify-center gap-x-10 gap-y-5 sm:flex-row sm:items-center">
-            <div className="flex flex-col items-center">
+        <FadeIn delay={0.16}>
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a
                 href={isWindows ? exe.url : dmg.url}
                 download={isWindows ? exe.name : dmg.name}
+                onClick={() => track("download_click", { location: "hero", platform: isWindows ? "windows" : "mac" })}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-8 py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5"
                 style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
               >
                 <Download className="h-4 w-4" />
                 Download for {isWindows ? "Windows" : "macOS"}
               </a>
-              <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-text-soft">
-                <a
-                  href={isWindows ? dmg.url : exe.url}
-                  download={isWindows ? dmg.name : exe.name}
-                  className="underline-offset-2 transition-colors hover:text-text hover:underline"
-                >
-                  {isWindows ? "macOS" : "Windows"}
-                </a>
-                <span aria-hidden className="text-text-mute">·</span>
-                <button onClick={copyCli} className="underline-offset-2 transition-colors hover:text-text hover:underline">
-                  {copied ? "Copied ✓" : "CLI"}
-                </button>
-                <span aria-hidden className="text-text-mute">·</span>
-                <a href="#install" className="underline-offset-2 transition-colors hover:text-text hover:underline">all builds</a>
-              </div>
+              <a
+                href="#demo"
+                onClick={() => track("watch_demo_click", { location: "hero" })}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-8 py-3 font-medium text-text-soft transition-all hover:border-border-strong hover:text-text"
+              >
+                <Play className="h-4 w-4" />
+                Watch the demo
+              </a>
             </div>
-            <div aria-hidden className="hidden h-12 w-px bg-border-soft sm:block" />
-            <SocialProof showMeta={false} />
+            {/* Trust line — every claim here is true and verifiable */}
+            <p className="text-[13px] text-text-mute">
+              Free · Open source (GPL-3.0) · Signed &amp; notarized · No account needed
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-text-soft">
+              <a
+                href={isWindows ? dmg.url : exe.url}
+                download={isWindows ? dmg.name : exe.name}
+                onClick={() => track("download_click", { location: "hero_alt", platform: isWindows ? "mac" : "windows" })}
+                className="underline-offset-2 transition-colors hover:text-text hover:underline"
+              >
+                {isWindows ? "macOS" : "Windows"}
+              </a>
+              <span aria-hidden className="text-text-mute">·</span>
+              <button onClick={copyCli} className="underline-offset-2 transition-colors hover:text-text hover:underline">
+                {copied ? "Copied ✓" : "CLI"}
+              </button>
+              <span aria-hidden className="text-text-mute">·</span>
+              <a href="#install" className="underline-offset-2 transition-colors hover:text-text hover:underline">all builds</a>
+            </div>
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.26}>
-          <div className="mt-10 flex flex-col items-center gap-4">
-            <div className="flex max-w-full flex-nowrap items-center gap-x-4 overflow-hidden whitespace-nowrap text-text-mute">
-              <span className="shrink-0 text-[11px] uppercase tracking-[0.18em]">Works with</span>
-              {WORKS_WITH.map((w) => (
-                <div
-                  key={w.name}
-                  title={w.name}
-                  className="group flex shrink-0 items-center gap-1.5 text-text-soft transition-colors hover:text-text"
-                >
-                  <span style={{ color: w.color }} className="inline-flex">
-                    {w.render("h-[1.65rem] w-[1.65rem]")}
-                  </span>
-                  <span className="text-xs">{w.name}</span>
-                </div>
-              ))}
+        {/* The product itself, above the fold. The council demo autoplays
+            muted; the full three-clip carousel lives one section down. */}
+        <FadeIn delay={0.22} y={24}>
+          <div className="mt-12 w-full max-w-4xl">
+            <div className="overflow-hidden rounded-2xl border border-gold-border bg-black shadow-2xl">
+              <video
+                src={heroSlide.src}
+                poster={heroSlide.poster}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                onPlay={() => track("demo_play", { location: "hero", title: heroSlide.title })}
+                className="block aspect-video w-full bg-black"
+              />
             </div>
+            <p className="mt-3 text-sm text-text-mute">
+              <span className="font-medium text-text-soft">{heroSlide.title}.</span> {heroSlide.blurb}
+            </p>
+          </div>
+        </FadeIn>
+
+        {/* Model strip — recognizable brands only. Our own ecosystem tools
+            (OpenClaw, Paperclip, Hermes) get their own section further down. */}
+        <FadeIn delay={0.28}>
+          <div className="mt-12 flex max-w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 text-text-mute">
+            <span className="shrink-0 text-[11px] uppercase tracking-[0.18em]">Convenes the models you already use</span>
+            {MODEL_STRIP.map((w) => (
+              <div
+                key={w.name}
+                title={w.name}
+                className="flex shrink-0 items-center gap-1.5 text-text-soft transition-colors hover:text-text"
+              >
+                <span style={{ color: w.color }} className="inline-flex">
+                  {w.render("h-[1.4rem] w-[1.4rem]")}
+                </span>
+                <span className="text-xs">{w.name}</span>
+              </div>
+            ))}
           </div>
         </FadeIn>
       </div>
@@ -785,10 +709,20 @@ function Hero() {
   );
 }
 
-// Hero visual — the life-domains radial. Every domain orbits "You" and feeds
-// the center; a highlighted domain cycles. (Moved here from its own section.)
-function HeroSlider({ active }: { active: number }) {
+// Life-domains radial — every domain orbits "You" and feeds the center; a
+// highlighted domain cycles on a timer. Lives in the How-it-works section
+// (it explains the model; the hero's job is to show the product).
+function DomainRadial() {
   const reduce = useReducedMotion();
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const t = setInterval(
+      () => setActive((a) => (a + 1) % LIFE_DOMAINS.length),
+      2800,
+    );
+    return () => clearInterval(t);
+  }, [reduce]);
   const N = LIFE_DOMAINS.length;
   const R = 40;
   const nodes = LIFE_DOMAINS.map((d, i) => {
@@ -919,33 +853,18 @@ function Pillars() {
               text: "Wealth, health, career, tax, estate, and more. Prevail is built for the high-stakes parts of your life, each a plain folder you own. No database, no cloud.",
               color: "#6ee787",
               visual: (
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { label: "Wealth", Icon: TrendingUp },
-                    { label: "Health", Icon: Heart },
-                    { label: "Career", Icon: Briefcase },
-                    { label: "Tax", Icon: Receipt },
-                    { label: "Family", Icon: Users },
-                    { label: "Home", Icon: Home },
-                  ].map((d) => {
-                    const DIcon = d.Icon;
-                    return (
-                      <div
-                        key={d.label}
-                        className="flex flex-col items-center gap-1.5 rounded-lg border border-border-soft bg-bg/50 py-3 text-text-soft"
-                      >
-                        <DIcon className="h-4 w-4 text-[#6ee787]" />
-                        <span className="text-[10px] font-medium uppercase tracking-wider text-text-mute">{d.label}</span>
-                      </div>
-                    );
-                  })}
+                // The life-domains radial, relocated from the hero — it
+                // explains the "you at the center" model, which is exactly
+                // this card's job.
+                <div className="mx-auto w-full max-w-[300px]">
+                  <DomainRadial />
                 </div>
               ),
             },
             {
               icon: Scale,
               title: "A council, not just one model",
-              text: "Ask every AI model at once, not just one. A chair reads all the answers, writes a single verdict, and flags where they disagree. New: hand a task to an agent — Hermes, Pi, OpenCode — and it runs it end-to-end, not just answers.",
+              text: "Ask every AI model at once, not just one. A chair reads all the answers, writes a single verdict, and flags where they disagree. New: hand a task to an agent (Hermes, Pi, OpenCode) and it runs it end-to-end, not just answers.",
               color: "#c4a35a",
               visual: (
                 <div className="flex flex-col items-center">
@@ -1047,6 +966,120 @@ function Pillars() {
               </FadeIn>
             );
           })}
+        </div>
+
+        {/* The two differentiators that aren't already covered above (the
+            council and self-learning cards used to repeat here — merged). */}
+        <div className="mx-auto mt-6 grid max-w-5xl gap-6 md:grid-cols-2">
+          {DIFFERENTIATORS.map((it, i) => {
+            const Icon = it.Icon;
+            return (
+              <FadeIn key={it.title} delay={0.18 + i * 0.06}>
+                <div className="flex h-full gap-5 rounded-xl border border-border-soft bg-surface-0 p-7 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${it.color}18`, color: it.color }}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold leading-snug">{it.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-text-soft">{it.body}</p>
+                  </div>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MOMENTUM — real social proof only. The shipping cadence is genuinely
+// impressive and every claim here is verifiable: latest shipped milestones
+// from the changelog, the live GitHub star count, GPL-3.0, notarization.
+// (This replaces the old illustrative rating + generated avatars, which cost
+// more trust than they bought.)
+
+function Momentum() {
+  const latest = SHIPPED.slice(0, 3);
+  return (
+    <section className="relative border-t border-border-soft py-24 md:py-28">
+      <div className="glow-ai absolute inset-0 -z-10 opacity-20" />
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-ai">Shipping weekly</p>
+          <h2 className="mx-auto mt-4 text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
+            Built in the open. <span className="font-serif italic text-text-soft">Moving fast.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
+            {SHIPPED.length} major milestones since May 2026, every line of it GPL-3.0 on GitHub.
+          </p>
+        </FadeIn>
+        <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
+          {latest.map((r, i) => {
+            const Icon = r.Icon;
+            return (
+              <FadeIn key={r.title} delay={i * 0.06}>
+                <div className="flex h-full flex-col rounded-xl border border-border-soft bg-surface-0 p-6 transition-all hover:border-border hover:bg-surface-1">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold/10 text-gold">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="font-mono text-xs uppercase tracking-wider text-text-mute">{r.date}</span>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold leading-snug">{r.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-text-soft">{r.body}</p>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
+        <FadeIn delay={0.2}>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <GitHubStarButton size="lg" />
+            <a
+              href="/changelog"
+              className="inline-flex items-center gap-1.5 text-sm text-text-soft underline-offset-2 hover:text-text hover:underline"
+            >
+              Full changelog &amp; roadmap <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ECOSYSTEM — Prevail's own agent-stack neighbors, with one line each. Kept
+// deliberately separate from the hero's model strip: these marks are for
+// people who already live in the agent world, not for borrowed credibility.
+
+function Ecosystem() {
+  return (
+    <section className="border-t border-border-soft py-20 md:py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <FadeIn>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-gold">Plays well with your stack</p>
+          <h2 className="mx-auto mt-4 text-center text-3xl font-semibold tracking-[-0.02em] md:text-4xl text-balance">
+            One knowledge layer, <span className="font-serif italic text-text-soft">shared with your agents.</span>
+          </h2>
+        </FadeIn>
+        <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {ECOSYSTEM.map((e, i) => (
+            <FadeIn key={e.name} delay={i * 0.05}>
+              <div className="flex h-full flex-col items-center gap-3 rounded-xl border border-border-soft bg-surface-0 p-6 text-center transition-colors hover:border-border hover:bg-surface-1">
+                <span style={{ color: e.color }} className="inline-flex">
+                  {e.render("h-8 w-8")}
+                </span>
+                <span className="font-semibold">{e.name}</span>
+                <span className="text-xs leading-relaxed text-text-mute">{e.blurb}</span>
+              </div>
+            </FadeIn>
+          ))}
         </div>
       </div>
     </section>
@@ -1156,6 +1189,7 @@ function AppPane({ platform }: { platform: "mac" | "win" }) {
         <a
           href={build.url}
           download={build.name}
+          onClick={() => track("download_click", { location: "install", platform })}
           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold py-3 font-medium text-bg transition-all hover:bg-gold-bright hover:-translate-y-0.5 sm:w-auto sm:px-9"
           style={{ boxShadow: "0 6px 32px rgba(196, 163, 90, 0.3)" }}
         >
@@ -1180,6 +1214,7 @@ function CmdPane({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(command);
+      track("cli_copy", { location: "install", prompt });
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
@@ -1274,7 +1309,7 @@ function DownloadSection() {
             Get it <span className="font-serif italic text-text-soft">in a click.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
-            Mac, Windows, terminal, or your agent — pick a tab and go.
+            Mac, Windows, terminal, or your agent. Pick a tab and go.
           </p>
         </FadeIn>
 
@@ -1297,8 +1332,8 @@ const FAQ = [
     a: "Every available CLI is asked the same question at once. A chair model reads all the answers and writes a single verdict: plus a panel that surfaces where the panelists disagreed.",
   },
   {
-    q: "Does my data leave my Mac?",
-    a: "Your vault always stays on your Mac, in plain files you own. Whether anything leaves is your call: Bunker Mode keeps everything on-device with local models; Cloud Mode sends your prompts to the frontier models you pick. You choose, per question.",
+    q: "Does my data leave my machine?",
+    a: "Your vault always stays on your machine, in plain files you own. Whether anything leaves is your call: Bunker Mode keeps everything on-device with local models; Cloud Mode sends your prompts to the frontier models you pick. You choose, per question.",
   },
   {
     q: "Bunker Mode or Cloud Mode?",
@@ -1389,7 +1424,7 @@ function Footer() {
               },
               {
                 name: "Prevail",
-                tagline: "A private AI that learns you, local-first",
+                tagline: "AI for your life, not your job",
                 href: null,
                 tile: <Logo size={22} />,
                 tileClass: "bg-[#0c0c0e]",
@@ -1449,7 +1484,6 @@ function Footer() {
           </nav>
           <GitHubStarButton size="lg" />
           <p className="text-xs text-text-mute">© 2026 Prevail.sh · built local, shipped open</p>
-          <p className="text-[11px] text-text-mute/70">Star &amp; share on GitHub. Ratings and user counts shown on this site are illustrative.</p>
         </div>
       </div>
     </footer>
@@ -1498,7 +1532,9 @@ const DEMO_SLIDES = [
 ];
 
 function DemoVideo() {
-  const [idx, setIdx] = useState(0);
+  // Starts on the second clip: the hero already plays the council demo, so
+  // the carousel leads with something the visitor hasn't seen yet.
+  const [idx, setIdx] = useState(1);
   const n = DEMO_SLIDES.length;
   const go = (d: number) => setIdx((i) => (i + d + n) % n);
   const slide = DEMO_SLIDES[idx];
@@ -1514,7 +1550,7 @@ function DemoVideo() {
             <h2 className="mx-auto mt-4 text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
               Watch it <span className="font-serif italic text-text-soft">work.</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-full overflow-x-auto whitespace-nowrap text-sm text-text-soft md:text-base">
+            <p className="mx-auto mt-4 max-w-2xl text-sm text-text-soft md:text-base">
               <span className="font-medium text-text">{slide.title}.</span> {slide.blurb}
             </p>
           </div>
@@ -1531,7 +1567,11 @@ function DemoVideo() {
                 playsInline
                 preload="metadata"
                 controls
-                onEnded={() => go(1)}
+                onPlay={() => track("demo_play", { location: "carousel", title: slide.title })}
+                onEnded={() => {
+                  track("demo_complete", { title: slide.title });
+                  go(1);
+                }}
                 className="block aspect-video w-full bg-black"
               />
             </div>
@@ -1595,11 +1635,6 @@ function DemoVideo() {
 // ─────────────────────────────────────────────────────────────────────────────
 // THESIS PAGE — why Prevail exists. A quiet manifesto, one belief per block.
 
-// Aspirational social-proof figures. NOT real yet — surfaced with an explicit
-// "illustrative" label (here and in the footer disclaimer). Edit to the real
-// numbers once they exist; the live GitHub-star count beside them is always true.
-const ILLUSTRATIVE = { users: "5,000+", rating: "4.9" };
-
 const THESES = [
   {
     title: "AI for your life will matter more than AI for your work.",
@@ -1614,63 +1649,14 @@ const THESES = [
     body: "The wealthy keep lawyers, accountants, doctors, and wealth managers on call. AI can give everyone that same caliber of counsel, in private, for the cost of the electricity. A panel of the best models, not a single guess.",
   },
   {
-    title: "Your context is the most valuable thing you own, so it should never leave your machine.",
-    body: "The industry default is \"send us everything.\" We think that's backwards: the intelligence should come to your data, not your data to the intelligence. Local-first isn't a feature, it's the moral position. Your vault stays on your Mac, in plain files you can read and delete.",
+    title: "Your context is the most valuable thing you own.",
+    body: "The industry default is \"send us everything.\" We think ownership should come first: your vault lives in plain files on your machine, and you decide what any model sees, question by question. Frontier cloud models when you want horsepower, local models when you want privacy. Your data, your call.",
   },
   {
     title: "Your life deserves the same rigor as your code.",
     body: "We version, test, and peer-review our software. Our biggest personal decisions get a gut feeling at 11pm. That asymmetry is absurd. Prevail brings structure, a second opinion, and a durable record to the choices that matter most.",
   },
 ];
-
-// Illustrated avatars (DiceBear "personas") — modern, friendly, younger-looking
-// flat portraits. Broad skin-tone + hair-color palettes and reduced glasses make
-// the set visibly diverse. Illustrative — labelled as such.
-const PROOF_FACES = ["Maya", "Leo", "Zara", "Theo", "Iris", "Kai", "Nora", "Eli"].map(
-  (seed) =>
-    `https://api.dicebear.com/9.x/personas/svg?seed=${seed}` +
-    `&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf,c1f4d1` +
-    `&skinColor=623d36,92594b,a47c63,b16a5b,cb9e6e,e5a07e,eeb4a4` +
-    `&hairColor=1b1b1b,3a2a1d,6c4a32,a55728,b9a05f,cb6820,e0ddff,ffffff` +
-    `&glassesProbability=35`,
-);
-
-function SocialProof({ center = true, showMeta = true }: { center?: boolean; showMeta?: boolean }) {
-  return (
-    <FadeIn>
-      <div className={`flex max-w-xl flex-col gap-2.5 ${center ? "mx-auto items-center" : "items-start"}`}>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="h-4 w-4 fill-gold text-gold" />
-            ))}
-          </div>
-          <span className="text-sm font-semibold">{ILLUSTRATIVE.rating}</span>
-          <span className="text-sm text-text-soft">· Loved by {ILLUSTRATIVE.users} early users</span>
-        </div>
-        <div className="flex -space-x-2.5">
-          {PROOF_FACES.map((src, i) => (
-            <img
-              key={i}
-              src={src}
-              alt=""
-              loading="lazy"
-              className="h-9 w-9 rounded-full bg-surface-2 object-cover ring-2 ring-bg"
-            />
-          ))}
-        </div>
-        {showMeta && (
-          <div className="flex items-center gap-3">
-            <GitHubStarButton size="sm" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-mute">
-              ratings &amp; count illustrative
-            </span>
-          </div>
-        )}
-      </div>
-    </FadeIn>
-  );
-}
 
 function ThesisPage() {
   const dmg = useDmgDownload();
@@ -1691,8 +1677,8 @@ function ThesisPage() {
               keeps it yours.
             </p>
           </FadeIn>
-          <div className="mt-10">
-            <SocialProof />
+          <div className="mt-10 flex justify-center">
+            <GitHubStarButton size="lg" />
           </div>
         </div>
       </section>
@@ -1751,22 +1737,11 @@ const LIFE_DOMAINS: { label: string; Icon: typeof Heart }[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DIFFERENTIATORS — the genuinely unique stuff: a council you assemble,
-// self-learning memory, proactive loops, and Bunker/Cloud control.
+// DIFFERENTIATORS — rendered inside the How-it-works section. Only the two
+// ideas the three pillar cards don't already cover: proactive loops and the
+// Bunker/Cloud control. (Council and self-learning used to repeat here.)
 
 const DIFFERENTIATORS = [
-  {
-    Icon: Users,
-    color: "#c4a35a",
-    title: "A council you assemble",
-    body: "Pick which models sit on the council. They answer in parallel, a chair you choose writes one verdict, and the panel shows exactly where they disagreed.",
-  },
-  {
-    Icon: Sparkles,
-    color: "#5fbfff",
-    title: "It learns you, not just your question",
-    body: "Every decision is captured the moment you make it and distilled into living memory. The next answer already knows what you decided last time.",
-  },
   {
     Icon: Target,
     color: "#6ee787",
@@ -1777,46 +1752,9 @@ const DIFFERENTIATORS = [
     Icon: ShieldCheck,
     color: "#c4a8ff",
     title: "Bunker or Cloud, your call",
-    body: "Bunker Mode runs entirely on local models, nothing leaves your Mac. Cloud Mode brings in Claude, GPT, and Gemini for the frontier. Switch per question.",
+    body: "Bunker Mode runs entirely on local models, nothing leaves your machine. Cloud Mode brings in Claude, GPT, and Gemini for the frontier. Switch per question.",
   },
 ];
-
-function Differentiators() {
-  return (
-    <section className="relative border-t border-border-soft py-24 md:py-28">
-      <div className="glow-ai absolute inset-0 -z-10 opacity-20" />
-      <div className="mx-auto max-w-6xl px-6">
-        <FadeIn>
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-ai">More than a chatbot</p>
-          <h2 className="mx-auto mt-4 text-center text-4xl font-semibold tracking-[-0.02em] md:text-5xl text-balance">
-            It doesn't just answer. <span className="font-serif italic text-text-soft">It works for you.</span>
-          </h2>
-        </FadeIn>
-        <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
-          {DIFFERENTIATORS.map((it, i) => {
-            const Icon = it.Icon;
-            return (
-              <FadeIn key={it.title} delay={i * 0.06}>
-                <div className="flex h-full gap-5 rounded-2xl border border-border-soft bg-surface-0 p-7 transition-all hover:-translate-y-0.5 hover:border-border hover:bg-surface-1">
-                  <div
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-                    style={{ backgroundColor: `${it.color}18`, color: it.color }}
-                  >
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold leading-snug">{it.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-text-soft">{it.body}</p>
-                  </div>
-                </div>
-              </FadeIn>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LEGAL — combined Terms of Service & Privacy Policy, served at /tos (aliases
@@ -2429,7 +2367,8 @@ function LandingMain() {
       <Hero />
       <DemoVideo />
       <Pillars />
-      <Differentiators />
+      <Momentum />
+      <Ecosystem />
       <DownloadSection />
       <FAQSection />
     </main>
