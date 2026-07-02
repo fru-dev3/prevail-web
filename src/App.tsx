@@ -2133,7 +2133,7 @@ const SHIPPED = [
     tag: "Proactive",
     Icon: Activity,
     title: "Prevail reaches out",
-    body: "During your active hours, it nudges you when an approval or overdue task needs you, on the desktop and on your phone, instead of waiting to be opened.",
+    body: "During your active hours, it nudges you with a desktop notification when an approval or overdue task needs you, instead of waiting to be opened.",
     href: RELEASES_LATEST,
   },
   {
