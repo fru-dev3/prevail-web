@@ -333,24 +333,59 @@ function formatStars(n: number): string {
   return n.toString();
 }
 
-// Live, verifiable social proof: real installer downloads (GitHub counts every
-// release-asset download, so this captures site + direct-from-GitHub in one
-// number) and the live star count. Downloads come from shields.io's cached
-// total endpoint so we never hit GitHub's unauthenticated rate limit; stars
-// come straight from the repo. Both fail silently to "-" so the strip never
-// breaks the page.
+// Total installer downloads, summed from GitHub's own release data. We use
+// api.github.com (which the site already calls for stars + the latest version)
+// rather than a shields.io badge, because privacy-minded visitors often run
+// ad-blockers that drop img.shields.io, which would silently hide the number.
+// Counts .dmg + .exe across every release. Cached at module scope so the hero
+// and the momentum strip share a single fetch (kind to the rate limit).
+let _downloadTotal: Promise<number | null> | null = null;
+function fetchDownloadTotal(): Promise<number | null> {
+  if (_downloadTotal) return _downloadTotal;
+  _downloadTotal = (async () => {
+    try {
+      let total = 0;
+      for (let page = 1; page <= 2; page++) {
+        const r = await fetch(
+          `https://api.github.com/repos/fru-dev3/prevail-desktop/releases?per_page=100&page=${page}`,
+        );
+        if (!r.ok) break;
+        const rels = (await r.json()) as { assets?: { name?: string; download_count?: number }[] }[];
+        if (!Array.isArray(rels) || rels.length === 0) break;
+        for (const rel of rels)
+          for (const a of rel.assets ?? [])
+            if (typeof a.name === "string" && /\.(dmg|exe)$/.test(a.name) && typeof a.download_count === "number")
+              total += a.download_count;
+        if (rels.length < 100) break;
+      }
+      return total;
+    } catch {
+      return null;
+    }
+  })();
+  return _downloadTotal;
+}
+function useDownloadTotal(): number | null {
+  const [n, setN] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchDownloadTotal().then((v) => {
+      if (!cancelled) setN(v);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return n;
+}
+
+// Live, verifiable social proof: real installer downloads + the live star count.
+// Both fail silently to "-" so the strip never breaks the page.
 function LiveStats() {
-  const [downloads, setDownloads] = useState<string | null>(null);
+  const downloads = useDownloadTotal();
   const [stars, setStars] = useState<number | null>(null);
   useEffect(() => {
     let cancelled = false;
-    fetch("https://img.shields.io/github/downloads/fru-dev3/prevail-desktop/total.json")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => {
-        if (cancelled || !j || typeof j.value !== "string") return;
-        setDownloads(/^\d+$/.test(j.value) ? Number(j.value).toLocaleString() : j.value);
-      })
-      .catch(() => {});
     fetch("https://api.github.com/repos/fru-dev3/prevail-desktop")
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
@@ -363,7 +398,7 @@ function LiveStats() {
     };
   }, []);
   const items = [
-    { label: "Downloads", value: downloads ?? "-", Icon: Download },
+    { label: "Downloads", value: downloads !== null ? downloads.toLocaleString() : "-", Icon: Download },
     { label: "Milestones shipped", value: String(SHIPPED.length), Icon: Rocket },
     { label: "GitHub stars", value: stars !== null ? formatStars(stars) : "-", Icon: Star },
   ];
@@ -637,6 +672,7 @@ function Hero() {
   const dmg = useDmgDownload();
   const exe = useExeDownload();
   const isWindows = useIsWindows();
+  const downloads = useDownloadTotal();
   // Primary download follows the detected OS; the other platforms + CLI are
   // quiet text links under the button. CLI copies the one-line installer.
   const [copied, setCopied] = useState(false);
@@ -694,6 +730,12 @@ function Hero() {
             {/* Trust line — every claim here is true and verifiable */}
             <p className="text-[13px] text-text-mute">
               Free · Open source (GPL-3.0) · Signed &amp; notarized · No account needed
+              {downloads !== null && (
+                <>
+                  {" · "}
+                  <span className="font-semibold text-text-soft tabular-nums">{downloads.toLocaleString()}</span> downloads
+                </>
+              )}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-text-soft">
               <a
