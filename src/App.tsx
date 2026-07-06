@@ -333,6 +333,58 @@ function formatStars(n: number): string {
   return n.toString();
 }
 
+// Live, verifiable social proof: real installer downloads (GitHub counts every
+// release-asset download, so this captures site + direct-from-GitHub in one
+// number) and the live star count. Downloads come from shields.io's cached
+// total endpoint so we never hit GitHub's unauthenticated rate limit; stars
+// come straight from the repo. Both fail silently to "-" so the strip never
+// breaks the page.
+function LiveStats() {
+  const [downloads, setDownloads] = useState<string | null>(null);
+  const [stars, setStars] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("https://img.shields.io/github/downloads/fru-dev3/prevail-desktop/total.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled || !j || typeof j.value !== "string") return;
+        setDownloads(/^\d+$/.test(j.value) ? Number(j.value).toLocaleString() : j.value);
+      })
+      .catch(() => {});
+    fetch("https://api.github.com/repos/fru-dev3/prevail-desktop")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled || !j || typeof j.stargazers_count !== "number") return;
+        setStars(j.stargazers_count);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const items = [
+    { label: "Downloads", value: downloads ?? "-", Icon: Download },
+    { label: "Milestones shipped", value: String(SHIPPED.length), Icon: Rocket },
+    { label: "GitHub stars", value: stars !== null ? formatStars(stars) : "-", Icon: Star },
+  ];
+  return (
+    <div className="mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-3 sm:gap-4">
+      {items.map(({ label, value, Icon }) => (
+        <div
+          key={label}
+          className="flex flex-col items-center rounded-xl border border-border-soft bg-surface-0 px-3 py-5 text-center"
+        >
+          <Icon className="h-5 w-5 text-gold" />
+          <span className="mt-2 font-mono text-2xl font-semibold tabular-nums tracking-tight md:text-3xl">
+            {value}
+          </span>
+          <span className="mt-1 text-[11px] uppercase tracking-wider text-text-mute">{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Nav — frosted, minimal
 
@@ -1017,6 +1069,7 @@ function Momentum() {
           <p className="mx-auto mt-5 max-w-xl text-center text-lg text-text-soft">
             {SHIPPED.length} major milestones since May 2026, every line of it GPL-3.0 on GitHub.
           </p>
+          <LiveStats />
         </FadeIn>
         <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
           {latest.map((r, i) => {
