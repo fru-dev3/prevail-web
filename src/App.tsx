@@ -46,10 +46,12 @@ import {
   siClaude,
   siGooglegemini,
   siOllama,
+  siProducthunt,
 } from "simple-icons";
 import { APP_VERSION, useLatestVersion, useLiveVersion } from "./version";
 
 const GITHUB_DESKTOP = "https://github.com/fru-dev3/prevail-desktop";
+const PRODUCT_HUNT_URL = "https://www.producthunt.com/products/prevail-2?launch=prevail";
 // Download is served from GitHub Releases, NOT this site. GitHub has no
 // bandwidth limit for release assets; serving a ~32 MB DMG from Netlify blew
 // the free-tier bandwidth quota and took the whole site down. `latest/download`
@@ -692,6 +694,20 @@ function Hero() {
       <div className="glow-gold absolute inset-0 -z-10" />
       <HeroGlow />
       <div className="mx-auto flex max-w-5xl flex-col items-center px-6 text-center">
+        <FadeIn delay={0}>
+          <a
+            href={PRODUCT_HUNT_URL}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => track("product_hunt_click", { location: "hero" })}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 px-4 py-1.5 text-[13px] font-medium text-text-soft transition-all hover:border-border-strong hover:text-text hover:-translate-y-0.5"
+          >
+            <SimpleIcon icon={siProducthunt} className="h-4 w-4 shrink-0 text-[#DA552F]" />
+            We're live on Product Hunt
+            <ArrowRight className="h-3.5 w-3.5" />
+          </a>
+        </FadeIn>
+
         <FadeIn delay={0.05}>
           <StrikeHeadline />
         </FadeIn>
@@ -727,15 +743,19 @@ function Hero() {
                 Watch the demo
               </a>
             </div>
+            {/* Live download total, promoted from a trust-line footnote to a
+                stat of its own — it's the strongest proof we have. */}
+            {downloads !== null && (
+              <p className="mt-1 flex items-baseline justify-center gap-2">
+                <span className="font-mono text-2xl font-semibold tabular-nums text-gold md:text-3xl">
+                  {downloads.toLocaleString()}
+                </span>
+                <span className="text-sm text-text-soft">downloads and counting</span>
+              </p>
+            )}
             {/* Trust line — every claim here is true and verifiable */}
             <p className="text-[13px] text-text-mute">
               Free · Open source (GPL-3.0) · Signed &amp; notarized · No account needed
-              {downloads !== null && (
-                <>
-                  {" · "}
-                  <span className="font-semibold text-text-soft tabular-nums">{downloads.toLocaleString()}</span> downloads
-                </>
-              )}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-text-soft">
               <a
@@ -1574,6 +1594,16 @@ function Footer() {
           </p>
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-text-soft">
             <a href="/changelog" className="hover:text-text">Changelog &amp; roadmap</a>
+            <a
+              href={PRODUCT_HUNT_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => track("product_hunt_click", { location: "footer" })}
+              className="inline-flex items-center gap-1.5 hover:text-text"
+            >
+              <SimpleIcon icon={siProducthunt} className="h-3.5 w-3.5 shrink-0 text-[#DA552F]" />
+              Product Hunt
+            </a>
             <a href="/tos" className="hover:text-text">Terms of Service</a>
             <a href="/privacy" className="hover:text-text">Privacy Policy</a>
           </nav>
