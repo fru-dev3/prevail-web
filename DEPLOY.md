@@ -13,7 +13,7 @@ Landing page for **Prevail** — *One question. Four engines. One verdict.*
 | **Netlify default** | https://prevail-site.netlify.app | ✅ live |
 | **Repo** | https://github.com/fru-dev3/prevail-web | |
 | **Netlify admin** | https://app.netlify.com/projects/prevail-site | |
-| **Site ID** | `68129d3b-87a5-4c7f-bc51-78078bd286e2` | |
+| **Site ID** | `<your-netlify-site-id>` | |
 
 ---
 
@@ -52,7 +52,7 @@ Check status:
 
 ```bash
 netlify api showSiteTLSCertificate \
-  --data='{"site_id":"68129d3b-87a5-4c7f-bc51-78078bd286e2"}'
+  --data='{"site_id":"<your-netlify-site-id>"}'
 ```
 
 If SSL doesn't auto-issue within an hour, force it:
@@ -83,7 +83,7 @@ For most users, **just add the 2 records at GoDaddy** above and move on.
 ### Manual deploy (from any machine with this repo cloned)
 
 ```bash
-cd /Users/dev/Documents/fru/fd-apps/fd-apps-prevail-site
+cd /path/to/prevail-web
 git pull
 netlify deploy --prod --build
 ```
@@ -100,7 +100,7 @@ Required secrets (already configured in this repo):
 | Secret | Value |
 |---|---|
 | `NETLIFY_AUTH_TOKEN` | Personal token from `~/Library/Preferences/netlify/config.json` |
-| `NETLIFY_SITE_ID` | `68129d3b-87a5-4c7f-bc51-78078bd286e2` |
+| `NETLIFY_SITE_ID` | `<your-netlify-site-id>` |
 
 Rotate by running:
 
