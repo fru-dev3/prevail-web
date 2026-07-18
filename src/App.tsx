@@ -45,6 +45,7 @@ import {
   siApple,
   siClaude,
   siGooglegemini,
+  siObsidian,
   siOllama,
   siProducthunt,
 } from "simple-icons";
@@ -269,6 +270,7 @@ const ECOSYSTEM = [
   { name: "OpenClaw", color: "#ff4d4d", blurb: "Chat gateway on Telegram & WhatsApp", render: (c: string) => <OpenClawMark className={c} /> },
   { name: "Paperclip", color: "#0092b7", blurb: "A team of agents for your work", render: (c: string) => <Paperclip className={c} /> },
   { name: "Hermes", color: "#c4a8ff", blurb: "An agent harness for autonomous tasks", render: (c: string) => <HermesBrand className={c} /> },
+  { name: "Obsidian", color: "#7c3aed", blurb: "Bring your existing Obsidian vault into Prevail", render: (c: string) => <SimpleIcon icon={siObsidian} className={c} /> },
   { name: "MCP", color: "#6ee787", blurb: "Your vault, readable by any MCP client", render: (c: string) => <Plug className={c} /> },
 ];
 
