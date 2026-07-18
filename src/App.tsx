@@ -764,19 +764,8 @@ function Hero() {
   const exe = useExeDownload();
   const isWindows = useIsWindows();
   const downloads = useDownloadTotal();
-  // Primary download follows the detected OS; the other platforms + CLI are
-  // quiet text links under the button. CLI copies the one-line installer.
-  const [copied, setCopied] = useState(false);
-  const copyCli = async () => {
-    try {
-      await navigator.clipboard.writeText("curl -fsSL prevail.sh/install | bash");
-      track("cli_copy", { location: "hero" });
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      /* clipboard unavailable — no-op */
-    }
-  };
+  // Primary download follows the detected OS; every other build lives in
+  // the Install section below.
   const heroSlide = DEMO_SLIDES[0];
   return (
     <section className="relative isolate overflow-hidden pt-14 pb-16 grain md:pt-20">
@@ -839,26 +828,6 @@ function Hero() {
             {/* Live download total, promoted from a trust-line footnote to
                 an odometer of its own — it's the strongest proof we have. */}
             {downloads !== null && <DownloadCounter value={downloads} />}
-            {/* Trust line — every claim here is true and verifiable */}
-            <p className="text-[13px] text-text-mute">
-              Free · Open source (GPL-3.0) · Signed &amp; notarized · No account needed
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-text-soft">
-              <a
-                href={isWindows ? dmg.url : exe.url}
-                download={isWindows ? dmg.name : exe.name}
-                onClick={() => track("download_click", { location: "hero_alt", platform: isWindows ? "mac" : "windows" })}
-                className="underline-offset-2 transition-colors hover:text-text hover:underline"
-              >
-                {isWindows ? "macOS" : "Windows"}
-              </a>
-              <span aria-hidden className="text-text-mute">·</span>
-              <button onClick={copyCli} className="underline-offset-2 transition-colors hover:text-text hover:underline">
-                {copied ? "Copied ✓" : "CLI"}
-              </button>
-              <span aria-hidden className="text-text-mute">·</span>
-              <a href="#install" className="underline-offset-2 transition-colors hover:text-text hover:underline">all builds</a>
-            </div>
           </div>
         </FadeIn>
 
