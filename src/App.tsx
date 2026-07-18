@@ -670,51 +670,14 @@ function Logo({ size = 24, animated = false }: { size?: number; animated?: boole
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HEADLINE — the editor's strike, in plain language. Everyone built AI agents
-// for work; Prevail is the one for your life. One animation trick only: the
-// gold strike through "your job". No typewriter, no jargon — the headline is
-// always whole and readable, and it passes the five-second "what is this?"
-// test. The reduced-motion / SSR state lands on the finished correction.
-function StrikeHeadline() {
-  const reduce = useReducedMotion();
-  // Dim "your job" only after the strike has been drawn.
-  const [struck, setStruck] = useState(!!reduce);
-  useEffect(() => {
-    if (reduce) return;
-    const t = setTimeout(() => setStruck(true), 1000);
-    return () => clearTimeout(t);
-  }, [reduce]);
-
-  const strikeT = reduce
-    ? { duration: 0 }
-    : { duration: 0.45, delay: 0.55, ease: EASE };
-
+// HEADLINE — one line, always (clamp is sized so the nowrap never overflows
+// the max-w-5xl container): a challenge, then the brand as the answer.
+function Headline() {
   return (
-    <h1 className="text-center font-semibold tracking-[-0.02em] leading-[1.08] text-[clamp(2rem,6.4vw,4.6rem)]">
-      <span className="flex flex-wrap items-baseline justify-center gap-x-3 sm:gap-x-4">
-        <span className="text-text">
-          <span className="text-ai">AI</span> agents for
-        </span>
-        <span className="relative inline-block whitespace-nowrap">
-          <span
-            className={`transition-colors duration-500 ${
-              struck ? "text-text-mute" : "text-text"
-            }`}
-          >
-            your job
-          </span>
-          <motion.span
-            aria-hidden
-            className="absolute inset-x-[-2px] top-1/2 h-[0.05em] -translate-y-1/2 rounded-full bg-gold"
-            style={{ transformOrigin: "left center" }}
-            initial={{ scaleX: reduce ? 1 : 0 }}
-            animate={{ scaleX: 1 }}
-            transition={strikeT}
-          />
-        </span>
-        <span className="whitespace-nowrap font-serif italic text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]">
-          your life.
-        </span>
+    <h1 className="whitespace-nowrap text-center font-semibold tracking-[-0.02em] leading-[1.08] text-[clamp(1.55rem,5vw,3.4rem)]">
+      <span className="text-text">Don&rsquo;t just keep up with AI.</span>{" "}
+      <span className="font-serif italic text-gold [text-shadow:0_2px_28px_rgba(196,163,90,0.35)]">
+        Prevail.
       </span>
     </h1>
   );
@@ -793,7 +756,7 @@ function Hero() {
         </FadeIn>
 
         <FadeIn delay={0.05}>
-          <StrikeHeadline />
+          <Headline />
         </FadeIn>
 
         <FadeIn delay={0.1}>
