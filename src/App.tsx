@@ -270,7 +270,6 @@ const ECOSYSTEM = [
   { name: "OpenClaw", color: "#ff4d4d", blurb: "Chat gateway on Telegram & WhatsApp", render: (c: string) => <OpenClawMark className={c} /> },
   { name: "Paperclip", color: "#0092b7", blurb: "A team of agents for your work", render: (c: string) => <Paperclip className={c} /> },
   { name: "Hermes", color: "#c4a8ff", blurb: "An agent harness for autonomous tasks", render: (c: string) => <HermesBrand className={c} /> },
-  { name: "Obsidian", color: "#7c3aed", blurb: "Bring your existing Obsidian vault into Prevail", render: (c: string) => <SimpleIcon icon={siObsidian} className={c} /> },
   { name: "MCP", color: "#6ee787", blurb: "Your vault, readable by any MCP client", render: (c: string) => <Plug className={c} /> },
 ];
 
@@ -803,11 +802,9 @@ function Hero() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-text-soft md:text-lg">
-            Prevail puts <span className="text-text">Claude, GPT, Gemini, and your local models</span>{" "}
-            around one table for the decisions that matter: money, health, career, tax.
-            They debate. A chair writes <span className="font-medium text-gold">one verdict</span>.
-            Everything lands in plain files you own.
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-text-soft md:text-lg">
+            <span className="text-text">Claude, GPT, Gemini, and your local models</span> debate.
+            A chair writes <span className="font-medium text-gold">one verdict</span>.
           </p>
         </FadeIn>
 
@@ -1266,7 +1263,41 @@ function Ecosystem() {
             One knowledge layer, <span className="font-serif italic text-text-soft">shared with your agents.</span>
           </h2>
         </FadeIn>
-        <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Featured: Obsidian import. Bigger than the strip cards because it's
+            an on-ramp for a whole existing vault, not just an integration. */}
+        <FadeIn>
+          <div className="mx-auto mt-12 flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-[#7c3aed]/30 bg-surface-0 p-8 md:flex-row md:gap-8 md:p-10">
+            {/* Obsidian -> Prevail import flow */}
+            <div className="flex shrink-0 items-center gap-4">
+              <span
+                className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#7c3aed]/40 bg-[#7c3aed]/10 text-[#7c3aed]"
+                style={{ boxShadow: "0 0 28px rgba(124, 58, 237, 0.35)" }}
+              >
+                <SimpleIcon icon={siObsidian} className="h-8 w-8" />
+              </span>
+              <ArrowRight className="h-5 w-5 text-text-mute" aria-hidden />
+              <span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-surface-1">
+                <Logo size={32} />
+              </span>
+            </div>
+            <div className="text-center md:text-left">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a78bfa]">New</p>
+              <h3 className="mt-1 text-xl font-semibold tracking-[-0.01em]">
+                Bring your Obsidian vault
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-text-soft">
+                Years of notes in Obsidian? Import them in one step. Wikilinks, tags, and folders
+                arrive as plain markdown in your Prevail vault, so every model on the council can
+                read what you already know. One click in the app, or{" "}
+                <code className="rounded bg-surface-1 px-1.5 py-0.5 font-mono text-[12px] text-text">
+                  prevail obsidian import
+                </code>{" "}
+                in the CLI.
+              </p>
+            </div>
+          </div>
+        </FadeIn>
+        <div className="mx-auto mt-6 grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ECOSYSTEM.map((e, i) => (
             <FadeIn key={e.name} delay={i * 0.05}>
               <div className="flex h-full flex-col items-center gap-3 rounded-xl border border-border-soft bg-surface-0 p-6 text-center transition-colors hover:border-border hover:bg-surface-1">
