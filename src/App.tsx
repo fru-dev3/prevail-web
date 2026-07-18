@@ -784,31 +784,23 @@ function Hero() {
       <HeroGlow />
       <div className="mx-auto flex max-w-5xl flex-col items-center px-6 text-center">
         <FadeIn delay={0}>
-          {/* Announcement pills: Product Hunt + the Obsidian on-ramp. Obsidian
-              gets above-the-fold billing because its community is a primary
-              audience; the pill anchors to the featured banner below. */}
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={PRODUCT_HUNT_URL}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => track("product_hunt_click", { location: "hero" })}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 px-4 py-1.5 text-[13px] font-medium text-text-soft transition-all hover:border-border-strong hover:text-text hover:-translate-y-0.5"
-            >
-              <SimpleIcon icon={siProducthunt} className="h-4 w-4 shrink-0 text-[#DA552F]" />
-              We're live on Product Hunt
-              <ArrowRight className="h-3.5 w-3.5" />
-            </a>
-            <a
-              href="#obsidian"
-              onClick={() => track("obsidian_pill_click", { location: "hero" })}
-              className="inline-flex items-center gap-2 rounded-full border border-[#7c3aed]/40 bg-surface-0 px-4 py-1.5 text-[13px] font-medium text-text-soft transition-all hover:border-[#7c3aed]/70 hover:text-text hover:-translate-y-0.5"
-            >
-              <SimpleIcon icon={siObsidian} className="h-4 w-4 shrink-0 text-[#a78bfa]" />
-              New: bring your Obsidian vault
-              <ArrowRight className="h-3.5 w-3.5" />
-            </a>
-          </div>
+          {/* The Obsidian on-ramp owns the sole top slot (Product Hunt keeps
+              its footer badge): the Obsidian community is a primary audience,
+              and one loud pill beats two quiet ones. Anchors to the featured
+              banner below. */}
+          <a
+            href="#obsidian"
+            onClick={() => track("obsidian_pill_click", { location: "hero" })}
+            className="mb-6 inline-flex flex-wrap items-center justify-center gap-2.5 rounded-full border border-[#7c3aed]/50 bg-[#7c3aed]/10 px-5 py-2 text-sm font-medium text-text transition-all hover:border-[#a78bfa] hover:-translate-y-0.5"
+            style={{ boxShadow: "0 0 26px rgba(124, 58, 237, 0.3)" }}
+          >
+            <SimpleIcon icon={siObsidian} className="h-5 w-5 shrink-0 text-[#a78bfa]" />
+            <span className="rounded-full bg-[#7c3aed]/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#c4b5fd]">
+              New
+            </span>
+            Bring your Obsidian vault into Prevail
+            <ArrowRight className="h-4 w-4" />
+          </a>
         </FadeIn>
 
         <FadeIn delay={0.05}>
