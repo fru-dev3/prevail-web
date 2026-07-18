@@ -761,8 +761,8 @@ function Hero() {
 
         <FadeIn delay={0.1}>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-text-soft md:text-lg">
-            <span className="text-text">Claude, GPT, Gemini, and your local models</span> debate.
-            A chair writes <span className="font-medium text-gold">one verdict</span>.
+            One <span className="text-text">adaptive intelligence harness</span> for everything you
+            manage, build, decide, and <span className="font-medium text-gold">become</span>.
           </p>
         </FadeIn>
 
