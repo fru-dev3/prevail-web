@@ -784,17 +784,31 @@ function Hero() {
       <HeroGlow />
       <div className="mx-auto flex max-w-5xl flex-col items-center px-6 text-center">
         <FadeIn delay={0}>
-          <a
-            href={PRODUCT_HUNT_URL}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => track("product_hunt_click", { location: "hero" })}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 px-4 py-1.5 text-[13px] font-medium text-text-soft transition-all hover:border-border-strong hover:text-text hover:-translate-y-0.5"
-          >
-            <SimpleIcon icon={siProducthunt} className="h-4 w-4 shrink-0 text-[#DA552F]" />
-            We're live on Product Hunt
-            <ArrowRight className="h-3.5 w-3.5" />
-          </a>
+          {/* Announcement pills: Product Hunt + the Obsidian on-ramp. Obsidian
+              gets above-the-fold billing because its community is a primary
+              audience; the pill anchors to the featured banner below. */}
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href={PRODUCT_HUNT_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => track("product_hunt_click", { location: "hero" })}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-0 px-4 py-1.5 text-[13px] font-medium text-text-soft transition-all hover:border-border-strong hover:text-text hover:-translate-y-0.5"
+            >
+              <SimpleIcon icon={siProducthunt} className="h-4 w-4 shrink-0 text-[#DA552F]" />
+              We're live on Product Hunt
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+            <a
+              href="#obsidian"
+              onClick={() => track("obsidian_pill_click", { location: "hero" })}
+              className="inline-flex items-center gap-2 rounded-full border border-[#7c3aed]/40 bg-surface-0 px-4 py-1.5 text-[13px] font-medium text-text-soft transition-all hover:border-[#7c3aed]/70 hover:text-text hover:-translate-y-0.5"
+            >
+              <SimpleIcon icon={siObsidian} className="h-4 w-4 shrink-0 text-[#a78bfa]" />
+              New: bring your Obsidian vault
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
         </FadeIn>
 
         <FadeIn delay={0.05}>
@@ -1266,7 +1280,10 @@ function Ecosystem() {
         {/* Featured: Obsidian import. Bigger than the strip cards because it's
             an on-ramp for a whole existing vault, not just an integration. */}
         <FadeIn>
-          <div className="mx-auto mt-12 flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-[#7c3aed]/30 bg-surface-0 p-8 md:flex-row md:gap-8 md:p-10">
+          <div
+            id="obsidian"
+            className="mx-auto mt-12 flex max-w-4xl scroll-mt-24 flex-col items-center gap-6 rounded-2xl border border-[#7c3aed]/30 bg-surface-0 p-8 md:flex-row md:gap-8 md:p-10"
+          >
             {/* Obsidian -> Prevail import flow */}
             <div className="flex shrink-0 items-center gap-4">
               <span
