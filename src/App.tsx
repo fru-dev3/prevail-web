@@ -761,7 +761,7 @@ function Hero() {
 
         <FadeIn delay={0.1}>
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-text-soft md:text-lg">
-            One <span className="text-text">adaptive intelligence harness</span> for everything you
+            Your <span className="text-text">adaptive intelligence</span> for everything you
             manage, build, decide, and <span className="font-medium text-gold">become</span>.
           </p>
         </FadeIn>
