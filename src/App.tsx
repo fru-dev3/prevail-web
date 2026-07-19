@@ -428,26 +428,35 @@ function DownloadCounter({ value }: { value: number }) {
 // api.github.com (which the site already calls for stars + the latest version)
 // rather than a shields.io badge, because privacy-minded visitors often run
 // ad-blockers that drop img.shields.io, which would silently hide the number.
-// Counts .dmg + .exe across every release. Cached at module scope so the hero
-// and the momentum strip share a single fetch (kind to the rate limit).
+// Desktop installers (.dmg/.exe) plus CLI binaries (.tar.gz; their .sha256
+// sidecars don't match) across every release of both repos. The desktop
+// updater tarball lives in the desktop repo, so the cli-only .tar.gz rule
+// never counts auto-updates. Cached at module scope so the hero and the
+// momentum strip share a single fetch (kind to the rate limit).
+const DOWNLOAD_SOURCES: { repo: string; asset: RegExp }[] = [
+  { repo: "fru-dev3/prevail-desktop", asset: /\.(dmg|exe)$/ },
+  { repo: "fru-dev3/prevail-cli", asset: /\.tar\.gz$/ },
+];
 let _downloadTotal: Promise<number | null> | null = null;
 function fetchDownloadTotal(): Promise<number | null> {
   if (_downloadTotal) return _downloadTotal;
   _downloadTotal = (async () => {
     try {
       let total = 0;
-      for (let page = 1; page <= 2; page++) {
-        const r = await fetch(
-          `https://api.github.com/repos/fru-dev3/prevail-desktop/releases?per_page=100&page=${page}`,
-        );
-        if (!r.ok) break;
-        const rels = (await r.json()) as { assets?: { name?: string; download_count?: number }[] }[];
-        if (!Array.isArray(rels) || rels.length === 0) break;
-        for (const rel of rels)
-          for (const a of rel.assets ?? [])
-            if (typeof a.name === "string" && /\.(dmg|exe)$/.test(a.name) && typeof a.download_count === "number")
-              total += a.download_count;
-        if (rels.length < 100) break;
+      for (const src of DOWNLOAD_SOURCES) {
+        for (let page = 1; page <= 3; page++) {
+          const r = await fetch(
+            `https://api.github.com/repos/${src.repo}/releases?per_page=100&page=${page}`,
+          );
+          if (!r.ok) break;
+          const rels = (await r.json()) as { assets?: { name?: string; download_count?: number }[] }[];
+          if (!Array.isArray(rels) || rels.length === 0) break;
+          for (const rel of rels)
+            for (const a of rel.assets ?? [])
+              if (typeof a.name === "string" && src.asset.test(a.name) && typeof a.download_count === "number")
+                total += a.download_count;
+          if (rels.length < 100) break;
+        }
       }
       return total;
     } catch {
